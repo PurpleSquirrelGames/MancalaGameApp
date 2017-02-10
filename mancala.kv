@@ -1,0 +1,23 @@
+#:kivy 1.9.1
+
+MancalaScreenManagement:
+    GameScreen:
+    SettingsScreen:
+
+<GameScreen>
+    name: "game_screen"
+    RelativeLayout:
+        canvas:
+            Rectangle:
+                source: 'assets/img/birch-game-board.png'
+                pos: self.pos
+                size: self.size
+
+<SettingsScreen>
+    name: "settings_screen"
+    RelativeLayout:
+        canvas:
+            Rectangle:
+                source: 'assets/img/settings.png'
+                pos: self.pos
+                size: self.size
