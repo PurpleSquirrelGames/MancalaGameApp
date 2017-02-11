@@ -6,16 +6,16 @@ MancalaScreenManagement:
 
 <GameScreen>
     name: "game_screen"
-    RelativeLayout:
+    FixedLayout:
         canvas:
             Rectangle:
                 source: 'assets/img/birch-game-board.png'
-                pos: self.pos
-                size: self.size
+                pos: (0, 0)
+                size: (1920, 1080)
 
 <SettingsScreen>
     name: "settings_screen"
-    RelativeLayout:
+    FixedLayout:
         canvas:
             Rectangle:
                 source: 'assets/img/settings.png'

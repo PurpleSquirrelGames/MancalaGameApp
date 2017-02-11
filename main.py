@@ -5,6 +5,8 @@ from kivy.lang import Builder
 from kivy.uix.screenmanager import ScreenManager, Screen, FadeTransition
 from kivy.uix.widget import Widget 
 
+from fixedlayout import FixedLayout
+
 __version__ = '0.0.1'
 
 class GameScreen(Screen):
