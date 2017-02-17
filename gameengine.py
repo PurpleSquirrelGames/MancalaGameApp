@@ -1,4 +1,5 @@
 import easyAI
+from copy import copy
 
 USER = 1
 AI = 2
@@ -29,25 +30,29 @@ OWNER = 0
 NEXT = 1
 ROLE = 2
 OPP = 3
+DISTPIT = 4
 
 HOUSE=88
 STORE=99
 
+#     13   12   11   10   09   08        AI
+# 14                               07
+#     01   02   03   04   05   06        USER
 P = {
-     1: {OWNER: USER, NEXT: {USER:  2, AI:  2}, ROLE: HOUSE, OPP: 13},
-     2: {OWNER: USER, NEXT: {USER:  3, AI:  3}, ROLE: HOUSE, OPP: 12},
-     3: {OWNER: USER, NEXT: {USER:  4, AI:  4}, ROLE: HOUSE, OPP: 11},
-     4: {OWNER: USER, NEXT: {USER:  5, AI:  5}, ROLE: HOUSE, OPP: 10},
-     5: {OWNER: USER, NEXT: {USER:  6, AI:  6}, ROLE: HOUSE, OPP:  9},
-     6: {OWNER: USER, NEXT: {USER:  7, AI:  8}, ROLE: HOUSE, OPP:  8},
-     7: {OWNER: USER, NEXT: {USER:  8, AI:  8}, ROLE: STORE, OPP: None},
-     8: {OWNER: AI  , NEXT: {USER:  9, AI:  9}, ROLE: HOUSE, OPP:  6},
-     9: {OWNER: AI  , NEXT: {USER: 10, AI: 10}, ROLE: HOUSE, OPP:  5},
-    10: {OWNER: AI  , NEXT: {USER: 11, AI: 11}, ROLE: HOUSE, OPP:  4},
-    11: {OWNER: AI  , NEXT: {USER: 12, AI: 12}, ROLE: HOUSE, OPP:  3},
-    12: {OWNER: AI  , NEXT: {USER: 13, AI: 13}, ROLE: HOUSE, OPP:  2},
-    13: {OWNER: AI  , NEXT: {USER:  1, AI: 14}, ROLE: HOUSE, OPP:  1},
-    14: {OWNER: AI  , NEXT: {USER:  1, AI:  1}, ROLE: STORE, OPP: None},
+     1: {OWNER: USER, NEXT: {USER:  2, AI:  2}, ROLE: HOUSE, OPP: 13, DISTPIT: {USER:  6, AI: 12}},
+     2: {OWNER: USER, NEXT: {USER:  3, AI:  3}, ROLE: HOUSE, OPP: 12, DISTPIT: {USER:  5, AI: 11}},
+     3: {OWNER: USER, NEXT: {USER:  4, AI:  4}, ROLE: HOUSE, OPP: 11, DISTPIT: {USER:  4, AI: 10}},
+     4: {OWNER: USER, NEXT: {USER:  5, AI:  5}, ROLE: HOUSE, OPP: 10, DISTPIT: {USER:  3, AI:  9}},
+     5: {OWNER: USER, NEXT: {USER:  6, AI:  6}, ROLE: HOUSE, OPP:  9, DISTPIT: {USER:  2, AI:  8}},
+     6: {OWNER: USER, NEXT: {USER:  7, AI:  8}, ROLE: HOUSE, OPP:  8, DISTPIT: {USER:  1, AI:  7}},
+     7: {OWNER: USER, NEXT: {USER:  8, AI:  8}, ROLE: STORE, OPP: -1, DISTPIT: None},
+     8: {OWNER: AI  , NEXT: {USER:  9, AI:  9}, ROLE: HOUSE, OPP:  6, DISTPIT: {USER: 12, AI:  6}},
+     9: {OWNER: AI  , NEXT: {USER: 10, AI: 10}, ROLE: HOUSE, OPP:  5, DISTPIT: {USER: 11, AI:  5}},
+    10: {OWNER: AI  , NEXT: {USER: 11, AI: 11}, ROLE: HOUSE, OPP:  4, DISTPIT: {USER: 10, AI:  4}},
+    11: {OWNER: AI  , NEXT: {USER: 12, AI: 12}, ROLE: HOUSE, OPP:  3, DISTPIT: {USER:  9, AI:  3}},
+    12: {OWNER: AI  , NEXT: {USER: 13, AI: 13}, ROLE: HOUSE, OPP:  2, DISTPIT: {USER:  8, AI:  2}},
+    13: {OWNER: AI  , NEXT: {USER:  1, AI: 14}, ROLE: HOUSE, OPP:  1, DISTPIT: {USER:  7, AI:  1}},
+    14: {OWNER: AI  , NEXT: {USER:  1, AI:  1}, ROLE: STORE, OPP: -1, DISTPIT: None},
 }
 ALL_PITS = range(1, 14)
 
@@ -66,9 +71,34 @@ class KalahGame(easyAI.TwoPlayersGame):
         self.seeds_per_house = 4
         self.board[HAND] = 12*self.seeds_per_house
         self.reset_board()
+
+    def is_stopping_in_own_store(self, pit):
+        count = self.board[pit] % 13  # if seeds > 12 then they wrap around board; so modulo 13
+        return count == P[pit][DISTPIT][self.nplayer]
         
     def possible_moves(self):
-        return self.possible_moves_choices()
+        move_list = [[pit] for pit in self.possible_moves_choices()]
+        completed_list = []
+        self.recurse_moves(move_list, completed_list)
+        return completed_list
+
+    def recurse_moves(self, move_list, completed_list):
+        for move in move_list:
+            last_pit = move[-1]
+            if self.is_stopping_in_own_store(last_pit):
+                board_copy = copy(self.board)
+                self.make_move_choice(last_pit)
+                more_choices = self.possible_moves_choices()
+                if more_choices:
+                    next_todo = []
+                    for pit in more_choices:
+                        next_todo.append(move+[pit])
+                    self.recurse_moves(next_todo, completed_list)
+                else:
+                    completed_list.append(move)
+                self.board = board_copy
+            else:
+                completed_list.append(move)
 
     def possible_moves_choices(self):
         possible = []
@@ -77,8 +107,11 @@ class KalahGame(easyAI.TwoPlayersGame):
                 possible.append(house)
         return possible
 
-    def make_move(self, house):
-        house = int(house)
+    def make_move(self, move):
+        for pit in move:
+            self.make_move_choice(pit)
+
+    def make_move_choice(self, house):
         # scoop up the house chosen
         self._scoop(house)
         current_house = house
@@ -95,6 +128,15 @@ class KalahGame(easyAI.TwoPlayersGame):
                         self._scoop(current_house)
                         self._scoop(P[current_house][OPP])
                         self._drop_all(STORE_IDX[self.nplayer])
+        # end of game scooping
+        if self.is_over():
+            # traditional end-of-game handling: both players scoop own houses into store
+            for player in PLAYER_LIST:
+                for house in HOUSE_LIST[player]:
+                    if self.board[house]:
+                        self._scoop(house)
+                if self.board[HAND]:
+                    self._drop_all(STORE_IDX[player])
     
     def is_over(self):
         for player in PLAYER_LIST:
@@ -122,8 +164,11 @@ class KalahGame(easyAI.TwoPlayersGame):
         )
         print "          01   02   03   04   05   06      USER"
 
-    def scoring(self):
-        return self.board[STORE_IDX[self.nplayer]] - self.board[STORE_IDX[self.nopponent]]
+    def scoring(self, player=None):
+        if player is None:
+            player = self.nplayer
+        other = USER if player==AI else AI        
+        return self.board[STORE_IDX[player]] - self.board[STORE_IDX[other]]
 
 #    def unmake_move(self, move):
 #        pass
@@ -151,10 +196,36 @@ class KalahGame(easyAI.TwoPlayersGame):
         self.board[pit] += self.board[HAND]
         self.board[HAND] = 0
 
+    def get_winner(self):
+        user_score = self.scoring(player=USER)
+        ai_score = self.scoring(player=AI)
+        if user_score>ai_score:
+            return USER
+        if user_score<ai_score:
+            return AI
+        return 0
 
 if __name__=="__main__":
     human = KalahHumanPlayer()
-    other_human = KalahHumanPlayer()
-    game = KalahGame([human, other_human])
+    ai = KalahAIPlayer(easyAI.Negamax(6))
+    game = KalahGame([human, ai])
 
-    game.play()
+    while not game.is_over():
+        game.show()
+        if game.nplayer==USER:
+            poss = game.possible_moves()
+            for index, move in enumerate(poss):
+                print index, move
+            index = int(input("enter move:"))
+            move = poss[index]
+        else:
+            move = game.get_move()
+            print "AI plays", move
+        game.play_move(move)
+    print
+    print "GAME OVER!"
+    print
+    print game.show()
+    print
+    print "RESULT:", ["TIE", "USER WON", "AI WON"][game.get_winner()]
+
