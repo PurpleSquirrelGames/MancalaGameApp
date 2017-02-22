@@ -1,23 +1,159 @@
 #:kivy 1.9.1
 
-MancalaScreenManagement:
-    GameScreen:
-    SettingsScreen:
+GameScreen:
 
 <GameScreen>
-    name: "game_screen"
     FixedLayout:
-        canvas:
-            Rectangle:
-                source: 'assets/img/birch-game-board.png'
-                pos: (0, 0)
-                size: (1920, 1080)
+        Image:
+            id: board_image
+            source: 'assets/img/birch-game-board.png'
+            true_place: (0, 0)
+            true_size: (1920, 1080)
+        Label:
+            id: center_message
+            text: 'here'
+            true_place: (800, 600)
+            true_font_size: 100
+            true_size: (100, 100)
+            color: (0, 0, 0, 1)
+        Image:
+            id: user_hand
+            source: 'assets/img/blue3.png'
+            true_place: (500, 0)
+            true_size: (300, 300)
+        FixedImageButton:
+            source: 'assets/img/brown190x200.png'
+            true_size: (190, 200)
+            true_place: (330, 230)
+            on_release: root.pushed_pit(1)
+        Label:
+            id: counter,1
+            text: '0'
+            true_font_size: 100
+            true_size: (100, 100)
+            true_place: (330, 130)
+            color: (0, 0, 0, 1)
 
-<SettingsScreen>
-    name: "settings_screen"
-    FixedLayout:
-        canvas:
-            Rectangle:
-                source: 'assets/img/settings.png'
-                pos: self.pos
-                size: self.size
+        FixedImageButton:
+            source: 'assets/img/brown190x200.png'
+            true_size: (190, 200)
+            true_place: (540, 230)
+            on_release: root.pushed_pit(2)
+        Label:
+            id: counter,2
+            text: '0'
+            true_font_size: 100
+            true_size: (100, 100)
+            true_place: (540, 130)
+            color: (0, 0, 0, 1)
+
+        FixedImageButton:
+            source: 'assets/img/brown190x200.png'
+            true_size: (190, 200)
+            true_place: (750, 230)
+            on_release: root.pushed_pit(3)
+        Label:
+            id: counter,3
+            text: '0'
+            true_font_size: 100
+            true_size: (100, 100)
+            true_place: (750, 130)
+            color: (0, 0, 0, 1)
+
+        FixedImageButton:
+            source: 'assets/img/brown190x200.png'
+            true_size: (190, 200)
+            true_place: (960, 230)
+            on_release: root.pushed_pit(4)
+        Label:
+            id: counter,4
+            text: '0'
+            true_font_size: 100
+            true_size: (100, 100)
+            true_place: (960, 130)
+            color: (0, 0, 0, 1)
+
+        FixedImageButton:
+            source: 'assets/img/brown190x200.png'
+            true_size: (190, 200)
+            true_place: (1170, 230)
+            on_release: root.pushed_pit(5)
+        Label:
+            id: counter,5
+            text: '0'
+            true_font_size: 100
+            true_size: (100, 100)
+            true_place: (1170, 130)
+            color: (0, 0, 0, 1)
+
+        FixedImageButton:
+            source: 'assets/img/brown190x200.png'
+            true_size: (190, 200)
+            true_place: (1380, 230)
+            on_release: root.pushed_pit(6)
+        Label:
+            id: counter,6
+            text: '0'
+            true_font_size: 100
+            true_size: (100, 100)
+            true_place: (1380, 130)
+            color: (0, 0, 0, 1)
+
+        Label:
+            id: counter,7
+            text: '0'
+            true_font_size: 100
+            true_size: (100, 100)
+            true_place: (1840, 500)
+            color: (0, 0, 0, 1)
+
+        Label:
+            id: counter,8
+            text: '0'
+            true_font_size: 100
+            true_size: (100, 100)
+            true_place: (1380, 930)
+            color: (0, 0, 0, 1)
+        Label:
+            id: counter,9
+            text: '0'
+            true_font_size: 100
+            true_size: (100, 100)
+            true_place: (1170, 930)
+            color: (0, 0, 0, 1)
+        Label:
+            id: counter,10
+            text: '0'
+            true_font_size: 100
+            true_size: (100, 100)
+            true_place: (960, 930)
+            color: (0, 0, 0, 1)
+        Label:
+            id: counter,11
+            text: '0'
+            true_font_size: 100
+            true_size: (100, 100)
+            true_place: (750, 930)
+            color: (0, 0, 0, 1)
+        Label:
+            id: counter,12
+            text: '0'
+            true_font_size: 100
+            true_size: (100, 100)
+            true_place: (540, 930)
+            color: (0, 0, 0, 1)
+        Label:
+            id: counter,13
+            text: '0'
+            true_font_size: 100
+            true_size: (100, 100)
+            true_place: (330, 930)
+            color: (0, 0, 0, 1)
+
+        Label:
+            id: counter,14
+            text: '0'
+            true_font_size: 100
+            true_size: (100, 100)
+            true_place: (10, 500)
+            color: (0, 0, 0, 1)

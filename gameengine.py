@@ -64,8 +64,8 @@ class KalahAIPlayer(easyAI.AI_Player):
 
 class KalahGame(easyAI.TwoPlayersGame):
 
-    def __init__(self, players):
-        self.players = players
+    def __init__(self):
+        self.players = [KalahHumanPlayer(), KalahAIPlayer(easyAI.Negamax(6))]
         self.nplayer = 1
         self.board = [0]*15
         self.seeds_per_house = 4
@@ -206,9 +206,7 @@ class KalahGame(easyAI.TwoPlayersGame):
         return 0
 
 if __name__=="__main__":
-    human = KalahHumanPlayer()
-    ai = KalahAIPlayer(easyAI.Negamax(6))
-    game = KalahGame([human, ai])
+    game = KalahGame()
 
     while not game.is_over():
         game.show()
