@@ -1,6 +1,9 @@
+import thread
 from kivy.app import App
+from kivy.animation import Animation
 from kivy.clock import Clock
 from kivy.factory import Factory 
+from kivy.garden.progressspinner import ProgressSpinner
 from kivy.lang import Builder
 from kivy.uix.screenmanager import ScreenManager, Screen, FadeTransition
 from kivy.uix.widget import Widget 
@@ -52,15 +55,13 @@ class PendingStartState(State):
 class InitGameState(State):
 
     def on_entry(self):
+        self.ref['kivy'].wait_on_ai.stop_spinning()
         self.ref["game"].reset_board()
         if self.ref["settings"]["user_first_player"]:
-            self.ref["kivy"].center_message.text = "Player, choose a house."
-            self.change_state("wait_for_pit")
+            self.change_state("start_user_turn")
         else:
             self.change_state("ai_thinking")
 
-    def on_exit(self):
-        self.ref["choices_so_far"] = []
 
 def grab(alist, index):
     try:
@@ -73,7 +74,13 @@ def display_board(board, kivy_ids):
         if pit > 0:
             pit_id = "counter,{}".format(pit)
             kivy_ids[pit_id].text = str(count)
-            #print count, pit_id, kivy_ids[pit_id].text
+
+class StartUserTurn(State):
+
+    def on_entry(self):
+        self.ref["kivy"].center_message.text = "Player, choose a house."
+        self.ref["choices_so_far"] = []
+        self.change_state("wait_for_pit")
 
 class WaitForPitButtons(State):
 
@@ -107,24 +114,47 @@ class AnitmateUserChoiceState(State):
             self.ref["choices_so_far"] = []
             self.change_state("ai_thinking")
         else:
+            self.ref['kivy'].center_message.text ="landed in store. play again."
             self.change_state("wait_for_pit")
 
     def on_exit(self):
         display_board(self.ref['game'].board, self.ref['kivy'])
 
+
+def get_ai_move():
+    global game
+    global machine
+    choices = game.get_move()
+    machine.input("ai_move", choices)
+
+
 class AIThinkingState(State):
     
     def on_entry(self):
         self.ref['kivy'].center_message.text = "AI is thinking"
-        self.ref['ai_choices'] = self.ref['game'].get_move()
-        self.change_state("animate_ai")
+        self.ref['kivy'].wait_on_ai.start_spinning()
+        thread.start_new_thread(get_ai_move, ())
+
+    def input(self, input_name, *args, **kwargs):
+        if input_name == "ai_move":
+            self.ref["ai_choices"] = args[0]
+            self.ref["kivy"].wait_on_ai.stop_spinning()
+            self.change_state("animate_ai")
 
 class AnimateAIChoicesState(State):
 
     def on_entry(self):
         self.ref['kivy'].center_message.text = "animating {}".format(self.ref['ai_choices'])
         self.ref['game'].play_move(self.ref['ai_choices'])
-        self.change_state('wait_for_pit')
+        move_hand = Animation(pos_hint=(400, 300))+Animation(pos_hint=(500, 0))
+        move_hand.bind(on_complete = self.done_moving_hand)
+        move_hand.start(self.ref['kivy'].user_hand)
+
+    def done_moving_hand(self, sequence, widget):
+        if self.ref['game'].is_over():
+            self.change_state("eog")
+        else:
+            self.change_state('start_user_turn')
 
     def on_exit(self):
         display_board(self.ref['game'].board, self.ref['kivy'])
@@ -137,6 +167,7 @@ if __name__=='__main__':
     game = KalahGame()
     machine.bind_reference("game", game)
     machine.bind_reference("settings", settings)
+    machine.register_state(StartUserTurn("start_user_turn"))
     machine.register_state(PendingStartState("pending_start"))
     machine.register_state(InitGameState("init_game"))
     machine.register_state(WaitForPitButtons("wait_for_pit"))
