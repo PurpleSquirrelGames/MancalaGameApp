@@ -12,6 +12,7 @@ class StateMachine(object):
             raise KeyError("Unable to locate 'state_name' in state object {}.".format(state))
         state_name = state.state_name
         state.change_state = self.change_state # binding parent function to child
+        state.get_state = self.get_state
         state.ref = self.ref
         self.state_dict[state_name] = state
         if self.DEBUG: print "REGISTERED {} {}".format(state_name, state)
@@ -27,21 +28,29 @@ class StateMachine(object):
         if state_name not in self.state_dict:
             raise KeyError("Unable to locate a state of '{}'.".format(state_name))
         if self.current_state is not None:
-            if self.DEBUG: print "EXITING STATE ", self.current_state
             if "on_exit" in dir(self.state_dict[self.current_state]):
+                # obliterate the 'change state' function to prevent use
                 self.state_dict[self.current_state].change_state = None
                 self.state_dict[self.current_state].on_exit()
+                # restore the change state function
                 self.state_dict[self.current_state].change_state = self.change_state
-        if self.DEBUG: print "ENTERING STATE ", state_name
         # Special NOTE: because 'on_entry' might also invoke 'change_state', it is
         # critical that the state_name be changed FIRST, or you will end up in
         # the wrong state due to recursion
+        previous_state = self.current_state
         self.current_state = state_name
+        if self.DEBUG: print "STATE CHANGE {} -> {}".format(previous_state, state_name)
         if "on_entry" in dir(self.state_dict[state_name]):
             self.state_dict[state_name].on_entry()
+            # print "STATE AFTER ON_ENTRY", self.current_state
+        return self.get_state()
 
     def get_state(self):
-        return self.state_name
+        return self.current_state
+
+    @property
+    def same_state(self):
+        return self.current_state
 
     def input(self, input_name, *args, **kwargs):
         if self.DEBUG: print "STATE {} RECEIVED INPUT {} {} {}".format(self.current_state, input_name, args, kwargs)
@@ -69,3 +78,11 @@ class State(object):
 
     def input(self, input_name, *args, **kwargs):
         pass
+
+    def get_state(self):
+        return None
+
+    @property
+    def same_state(self):
+        return self.get_state()
+

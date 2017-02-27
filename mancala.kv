@@ -21,15 +21,24 @@ GameScreen:
             true_font_size: 100
             size_hint: (100, 100)
             color: (0, 0, 0, 1)
-        Image:
+        FixedImage:
             id: user_hand
             source: 'assets/img/blue3.png'
-            pos_hint: (500, 0)
+            pos_hint: root.HANDS[1]['pos']
+            true_spot: (150, 150)
             size_hint: (300, 300)
+        FixedImage:
+            id: ai_hand
+            source: 'assets/img/blue3.png'
+            pos_hint: root.HANDS[2]['pos']
+            true_spot: (150, 150)
+            size_hint: (300, 300)
+
         FixedImageButton:
             source: 'assets/img/brown190x200.png'
             size_hint: (190, 200)
-            pos_hint: (330, 230)
+            pos_hint: root.PITS[1]['pos']
+            true_spot: (95, 100)
             on_release: root.pushed_pit(1)
         Label:
             id: counter,1
@@ -42,7 +51,8 @@ GameScreen:
         FixedImageButton:
             source: 'assets/img/brown190x200.png'
             size_hint: (190, 200)
-            pos_hint: (540, 230)
+            pos_hint: root.PITS[2]['pos']
+            true_spot: (95, 100)
             on_release: root.pushed_pit(2)
         Label:
             id: counter,2
@@ -55,7 +65,8 @@ GameScreen:
         FixedImageButton:
             source: 'assets/img/brown190x200.png'
             size_hint: (190, 200)
-            pos_hint: (750, 230)
+            pos_hint: root.PITS[3]['pos']
+            true_spot: (95, 100)
             on_release: root.pushed_pit(3)
         Label:
             id: counter,3
@@ -68,7 +79,8 @@ GameScreen:
         FixedImageButton:
             source: 'assets/img/brown190x200.png'
             size_hint: (190, 200)
-            pos_hint: (960, 230)
+            pos_hint: root.PITS[4]['pos']
+            true_spot: (95, 100)
             on_release: root.pushed_pit(4)
         Label:
             id: counter,4
@@ -81,7 +93,8 @@ GameScreen:
         FixedImageButton:
             source: 'assets/img/brown190x200.png'
             size_hint: (190, 200)
-            pos_hint: (1170, 230)
+            pos_hint: root.PITS[5]['pos']
+            true_spot: (95, 100)
             on_release: root.pushed_pit(5)
         Label:
             id: counter,5
@@ -94,7 +107,8 @@ GameScreen:
         FixedImageButton:
             source: 'assets/img/brown190x200.png'
             size_hint: (190, 200)
-            pos_hint: (1380, 230)
+            pos_hint: root.PITS[6]['pos']
+            true_spot: (95, 100)
             on_release: root.pushed_pit(6)
         Label:
             id: counter,6

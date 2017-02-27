@@ -56,6 +56,11 @@ P = {
 }
 ALL_PITS = range(1, 14)
 
+ACTION = "action"
+COUNT = "count"
+LOC = "loc"
+
+
 class KalahHumanPlayer(easyAI.Human_Player):
     pass
 
@@ -67,6 +72,8 @@ class KalahGame(easyAI.TwoPlayersGame):
     def __init__(self):
         self.players = [KalahHumanPlayer(), KalahAIPlayer(easyAI.Negamax(6))]
         self.nplayer = 1
+        self.animate = []
+        self.want_animation = True
         self.board = [0]*15
         self.seeds_per_house = 4
         self.board[HAND] = 12*self.seeds_per_house
@@ -86,6 +93,8 @@ class KalahGame(easyAI.TwoPlayersGame):
         for move in move_list:
             last_pit = move[-1]
             if self.is_stopping_in_own_store(last_pit):
+                want_copy = self.want_animation
+                self.want_animation = False
                 board_copy = copy(self.board)
                 self.make_move_choice(last_pit)
                 more_choices = self.possible_moves_choices()
@@ -97,6 +106,7 @@ class KalahGame(easyAI.TwoPlayersGame):
                 else:
                     completed_list.append(move)
                 self.board = board_copy
+                self.want_animation = want_copy
             else:
                 completed_list.append(move)
 
@@ -108,6 +118,7 @@ class KalahGame(easyAI.TwoPlayersGame):
         return possible
 
     def make_move(self, move):
+        self.animate = []
         for pit in move:
             self.make_move_choice(pit)
 
@@ -125,11 +136,15 @@ class KalahGame(easyAI.TwoPlayersGame):
             if P[current_house][OWNER]==self.nplayer:
                 if P[current_house][ROLE]==HOUSE:
                     if self.board[P[current_house][OPP]]:
+                        if self.want_animation:
+                            self.animate.append({ACTION: "steal"})
                         self._scoop(current_house)
                         self._scoop(P[current_house][OPP])
                         self._drop_all(STORE_IDX[self.nplayer])
         # end of game scooping
         if self.is_over():
+            if self.want_animation:
+                self.animate.append({ACTION: "game_over"})
             # traditional end-of-game handling: both players scoop own houses into store
             for player in PLAYER_LIST:
                 for house in HOUSE_LIST[player]:
@@ -187,14 +202,21 @@ class KalahGame(easyAI.TwoPlayersGame):
     def _scoop(self, pit):
         self.board[HAND] += self.board[pit]
         self.board[pit] = 0
+        if self.want_animation:
+            self.animate.append({ACTION: "scoop", LOC: pit})
 
     def _drop(self, pit, count=1):
         self.board[HAND] -= count
         self.board[pit] += count
+        if self.want_animation:
+            self.animate.append({ACTION: "drop", LOC: pit, COUNT: count})
 
     def _drop_all(self, pit):
+        count = self.board[HAND]
         self.board[pit] += self.board[HAND]
         self.board[HAND] = 0
+        if self.want_animation:
+            self.animate.append({ACTION: "drop_all", LOC: pit, COUNT: count})
 
     def get_winner(self):
         user_score = self.scoring(player=USER)
@@ -204,6 +226,23 @@ class KalahGame(easyAI.TwoPlayersGame):
         if user_score<ai_score:
             return AI
         return 0
+
+    def get_animation(self):
+        return self.animate
+
+    def usermove_start_simulation(self):
+        self.animate = []
+        self.original_board = copy(self.board)
+
+    def usermove_simulate_choice(self, choices_so_far):
+        self.animate = []
+        current_choice = choices_so_far[-1]
+        self.make_move_choice(current_choice)
+
+    def usermove_finish_simulation(self):
+        self.animate = []
+        self.board = self.original_board
+
 
 if __name__=="__main__":
     game = KalahGame()
