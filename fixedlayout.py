@@ -140,6 +140,7 @@ class FixedLayout(Layout):
 
 class FixedImage(Image):
 
+    true_screen_size = VariableListProperty([1920, 1080], limit=2)
     true_spot = ObjectProperty((0,0))
 
 class FixedImageButton(ButtonBehavior, FixedImage):

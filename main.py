@@ -1,4 +1,6 @@
 import thread
+import random
+from copy import copy
 from kivy.app import App
 from kivy.animation import Animation
 from kivy.clock import Clock
@@ -16,9 +18,19 @@ __version__ = '0.0.6'
 
 machine = StateMachine(debug=True)
 
+seeds = None
+
+USER = 1
+AI = 2
+
+PARKED = (2000, 2000)
+HAND = 0
+OFF_BOARD = 15
 settings = {
-    "user_first_player": True
+    "user_first_player": True,
+    "seed_drop_rate": 0.4
 }
+
 
 ##############################
 #
@@ -36,7 +48,7 @@ class GameScreen(FixedLayoutRoot):
     ]
 
     PITS = [
-        {}, #  0, hand (ignore)
+        {"pos": PARKED     }, #  0, hand
         {"pos": (430,  350)}, #  1
         {"pos": (640,  350)}, #  2
         {"pos": (850,  350)}, #  3
@@ -51,6 +63,7 @@ class GameScreen(FixedLayoutRoot):
         {"pos": (640,  770)}, # 12
         {"pos": (430,  770)}, # 13
         {"pos": (220,  770)}, # 14 ai store
+        {"pos": PARKED     }  # 15 is OFF the BOARD
     ]
 
     def pushed_pit(self, pit):
@@ -58,35 +71,150 @@ class GameScreen(FixedLayoutRoot):
 
 
 class MancalaApp(App):
+
     def build(self):
-        self.presentation = Builder.load_file('mancala.kv')
-        return self.presentation
+        presentation = Builder.load_file('mancala.kv')
 
     def on_start(self):
-        machine.bind_reference("kivy", self.presentation.ids)
+        machine.bind_reference("kivy", self.root.ids)
         machine.change_state("init_game")
 
-def build_animation(player, steps):
-    hand_list = []
-    message_list = []
-    pit_pos = GameScreen.HANDS[player]["pos"]
-    text = ""
-    for step in steps:
-        if step['action']=="scoop":
-            pit_pos = GameScreen.PITS[step["loc"]]["pos"]
-        if step['action']=="drop":
-            pit_pos = GameScreen.PITS[step["loc"]]["pos"]
-        if step['action']=="drop_all":
-            pit_pos = GameScreen.PITS[step["loc"]]["pos"]
-        if step['action']=="steal":
-            text = "Stealing!"
-        if step['action']=="game_over":
-            text = "Handling End of Game"
-        message_list.append(text)
-        hand_list.append(Animation(pos_hint=pit_pos))
-    hand_list.append(Animation(pos_hint=GameScreen.HANDS[player]["pos"]))
-    message_list.append(text)
-    return hand_list, message_list
+
+##############################
+#
+#  ANIMATION
+#
+##############################
+
+class Seeds(object):
+
+    global HAND, OFF_BOARD
+
+    def __init__(self, display):
+        self.board = [[] for x in xrange(16)]
+        self.seed_list = []
+        for index in range(4*12):
+            seed = display["seed,{}".format(index)]
+            self.seed_list.append(seed)
+            self.board[OFF_BOARD].append(seed)
+        self.display = display
+
+    def scoop(self, pit):
+        new_seeds = self.board[pit]
+        self.board[HAND] += new_seeds
+        self.board[pit] == []
+        for seed in new_seeds:
+            self._move(seed, HAND)
+
+    def drop(self, pit, count):
+        for _ in range(count):
+            if self.board[HAND]:
+                seed = self.board[HAND].pop()
+            else:
+                seed = self.board[OFF_BOARD].pop()
+            self.board[pit].append(seed)
+            self._move(seed, pit)
+
+    def _move(self, seed, pit):
+        pos_hint = GameScreen.PITS[pit]['pos']
+        x = pos_hint[0] + random.randint(-50, 50)
+        y = pos_hint[1] + random.randint(-50, 50)
+        seed.pos_hint = (x, y)
+
+
+
+class HandSeedAnimation(object):
+
+    global seeds
+    global settings
+
+    def __init__(self, player, board, display):
+        self.nplayer = player
+        self.idx = 0
+        self.board = copy(board)
+        self.display = display
+        self.animation_steps = game.animate
+        self.animation_steps.append({"action": "home"})
+        self.last_step = {}
+        if player==USER:
+            self.hand = display.user_hand
+        else:
+            self.hand = display.ai_hand
+        self.play_one_step(None, None)
+
+    def play_one_step(self, sequence, widget):
+        if self.idx<len(self.animation_steps):
+            # CLEAN UP AFTER LAST STEP
+            action = self.last_step.get('action')
+            pit = self.last_step.get('loc')
+            count = self.last_step.get('count')
+            if action=="scoop":
+                self.board[pit] = 0
+                seeds.scoop(pit)
+            elif action=="drop":
+                self.board[pit] += count
+                seeds.drop(pit, count)
+            elif action=="drop_all":
+                self.board[pit] += count
+                seeds.drop(pit, count)
+            elif action=="steal":
+                pass
+            elif action=="game_over":
+                pass
+            elif action=="normal_move":
+                pass
+            elif action=="home":
+                pass
+            # ACT ON NEW STEP
+            step = self.animation_steps[self.idx]
+            action = step['action']
+            pit = step.get('loc')
+            count = step.get('count')
+            hand_animation = None # everything is timed by hand movement
+            if step['action']=="scoop":
+                hand_animation = Animation(
+                    pos_hint=GameScreen.PITS[pit]["pos"],
+                    duration=settings['seed_drop_rate'],
+                    t='in_out_sine'
+                )
+            elif step['action']=="drop":
+                hand_animation = Animation(
+                    pos_hint=GameScreen.PITS[pit]["pos"],
+                    duration=settings['seed_drop_rate'],
+                    t='in_out_sine'
+                )
+            elif step['action']=="drop_all":
+                hand_animation = Animation(
+                    pos_hint=GameScreen.PITS[pit]["pos"],
+                    duration=settings['seed_drop_rate'],
+                    t='in_out_sine'
+                )
+            elif step['action']=="steal":
+                self.display.center_message.text = "Stealing!"
+            elif step['action']=="game_over":
+                self.display.center_message.text = "Handling End of Game"
+            elif step['action']=="setting_up":
+                self.display.center_message.text = "Setting Up Board"
+            elif step['action']=="normal_move":
+                self.display.center_message.text = ""
+            elif step['action']=="home":
+                self.display.center_message.text = ""
+                hand_animation = Animation(
+                    pos_hint = GameScreen.HANDS[self.nplayer]['pos'],
+                    duration=settings['seed_drop_rate'],
+                    t='in_out_sine'
+                )
+            # update_numbers
+            display_board(self.board, self.display)
+            if not hand_animation:
+                hand_animation = Animation(pos_hint=self.hand.pos_hint)
+            hand_animation.bind(on_complete = self.play_one_step)
+            hand_animation.start(self.hand)
+            self.idx += 1
+            self.last_step = step
+        else:
+            machine.input("animation_done")
+
 
 ##############################
 #
@@ -100,9 +228,17 @@ class PendingStartState(State):
 class InitGameState(State):
 
     def on_entry(self):
+        global seeds
+        seeds = Seeds(self.ref["kivy"])
         self.ref['kivy'].wait_on_ai.stop_spinning()
+        board_prior = copy(self.ref["game"].board)
         self.ref["game"].reset_board()
-        return self.change_state("start_turn")
+        self.animation = HandSeedAnimation(AI, board_prior, self.ref['kivy'])
+        return self.same_state
+
+    def input(self, input_name, *args, **kwargs):
+        if input_name=="animation_done":
+            return self.change_state("start_turn")
 
 
 def grab(alist, index):
@@ -151,29 +287,20 @@ class WaitForPitButtons(State):
 class AnitmateUserChoiceState(State):
 
     def on_entry(self):
+        board_prior = copy(self.ref["game"].board)
         self.ref["game"].usermove_simulate_choice(self.ref['choices_so_far'])
-        (self.move_list, self.message_list) = build_animation(
-            self.ref["game"].nplayer, 
-            self.ref["game"].get_animation()
-        )
-        self.idx = 0
-        self.done_moving_hand(None, None)
+        self.animation = HandSeedAnimation(USER, board_prior, self.ref['kivy'])
 
-    def done_moving_hand(self, sequence, widget):
-        if self.idx<len(self.move_list):
-            self.move_list[self.idx].bind(on_complete = self.done_moving_hand)
-            self.move_list[self.idx].start(self.ref['kivy'].user_hand)
-            self.ref['kivy'].center_message.text = self.message_list[self.idx]
-            self.idx += 1
-            return self.same_state
-        possible_moves = self.ref["possible_user_moves"]
-        done = any([chlist==self.ref['choices_so_far'] for chlist in possible_moves])
-        if done:
-            self.ref["game"].usermove_finish_simulation()
-            self.ref["game"].play_move(self.ref['choices_so_far'])
-            return self.change_state("start_turn")
-        self.ref['kivy'].center_message.text ="landed in store. play again."
-        return self.change_state("wait_for_pit")
+    def input(self, input_name, *args, **kwargs):
+        if input_name=="animation_done":
+            possible_moves = self.ref["possible_user_moves"]
+            done = any([chlist==self.ref['choices_so_far'] for chlist in possible_moves])
+            if done:
+                self.ref["game"].usermove_finish_simulation()
+                self.ref["game"].play_move(self.ref['choices_so_far'])
+                return self.change_state("start_turn")
+            self.ref['kivy'].center_message.text ="landed in store. play again."
+            return self.change_state("wait_for_pit")
 
     def on_exit(self):
         display_board(self.ref['game'].board, self.ref['kivy'])
@@ -202,22 +329,13 @@ class AIThinkingState(State):
 class AnimateAIChoicesState(State):
 
     def on_entry(self):
+        board_prior = copy(self.ref['game'].board)
         self.ref['game'].play_move(self.ref['ai_choices'])
-        (self.move_list, self.message_list) = build_animation(
-            self.ref["game"].nplayer, 
-            self.ref["game"].get_animation()
-        )
-        self.idx = 0
-        self.done_moving_hand(None, None)
+        self.animation = HandSeedAnimation(AI, board_prior, self.ref['kivy'])
 
-    def done_moving_hand(self, sequence, widget):
-        if self.idx<len(self.move_list):
-            self.move_list[self.idx].bind(on_complete = self.done_moving_hand)
-            self.move_list[self.idx].start(self.ref['kivy'].ai_hand)
-            self.ref['kivy'].center_message.text = self.message_list[self.idx]
-            self.idx += 1
-            return self.same_state
-        self.change_state('start_turn')
+    def input(self, input_name, *args, **kwargs):
+        if input_name=="animation_done":
+            self.change_state('start_turn')
 
     def on_exit(self):
         display_board(self.ref['game'].board, self.ref['kivy'])

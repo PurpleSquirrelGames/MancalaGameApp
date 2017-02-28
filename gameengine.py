@@ -123,6 +123,8 @@ class KalahGame(easyAI.TwoPlayersGame):
             self.make_move_choice(pit)
 
     def make_move_choice(self, house):
+        if self.want_animation:
+            self.animate.append({ACTION: "normal_move"})
         # scoop up the house chosen
         self._scoop(house)
         current_house = house
@@ -192,6 +194,8 @@ class KalahGame(easyAI.TwoPlayersGame):
         return "Mancala (Kalah) Game"
 
     def reset_board(self):
+        if self.want_animation:
+            self.animate = [{ACTION: "setting_up"}]
         for pit in ALL_PITS:
             if self.board[pit]:
                 self._scoop(pit)
