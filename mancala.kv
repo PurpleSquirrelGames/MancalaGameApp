@@ -1,473 +1,621 @@
 #:kivy 1.9.1
+#:import NoTransition kivy.uix.screenmanager.NoTransition
 
-GameScreen:
+AppScreenManager:
+    transition: NoTransition()
+    GameScreen:
+    SettingsOpponentScreen:
+    SettingsRulesScreen:
+    SettingsScreenScreen:
+    SettingsSoundScreen:
+
+<SettingsOpponentScreen>
+    name: "settings_opponent_screen"
+    FixedLayoutRoot:
+        FixedLayout:
+            Image:
+                id: board_image
+                source: 'assets/img/settings-opponent-screen.png'
+                pos_hint: (0, 0)
+                size_hint: (1920, 1080)
+            FixedImageButton:
+                source: 'assets/img/not-rules.png'
+                pos_hint: (0, 600)
+                size_hint: (300, 200)
+                on_release: app.root.current = "settings_rules_screen"
+            FixedImageButton:
+                source: 'assets/img/not-screen.png'
+                pos_hint: (0, 400)
+                size_hint: (300, 200)
+                on_release: app.root.current = "settings_screen_screen"
+            FixedImageButton:
+                source: 'assets/img/not-sound.png'
+                pos_hint: (0, 200)
+                size_hint: (300, 200)
+                on_release: app.root.current = "settings_sound_screen"
+            Button:
+                pos_hint: (1600, 0)
+                size_hint: (200, 100)
+                text: "Resume"
+                on_release: app.root.current = "game_screen"
+                true_font_size: 50
+                color: (0, 0, 0, 1)
+                background_color: (0.1, 1, 0.1, 1)
+
+<SettingsRulesScreen>
+    name: "settings_rules_screen"
+    FixedLayoutRoot:
+        FixedLayout:
+            Image:
+                id: board_image
+                source: 'assets/img/settings-rules-screen.png'
+                pos_hint: (0, 0)
+                size_hint: (1920, 1080)
+            FixedImageButton:
+                source: 'assets/img/not-opponent.png'
+                pos_hint: (0, 800)
+                size_hint: (300, 200)
+                on_release: app.root.current = "settings_opponent_screen"
+            FixedImageButton:
+                source: 'assets/img/not-screen.png'
+                pos_hint: (0, 400)
+                size_hint: (300, 200)
+                on_release: app.root.current = "settings_screen_screen"
+            FixedImageButton:
+                source: 'assets/img/not-sound.png'
+                pos_hint: (0, 200)
+                size_hint: (300, 200)
+                on_release: app.root.current = "settings_sound_screen"
+            Button:
+                pos_hint: (1600, 0)
+                size_hint: (200, 100)
+                text: "Resume"
+                on_release: app.root.current = "game_screen"
+                true_font_size: 50
+                color: (0, 0, 0, 1)
+                background_color: (0.1, 1, 0.1, 1)
+
+<SettingsScreenScreen>
+    name: "settings_screen_screen"
+    FixedLayoutRoot:
+        FixedLayout:
+            Image:
+                id: board_image
+                source: 'assets/img/settings-screen-screen.png'
+                pos_hint: (0, 0)
+                size_hint: (1920, 1080)
+            FixedImageButton:
+                source: 'assets/img/not-opponent.png'
+                pos_hint: (0, 800)
+                size_hint: (300, 200)
+                on_release: app.root.current = "settings_opponent_screen"
+            FixedImageButton:
+                source: 'assets/img/not-rules.png'
+                pos_hint: (0, 600)
+                size_hint: (300, 200)
+                on_release: app.root.current = "settings_rules_screen"
+            FixedImageButton:
+                source: 'assets/img/not-sound.png'
+                pos_hint: (0, 200)
+                size_hint: (300, 200)
+                on_release: app.root.current = "settings_sound_screen"
+            Button:
+                pos_hint: (1600, 0)
+                size_hint: (200, 100)
+                text: "Resume"
+                on_release: app.root.current = "game_screen"
+                true_font_size: 50
+                color: (0, 0, 0, 1)
+                background_color: (0.1, 1, 0.1, 1)
+
+<SettingsSoundScreen>
+    name: "settings_sound_screen"
+    FixedLayoutRoot:
+        FixedLayout:
+            Image:
+                id: board_image
+                source: 'assets/img/settings-sound-screen.png'
+                pos_hint: (0, 0)
+                size_hint: (1920, 1080)
+            FixedImageButton:
+                source: 'assets/img/not-opponent.png'
+                pos_hint: (0, 800)
+                size_hint: (300, 200)
+                on_release: app.root.current = "settings_opponent_screen"
+            FixedImageButton:
+                source: 'assets/img/not-rules.png'
+                pos_hint: (0, 600)
+                size_hint: (300, 200)
+                on_release: app.root.current = "settings_rules_screen"
+            FixedImageButton:
+                source: 'assets/img/not-screen.png'
+                pos_hint: (0, 400)
+                size_hint: (300, 200)
+                on_release: app.root.current = "settings_screen_screen"
+            Button:
+                pos_hint: (1600, 0)
+                size_hint: (200, 100)
+                text: "Resume"
+                on_release: app.root.current = "game_screen"
+                true_font_size: 50
+                color: (0, 0, 0, 1)
+                background_color: (0.1, 1, 0.1, 1)
+
 
 <GameScreen>
-    FixedLayout:
-        Image:
-            id: board_image
-            source: 'assets/img/birch-game-board.png'
-            pos_hint: (0, 0)
-            size_hint: (1920, 1080)
-        ProgressSpinner:
-            id: wait_on_ai
-            size_hint: (100, 100)
-            pos_hint: (300, 500)
-            auto_start: False
-        Label:
-            id: center_message
-            text: 'here'
-            pos_hint: (800, 600)
-            true_font_size: 100
-            size_hint: (100, 100)
-            color: (0, 0, 0, 1)
-        FixedImage:
-            id: user_hand
-            source: 'assets/img/blue3.png'
-            pos_hint: root.HANDS[1]['pos']
-            true_spot: (150, 150)
-            size_hint: (300, 300)
-        FixedImage:
-            id: ai_hand
-            source: 'assets/img/blue3.png'
-            pos_hint: root.HANDS[2]['pos']
-            true_spot: (150, 150)
-            size_hint: (300, 300)
+    name: "game_screen"
+    FixedLayoutRoot:
+        FixedLayout:
+            Image:
+                id: board_image
+                source: 'assets/img/birch-game-board.png'
+                pos_hint: (0, 0)
+                size_hint: (1920, 1080)
+            FixedImageButton:
+                id: settings_button
+                source: 'assets/img/blue.png'
+                pos_hint: (1820, 980)
+                size_hint: (100, 100)
+                on_release: app.root.current = "settings_opponent_screen"
+            ProgressSpinner:
+                id: wait_on_ai
+                size_hint: (100, 100)
+                pos_hint: (300, 500)
+                auto_start: False
+            Label:
+                id: center_message
+                text: 'here'
+                pos_hint: (800, 600)
+                true_font_size: 100
+                size_hint: (100, 100)
+                color: (0, 0, 0, 1)
+            FixedImage:
+                id: user_hand
+                source: 'assets/img/blue3.png'
+                pos_hint: root.HANDS[1]['pos']
+                true_spot: (150, 150)
+                size_hint: (300, 300)
+            FixedImage:
+                id: ai_hand
+                source: 'assets/img/blue3.png'
+                pos_hint: root.HANDS[2]['pos']
+                true_spot: (150, 150)
+                size_hint: (300, 300)
 
-        FixedImageButton:
-            source: 'assets/img/brown190x200.png'
-            size_hint: (190, 200)
-            pos_hint: root.PITS[1]['pos']
-            true_spot: (95, 100)
-            on_release: root.pushed_pit(1)
-        Label:
-            id: counter,1
-            text: '0'
-            true_font_size: 100
-            size_hint: (100, 100)
-            pos_hint: (330, 130)
-            color: (0, 0, 0, 1)
+            FixedImageButton:
+                source: 'assets/img/brown190x200.png'
+                size_hint: (190, 200)
+                pos_hint: root.PITS[1]['pos']
+                true_spot: (95, 100)
+                on_release: root.pushed_pit(1)
+            Label:
+                id: counter,1
+                text: '0'
+                true_font_size: 100
+                size_hint: (100, 100)
+                pos_hint: (330, 130)
+                color: (0, 0, 0, 1)
 
-        FixedImageButton:
-            source: 'assets/img/brown190x200.png'
-            size_hint: (190, 200)
-            pos_hint: root.PITS[2]['pos']
-            true_spot: (95, 100)
-            on_release: root.pushed_pit(2)
-        Label:
-            id: counter,2
-            text: '0'
-            true_font_size: 100
-            size_hint: (100, 100)
-            pos_hint: (540, 130)
-            color: (0, 0, 0, 1)
+            FixedImageButton:
+                source: 'assets/img/brown190x200.png'
+                size_hint: (190, 200)
+                pos_hint: root.PITS[2]['pos']
+                true_spot: (95, 100)
+                on_release: root.pushed_pit(2)
+            Label:
+                id: counter,2
+                text: '0'
+                true_font_size: 100
+                size_hint: (100, 100)
+                pos_hint: (540, 130)
+                color: (0, 0, 0, 1)
 
-        FixedImageButton:
-            source: 'assets/img/brown190x200.png'
-            size_hint: (190, 200)
-            pos_hint: root.PITS[3]['pos']
-            true_spot: (95, 100)
-            on_release: root.pushed_pit(3)
-        Label:
-            id: counter,3
-            text: '0'
-            true_font_size: 100
-            size_hint: (100, 100)
-            pos_hint: (750, 130)
-            color: (0, 0, 0, 1)
+            FixedImageButton:
+                source: 'assets/img/brown190x200.png'
+                size_hint: (190, 200)
+                pos_hint: root.PITS[3]['pos']
+                true_spot: (95, 100)
+                on_release: root.pushed_pit(3)
+            Label:
+                id: counter,3
+                text: '0'
+                true_font_size: 100
+                size_hint: (100, 100)
+                pos_hint: (750, 130)
+                color: (0, 0, 0, 1)
 
-        FixedImageButton:
-            source: 'assets/img/brown190x200.png'
-            size_hint: (190, 200)
-            pos_hint: root.PITS[4]['pos']
-            true_spot: (95, 100)
-            on_release: root.pushed_pit(4)
-        Label:
-            id: counter,4
-            text: '0'
-            true_font_size: 100
-            size_hint: (100, 100)
-            pos_hint: (960, 130)
-            color: (0, 0, 0, 1)
+            FixedImageButton:
+                source: 'assets/img/brown190x200.png'
+                size_hint: (190, 200)
+                pos_hint: root.PITS[4]['pos']
+                true_spot: (95, 100)
+                on_release: root.pushed_pit(4)
+            Label:
+                id: counter,4
+                text: '0'
+                true_font_size: 100
+                size_hint: (100, 100)
+                pos_hint: (960, 130)
+                color: (0, 0, 0, 1)
 
-        FixedImageButton:
-            source: 'assets/img/brown190x200.png'
-            size_hint: (190, 200)
-            pos_hint: root.PITS[5]['pos']
-            true_spot: (95, 100)
-            on_release: root.pushed_pit(5)
-        Label:
-            id: counter,5
-            text: '0'
-            true_font_size: 100
-            size_hint: (100, 100)
-            pos_hint: (1170, 130)
-            color: (0, 0, 0, 1)
+            FixedImageButton:
+                source: 'assets/img/brown190x200.png'
+                size_hint: (190, 200)
+                pos_hint: root.PITS[5]['pos']
+                true_spot: (95, 100)
+                on_release: root.pushed_pit(5)
+            Label:
+                id: counter,5
+                text: '0'
+                true_font_size: 100
+                size_hint: (100, 100)
+                pos_hint: (1170, 130)
+                color: (0, 0, 0, 1)
 
-        FixedImageButton:
-            source: 'assets/img/brown190x200.png'
-            size_hint: (190, 200)
-            pos_hint: root.PITS[6]['pos']
-            true_spot: (95, 100)
-            on_release: root.pushed_pit(6)
-        Label:
-            id: counter,6
-            text: '0'
-            true_font_size: 100
-            size_hint: (100, 100)
-            pos_hint: (1380, 130)
-            color: (0, 0, 0, 1)
+            FixedImageButton:
+                source: 'assets/img/brown190x200.png'
+                size_hint: (190, 200)
+                pos_hint: root.PITS[6]['pos']
+                true_spot: (95, 100)
+                on_release: root.pushed_pit(6)
+            Label:
+                id: counter,6
+                text: '0'
+                true_font_size: 100
+                size_hint: (100, 100)
+                pos_hint: (1380, 130)
+                color: (0, 0, 0, 1)
 
-        Label:
-            id: counter,7
-            text: '0'
-            true_font_size: 100
-            size_hint: (100, 100)
-            pos_hint: (1840, 500)
-            color: (0, 0, 0, 1)
+            Label:
+                id: counter,7
+                text: '0'
+                true_font_size: 100
+                size_hint: (100, 100)
+                pos_hint: (1840, 500)
+                color: (0, 0, 0, 1)
 
-        Label:
-            id: counter,8
-            text: '0'
-            true_font_size: 100
-            size_hint: (100, 100)
-            pos_hint: (1380, 930)
-            color: (0, 0, 0, 1)
-        Label:
-            id: counter,9
-            text: '0'
-            true_font_size: 100
-            size_hint: (100, 100)
-            pos_hint: (1170, 930)
-            color: (0, 0, 0, 1)
-        Label:
-            id: counter,10
-            text: '0'
-            true_font_size: 100
-            size_hint: (100, 100)
-            pos_hint: (960, 930)
-            color: (0, 0, 0, 1)
-        Label:
-            id: counter,11
-            text: '0'
-            true_font_size: 100
-            size_hint: (100, 100)
-            pos_hint: (750, 930)
-            color: (0, 0, 0, 1)
-        Label:
-            id: counter,12
-            text: '0'
-            true_font_size: 100
-            size_hint: (100, 100)
-            pos_hint: (540, 930)
-            color: (0, 0, 0, 1)
-        Label:
-            id: counter,13
-            text: '0'
-            true_font_size: 100
-            size_hint: (100, 100)
-            pos_hint: (330, 930)
-            color: (0, 0, 0, 1)
+            Label:
+                id: counter,8
+                text: '0'
+                true_font_size: 100
+                size_hint: (100, 100)
+                pos_hint: (1380, 930)
+                color: (0, 0, 0, 1)
+            Label:
+                id: counter,9
+                text: '0'
+                true_font_size: 100
+                size_hint: (100, 100)
+                pos_hint: (1170, 930)
+                color: (0, 0, 0, 1)
+            Label:
+                id: counter,10
+                text: '0'
+                true_font_size: 100
+                size_hint: (100, 100)
+                pos_hint: (960, 930)
+                color: (0, 0, 0, 1)
+            Label:
+                id: counter,11
+                text: '0'
+                true_font_size: 100
+                size_hint: (100, 100)
+                pos_hint: (750, 930)
+                color: (0, 0, 0, 1)
+            Label:
+                id: counter,12
+                text: '0'
+                true_font_size: 100
+                size_hint: (100, 100)
+                pos_hint: (540, 930)
+                color: (0, 0, 0, 1)
+            Label:
+                id: counter,13
+                text: '0'
+                true_font_size: 100
+                size_hint: (100, 100)
+                pos_hint: (330, 930)
+                color: (0, 0, 0, 1)
 
-        Label:
-            id: counter,14
-            text: '0'
-            true_font_size: 100
-            size_hint: (100, 100)
-            pos_hint: (10, 500)
-            color: (0, 0, 0, 1)
+            Label:
+                id: counter,14
+                text: '0'
+                true_font_size: 100
+                size_hint: (100, 100)
+                pos_hint: (10, 500)
+                color: (0, 0, 0, 1)
 
-        FixedImage:
-            id: seed,0
-            source: 'assets/img/seed-br-0.png'
-            pos_hint: (2000, 2000)
-            true_spot: (20, 20)
-            size_hint: (40, 40)
-        FixedImage:
-            id: seed,1
-            source: 'assets/img/seed-br-0.png'
-            pos_hint: (2000, 2000)
-            true_spot: (20, 20)
-            size_hint: (40, 40)
-        FixedImage:
-            id: seed,2
-            source: 'assets/img/seed-br-0.png'
-            pos_hint: (2000, 2000)
-            true_spot: (20, 20)
-            size_hint: (40, 40)
-        FixedImage:
-            id: seed,3
-            source: 'assets/img/seed-br-0.png'
-            pos_hint: (2000, 2000)
-            true_spot: (20, 20)
-            size_hint: (40, 40)
-        FixedImage:
-            id: seed,4
-            source: 'assets/img/seed-br-0.png'
-            pos_hint: (2000, 2000)
-            true_spot: (20, 20)
-            size_hint: (40, 40)
-        FixedImage:
-            id: seed,5
-            source: 'assets/img/seed-br-0.png'
-            pos_hint: (2000, 2000)
-            true_spot: (20, 20)
-            size_hint: (40, 40)
-        FixedImage:
-            id: seed,6
-            source: 'assets/img/seed-br-0.png'
-            pos_hint: (2000, 2000)
-            true_spot: (20, 20)
-            size_hint: (40, 40)
-        FixedImage:
-            id: seed,7
-            source: 'assets/img/seed-br-0.png'
-            pos_hint: (2000, 2000)
-            true_spot: (20, 20)
-            size_hint: (40, 40)
-        FixedImage:
-            id: seed,8
-            source: 'assets/img/seed-br-0.png'
-            pos_hint: (2000, 2000)
-            true_spot: (20, 20)
-            size_hint: (40, 40)
-        FixedImage:
-            id: seed,9
-            source: 'assets/img/seed-br-0.png'
-            pos_hint: (2000, 2000)
-            true_spot: (20, 20)
-            size_hint: (40, 40)
-        FixedImage:
-            id: seed,10
-            source: 'assets/img/seed-br-0.png'
-            pos_hint: (2000, 2000)
-            true_spot: (20, 20)
-            size_hint: (40, 40)
-        FixedImage:
-            id: seed,11
-            source: 'assets/img/seed-br-0.png'
-            pos_hint: (2000, 2000)
-            true_spot: (20, 20)
-            size_hint: (40, 40)
-        FixedImage:
-            id: seed,12
-            source: 'assets/img/seed-br-0.png'
-            pos_hint: (2000, 2000)
-            true_spot: (20, 20)
-            size_hint: (40, 40)
-        FixedImage:
-            id: seed,13
-            source: 'assets/img/seed-br-0.png'
-            pos_hint: (2000, 2000)
-            true_spot: (20, 20)
-            size_hint: (40, 40)
-        FixedImage:
-            id: seed,14
-            source: 'assets/img/seed-br-0.png'
-            pos_hint: (2000, 2000)
-            true_spot: (20, 20)
-            size_hint: (40, 40)
-        FixedImage:
-            id: seed,15
-            source: 'assets/img/seed-br-0.png'
-            pos_hint: (2000, 2000)
-            true_spot: (20, 20)
-            size_hint: (40, 40)
-        FixedImage:
-            id: seed,16
-            source: 'assets/img/seed-br-0.png'
-            pos_hint: (2000, 2000)
-            true_spot: (20, 20)
-            size_hint: (40, 40)
-        FixedImage:
-            id: seed,17
-            source: 'assets/img/seed-br-0.png'
-            pos_hint: (2000, 2000)
-            true_spot: (20, 20)
-            size_hint: (40, 40)
-        FixedImage:
-            id: seed,18
-            source: 'assets/img/seed-br-0.png'
-            pos_hint: (2000, 2000)
-            true_spot: (20, 20)
-            size_hint: (40, 40)
-        FixedImage:
-            id: seed,19
-            source: 'assets/img/seed-br-0.png'
-            pos_hint: (2000, 2000)
-            true_spot: (20, 20)
-            size_hint: (40, 40)
-        FixedImage:
-            id: seed,20
-            source: 'assets/img/seed-br-0.png'
-            pos_hint: (2000, 2000)
-            true_spot: (20, 20)
-            size_hint: (40, 40)
-        FixedImage:
-            id: seed,21
-            source: 'assets/img/seed-br-0.png'
-            pos_hint: (2000, 2000)
-            true_spot: (20, 20)
-            size_hint: (40, 40)
-        FixedImage:
-            id: seed,22
-            source: 'assets/img/seed-br-0.png'
-            pos_hint: (2000, 2000)
-            true_spot: (20, 20)
-            size_hint: (40, 40)
-        FixedImage:
-            id: seed,23
-            source: 'assets/img/seed-br-0.png'
-            pos_hint: (2000, 2000)
-            true_spot: (20, 20)
-            size_hint: (40, 40)
-        FixedImage:
-            id: seed,24
-            source: 'assets/img/seed-br-0.png'
-            pos_hint: (2000, 2000)
-            true_spot: (20, 20)
-            size_hint: (40, 40)
-        FixedImage:
-            id: seed,25
-            source: 'assets/img/seed-br-0.png'
-            pos_hint: (2000, 2000)
-            true_spot: (20, 20)
-            size_hint: (40, 40)
-        FixedImage:
-            id: seed,26
-            source: 'assets/img/seed-br-0.png'
-            pos_hint: (2000, 2000)
-            true_spot: (20, 20)
-            size_hint: (40, 40)
-        FixedImage:
-            id: seed,27
-            source: 'assets/img/seed-br-0.png'
-            pos_hint: (2000, 2000)
-            true_spot: (20, 20)
-            size_hint: (40, 40)
-        FixedImage:
-            id: seed,28
-            source: 'assets/img/seed-br-0.png'
-            pos_hint: (2000, 2000)
-            true_spot: (20, 20)
-            size_hint: (40, 40)
-        FixedImage:
-            id: seed,29
-            source: 'assets/img/seed-br-0.png'
-            pos_hint: (2000, 2000)
-            true_spot: (20, 20)
-            size_hint: (40, 40)
-        FixedImage:
-            id: seed,30
-            source: 'assets/img/seed-br-0.png'
-            pos_hint: (2000, 2000)
-            true_spot: (20, 20)
-            size_hint: (40, 40)
-        FixedImage:
-            id: seed,31
-            source: 'assets/img/seed-br-0.png'
-            pos_hint: (2000, 2000)
-            true_spot: (20, 20)
-            size_hint: (40, 40)
-        FixedImage:
-            id: seed,32
-            source: 'assets/img/seed-br-0.png'
-            pos_hint: (2000, 2000)
-            true_spot: (20, 20)
-            size_hint: (40, 40)
-        FixedImage:
-            id: seed,33
-            source: 'assets/img/seed-br-0.png'
-            pos_hint: (2000, 2000)
-            true_spot: (20, 20)
-            size_hint: (40, 40)
-        FixedImage:
-            id: seed,34
-            source: 'assets/img/seed-br-0.png'
-            pos_hint: (2000, 2000)
-            true_spot: (20, 20)
-            size_hint: (40, 40)
-        FixedImage:
-            id: seed,35
-            source: 'assets/img/seed-br-0.png'
-            pos_hint: (2000, 2000)
-            true_spot: (20, 20)
-            size_hint: (40, 40)
-        FixedImage:
-            id: seed,36
-            source: 'assets/img/seed-br-0.png'
-            pos_hint: (2000, 2000)
-            true_spot: (20, 20)
-            size_hint: (40, 40)
-        FixedImage:
-            id: seed,37
-            source: 'assets/img/seed-br-0.png'
-            pos_hint: (2000, 2000)
-            true_spot: (20, 20)
-            size_hint: (40, 40)
-        FixedImage:
-            id: seed,38
-            source: 'assets/img/seed-br-0.png'
-            pos_hint: (2000, 2000)
-            true_spot: (20, 20)
-            size_hint: (40, 40)
-        FixedImage:
-            id: seed,39
-            source: 'assets/img/seed-br-0.png'
-            pos_hint: (2000, 2000)
-            true_spot: (20, 20)
-            size_hint: (40, 40)
-        FixedImage:
-            id: seed,40
-            source: 'assets/img/seed-br-0.png'
-            pos_hint: (2000, 2000)
-            true_spot: (20, 20)
-            size_hint: (40, 40)
-        FixedImage:
-            id: seed,41
-            source: 'assets/img/seed-br-0.png'
-            pos_hint: (2000, 2000)
-            true_spot: (20, 20)
-            size_hint: (40, 40)
-        FixedImage:
-            id: seed,42
-            source: 'assets/img/seed-br-0.png'
-            pos_hint: (2000, 2000)
-            true_spot: (20, 20)
-            size_hint: (40, 40)
-        FixedImage:
-            id: seed,43
-            source: 'assets/img/seed-br-0.png'
-            pos_hint: (2000, 2000)
-            true_spot: (20, 20)
-            size_hint: (40, 40)
-        FixedImage:
-            id: seed,44
-            source: 'assets/img/seed-br-0.png'
-            pos_hint: (2000, 2000)
-            true_spot: (20, 20)
-            size_hint: (40, 40)
-        FixedImage:
-            id: seed,45
-            source: 'assets/img/seed-br-0.png'
-            pos_hint: (2000, 2000)
-            true_spot: (20, 20)
-            size_hint: (40, 40)
-        FixedImage:
-            id: seed,46
-            source: 'assets/img/seed-br-0.png'
-            pos_hint: (2000, 2000)
-            true_spot: (20, 20)
-            size_hint: (40, 40)
-        FixedImage:
-            id: seed,47
-            source: 'assets/img/seed-br-0.png'
-            pos_hint: (2000, 2000)
-            true_spot: (20, 20)
-            size_hint: (40, 40)
-        FixedImage:
-            id: seed,48
-            source: 'assets/img/seed-br-0.png'
-            pos_hint: (2000, 2000)
-            true_spot: (20, 20)
-            size_hint: (40, 40)
+            FixedImage:
+                id: seed,0
+                source: 'assets/img/seed-br-0.png'
+                pos_hint: (2000, 2000)
+                true_spot: (20, 20)
+                size_hint: (40, 40)
+            FixedImage:
+                id: seed,1
+                source: 'assets/img/seed-br-0.png'
+                pos_hint: (2000, 2000)
+                true_spot: (20, 20)
+                size_hint: (40, 40)
+            FixedImage:
+                id: seed,2
+                source: 'assets/img/seed-br-0.png'
+                pos_hint: (2000, 2000)
+                true_spot: (20, 20)
+                size_hint: (40, 40)
+            FixedImage:
+                id: seed,3
+                source: 'assets/img/seed-br-0.png'
+                pos_hint: (2000, 2000)
+                true_spot: (20, 20)
+                size_hint: (40, 40)
+            FixedImage:
+                id: seed,4
+                source: 'assets/img/seed-br-0.png'
+                pos_hint: (2000, 2000)
+                true_spot: (20, 20)
+                size_hint: (40, 40)
+            FixedImage:
+                id: seed,5
+                source: 'assets/img/seed-br-0.png'
+                pos_hint: (2000, 2000)
+                true_spot: (20, 20)
+                size_hint: (40, 40)
+            FixedImage:
+                id: seed,6
+                source: 'assets/img/seed-br-0.png'
+                pos_hint: (2000, 2000)
+                true_spot: (20, 20)
+                size_hint: (40, 40)
+            FixedImage:
+                id: seed,7
+                source: 'assets/img/seed-br-0.png'
+                pos_hint: (2000, 2000)
+                true_spot: (20, 20)
+                size_hint: (40, 40)
+            FixedImage:
+                id: seed,8
+                source: 'assets/img/seed-br-0.png'
+                pos_hint: (2000, 2000)
+                true_spot: (20, 20)
+                size_hint: (40, 40)
+            FixedImage:
+                id: seed,9
+                source: 'assets/img/seed-br-0.png'
+                pos_hint: (2000, 2000)
+                true_spot: (20, 20)
+                size_hint: (40, 40)
+            FixedImage:
+                id: seed,10
+                source: 'assets/img/seed-br-0.png'
+                pos_hint: (2000, 2000)
+                true_spot: (20, 20)
+                size_hint: (40, 40)
+            FixedImage:
+                id: seed,11
+                source: 'assets/img/seed-br-0.png'
+                pos_hint: (2000, 2000)
+                true_spot: (20, 20)
+                size_hint: (40, 40)
+            FixedImage:
+                id: seed,12
+                source: 'assets/img/seed-br-0.png'
+                pos_hint: (2000, 2000)
+                true_spot: (20, 20)
+                size_hint: (40, 40)
+            FixedImage:
+                id: seed,13
+                source: 'assets/img/seed-br-0.png'
+                pos_hint: (2000, 2000)
+                true_spot: (20, 20)
+                size_hint: (40, 40)
+            FixedImage:
+                id: seed,14
+                source: 'assets/img/seed-br-0.png'
+                pos_hint: (2000, 2000)
+                true_spot: (20, 20)
+                size_hint: (40, 40)
+            FixedImage:
+                id: seed,15
+                source: 'assets/img/seed-br-0.png'
+                pos_hint: (2000, 2000)
+                true_spot: (20, 20)
+                size_hint: (40, 40)
+            FixedImage:
+                id: seed,16
+                source: 'assets/img/seed-br-0.png'
+                pos_hint: (2000, 2000)
+                true_spot: (20, 20)
+                size_hint: (40, 40)
+            FixedImage:
+                id: seed,17
+                source: 'assets/img/seed-br-0.png'
+                pos_hint: (2000, 2000)
+                true_spot: (20, 20)
+                size_hint: (40, 40)
+            FixedImage:
+                id: seed,18
+                source: 'assets/img/seed-br-0.png'
+                pos_hint: (2000, 2000)
+                true_spot: (20, 20)
+                size_hint: (40, 40)
+            FixedImage:
+                id: seed,19
+                source: 'assets/img/seed-br-0.png'
+                pos_hint: (2000, 2000)
+                true_spot: (20, 20)
+                size_hint: (40, 40)
+            FixedImage:
+                id: seed,20
+                source: 'assets/img/seed-br-0.png'
+                pos_hint: (2000, 2000)
+                true_spot: (20, 20)
+                size_hint: (40, 40)
+            FixedImage:
+                id: seed,21
+                source: 'assets/img/seed-br-0.png'
+                pos_hint: (2000, 2000)
+                true_spot: (20, 20)
+                size_hint: (40, 40)
+            FixedImage:
+                id: seed,22
+                source: 'assets/img/seed-br-0.png'
+                pos_hint: (2000, 2000)
+                true_spot: (20, 20)
+                size_hint: (40, 40)
+            FixedImage:
+                id: seed,23
+                source: 'assets/img/seed-br-0.png'
+                pos_hint: (2000, 2000)
+                true_spot: (20, 20)
+                size_hint: (40, 40)
+            FixedImage:
+                id: seed,24
+                source: 'assets/img/seed-br-0.png'
+                pos_hint: (2000, 2000)
+                true_spot: (20, 20)
+                size_hint: (40, 40)
+            FixedImage:
+                id: seed,25
+                source: 'assets/img/seed-br-0.png'
+                pos_hint: (2000, 2000)
+                true_spot: (20, 20)
+                size_hint: (40, 40)
+            FixedImage:
+                id: seed,26
+                source: 'assets/img/seed-br-0.png'
+                pos_hint: (2000, 2000)
+                true_spot: (20, 20)
+                size_hint: (40, 40)
+            FixedImage:
+                id: seed,27
+                source: 'assets/img/seed-br-0.png'
+                pos_hint: (2000, 2000)
+                true_spot: (20, 20)
+                size_hint: (40, 40)
+            FixedImage:
+                id: seed,28
+                source: 'assets/img/seed-br-0.png'
+                pos_hint: (2000, 2000)
+                true_spot: (20, 20)
+                size_hint: (40, 40)
+            FixedImage:
+                id: seed,29
+                source: 'assets/img/seed-br-0.png'
+                pos_hint: (2000, 2000)
+                true_spot: (20, 20)
+                size_hint: (40, 40)
+            FixedImage:
+                id: seed,30
+                source: 'assets/img/seed-br-0.png'
+                pos_hint: (2000, 2000)
+                true_spot: (20, 20)
+                size_hint: (40, 40)
+            FixedImage:
+                id: seed,31
+                source: 'assets/img/seed-br-0.png'
+                pos_hint: (2000, 2000)
+                true_spot: (20, 20)
+                size_hint: (40, 40)
+            FixedImage:
+                id: seed,32
+                source: 'assets/img/seed-br-0.png'
+                pos_hint: (2000, 2000)
+                true_spot: (20, 20)
+                size_hint: (40, 40)
+            FixedImage:
+                id: seed,33
+                source: 'assets/img/seed-br-0.png'
+                pos_hint: (2000, 2000)
+                true_spot: (20, 20)
+                size_hint: (40, 40)
+            FixedImage:
+                id: seed,34
+                source: 'assets/img/seed-br-0.png'
+                pos_hint: (2000, 2000)
+                true_spot: (20, 20)
+                size_hint: (40, 40)
+            FixedImage:
+                id: seed,35
+                source: 'assets/img/seed-br-0.png'
+                pos_hint: (2000, 2000)
+                true_spot: (20, 20)
+                size_hint: (40, 40)
+            FixedImage:
+                id: seed,36
+                source: 'assets/img/seed-br-0.png'
+                pos_hint: (2000, 2000)
+                true_spot: (20, 20)
+                size_hint: (40, 40)
+            FixedImage:
+                id: seed,37
+                source: 'assets/img/seed-br-0.png'
+                pos_hint: (2000, 2000)
+                true_spot: (20, 20)
+                size_hint: (40, 40)
+            FixedImage:
+                id: seed,38
+                source: 'assets/img/seed-br-0.png'
+                pos_hint: (2000, 2000)
+                true_spot: (20, 20)
+                size_hint: (40, 40)
+            FixedImage:
+                id: seed,39
+                source: 'assets/img/seed-br-0.png'
+                pos_hint: (2000, 2000)
+                true_spot: (20, 20)
+                size_hint: (40, 40)
+            FixedImage:
+                id: seed,40
+                source: 'assets/img/seed-br-0.png'
+                pos_hint: (2000, 2000)
+                true_spot: (20, 20)
+                size_hint: (40, 40)
+            FixedImage:
+                id: seed,41
+                source: 'assets/img/seed-br-0.png'
+                pos_hint: (2000, 2000)
+                true_spot: (20, 20)
+                size_hint: (40, 40)
+            FixedImage:
+                id: seed,42
+                source: 'assets/img/seed-br-0.png'
+                pos_hint: (2000, 2000)
+                true_spot: (20, 20)
+                size_hint: (40, 40)
+            FixedImage:
+                id: seed,43
+                source: 'assets/img/seed-br-0.png'
+                pos_hint: (2000, 2000)
+                true_spot: (20, 20)
+                size_hint: (40, 40)
+            FixedImage:
+                id: seed,44
+                source: 'assets/img/seed-br-0.png'
+                pos_hint: (2000, 2000)
+                true_spot: (20, 20)
+                size_hint: (40, 40)
+            FixedImage:
+                id: seed,45
+                source: 'assets/img/seed-br-0.png'
+                pos_hint: (2000, 2000)
+                true_spot: (20, 20)
+                size_hint: (40, 40)
+            FixedImage:
+                id: seed,46
+                source: 'assets/img/seed-br-0.png'
+                pos_hint: (2000, 2000)
+                true_spot: (20, 20)
+                size_hint: (40, 40)
+            FixedImage:
+                id: seed,47
+                source: 'assets/img/seed-br-0.png'
+                pos_hint: (2000, 2000)
+                true_spot: (20, 20)
+                size_hint: (40, 40)
+            FixedImage:
+                id: seed,48
+                source: 'assets/img/seed-br-0.png'
+                pos_hint: (2000, 2000)
+                true_spot: (20, 20)
+                size_hint: (40, 40)

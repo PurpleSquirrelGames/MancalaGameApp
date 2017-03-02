@@ -7,7 +7,7 @@ from kivy.clock import Clock
 from kivy.factory import Factory 
 from kivy.garden.progressspinner import ProgressSpinner
 from kivy.lang import Builder
-from kivy.uix.screenmanager import ScreenManager, Screen, FadeTransition
+from kivy.uix.screenmanager import ScreenManager, Screen, NoTransition
 from kivy.uix.widget import Widget 
 
 from fixedlayout import FixedLayout, FixedLayoutRoot, FixedImage, FixedImageButton
@@ -25,10 +25,10 @@ AI = 2
 
 PARKED = (2000, 2000)
 HAND = 0
-OFF_BOARD = 15
 settings = {
     "user_first_player": True,
-    "seed_drop_rate": 0.4
+    "seed_drop_rate": 0.4,
+    "seeds_per_house": 4
 }
 
 
@@ -38,7 +38,13 @@ settings = {
 #
 ##############################
 
-class GameScreen(FixedLayoutRoot):
+GAME_SCREEN = 0
+SETTINGS_OPPONENT_SCREEN = 1
+SETTINGS_RULES_SCREEN = 2
+SETTINGS_SCREEN_SCREEN = 3
+SETTINGS_SOUND_SCREEN = 4
+
+class GameScreen(Screen):
     global machine
 
     HANDS = [
@@ -62,13 +68,31 @@ class GameScreen(FixedLayoutRoot):
         {"pos": (850,  770)}, # 11
         {"pos": (640,  770)}, # 12
         {"pos": (430,  770)}, # 13
-        {"pos": (220,  770)}, # 14 ai store
-        {"pos": PARKED     }  # 15 is OFF the BOARD
+        {"pos": (220,  770)}  # 14 ai store
     ]
 
     def pushed_pit(self, pit):
         machine.input("pushed_pit", pit)
 
+
+class SettingsOpponentScreen(Screen):
+    pass
+
+
+class SettingsRulesScreen(Screen):
+    pass
+
+
+class SettingsScreenScreen(Screen):
+    pass
+
+
+class SettingsSoundScreen(Screen):
+    pass
+
+
+class AppScreenManager(ScreenManager):
+    pass
 
 class MancalaApp(App):
 
@@ -76,7 +100,7 @@ class MancalaApp(App):
         presentation = Builder.load_file('mancala.kv')
 
     def on_start(self):
-        machine.bind_reference("kivy", self.root.ids)
+        machine.bind_reference("kivy", self.root.screens[GAME_SCREEN].ids)
         machine.change_state("init_game")
 
 
@@ -88,30 +112,25 @@ class MancalaApp(App):
 
 class Seeds(object):
 
-    global HAND, OFF_BOARD
+    global HAND
 
     def __init__(self, display):
-        self.board = [[] for x in xrange(16)]
-        self.seed_list = []
+        self.board = [[] for x in xrange(15)]
         for index in range(4*12):
             seed = display["seed,{}".format(index)]
-            self.seed_list.append(seed)
-            self.board[OFF_BOARD].append(seed)
+            self.board[HAND].append(seed)
         self.display = display
 
     def scoop(self, pit):
-        new_seeds = self.board[pit]
-        self.board[HAND] += new_seeds
-        self.board[pit] == []
-        for seed in new_seeds:
+        seed_count = len(self.board[pit])
+        for _ in range(seed_count):
+            seed = self.board[pit].pop()
+            self.board[HAND].append(seed)
             self._move(seed, HAND)
 
     def drop(self, pit, count):
         for _ in range(count):
-            if self.board[HAND]:
-                seed = self.board[HAND].pop()
-            else:
-                seed = self.board[OFF_BOARD].pop()
+            seed = self.board[HAND].pop()
             self.board[pit].append(seed)
             self._move(seed, pit)
 
@@ -223,7 +242,11 @@ class HandSeedAnimation(object):
 ##############################
 
 class PendingStartState(State):
-    pass
+    
+    global settings
+
+    def on_exit(self):
+        self.ref['game'].board = [settings["seeds_per_house"]*12] + [0]*14
 
 class InitGameState(State):
 
