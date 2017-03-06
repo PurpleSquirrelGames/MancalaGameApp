@@ -10,9 +10,13 @@ from kivy.lang import Builder
 from kivy.uix.screenmanager import ScreenManager, Screen, NoTransition
 from kivy.uix.widget import Widget 
 
-from fixedlayout import FixedLayout, FixedLayoutRoot, FixedImage, FixedImageButton
+from fixedlayout import FixedLayout, FixedLayoutRoot, FixedImage,\
+    FixedImageButton, FixedPopup, FixedRadioButtons, FixedSimpleMenu,\
+    FixedSimpleMenuItem, FixedButton
+
 from simplestate import StateMachine, State
 from gameengine import KalahGame
+from characters import AI_LIST
 
 __version__ = '0.0.6'
 
@@ -26,6 +30,7 @@ AI = 2
 PARKED = (2000, 2000)
 HAND = 0
 settings = {
+    "ai_chosen": 0,
     "user_first_player": True,
     "seed_drop_rate": 0.4,
     "seeds_per_house": 4
@@ -76,8 +81,26 @@ class GameScreen(Screen):
 
 
 class SettingsOpponentScreen(Screen):
-    pass
 
+    global settings
+    global AI_LIST
+    
+    def _update_details(self, ai_chosen):
+        ai = AI_LIST[ai_chosen]
+        self.ids.ai_description.text = ai['desc']
+        self.ids.ai_play_style.text = ai['tagline']
+        self.ids.ai_name.text = format("{} of 12: [size=80]{}[/size]").format(ai['rank'], ai['name'])
+        # self.ids.ai_face_image
+
+    def previous_ai(self):
+        ai_chosen = (settings['ai_chosen'] - 1) % 12
+        settings['ai_chosen'] = ai_chosen
+        self._update_details(ai_chosen)
+
+    def next_ai(self):
+        ai_chosen = (settings['ai_chosen'] + 1) % 12
+        settings['ai_chosen'] = ai_chosen
+        self._update_details(ai_chosen)
 
 class SettingsRulesScreen(Screen):
     pass
@@ -95,6 +118,14 @@ class AppScreenManager(ScreenManager):
     pass
 
 class MancalaApp(App):
+
+    global settings
+    global AI_LIST
+
+    def __init__(self, **kwargs):
+        self.settings = settings
+        self.ai = AI_LIST[self.settings["ai_chosen"]]
+        super(MancalaApp, self).__init__(**kwargs)
 
     def build(self):
         presentation = Builder.load_file('mancala.kv')

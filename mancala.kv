@@ -34,13 +34,73 @@ AppScreenManager:
                 size_hint: (300, 200)
                 on_release: app.root.current = "settings_sound_screen"
             Button:
-                pos_hint: (1600, 0)
+                pos_hint: (1350, 0)
                 size_hint: (200, 100)
                 text: "Resume"
                 on_release: app.root.current = "game_screen"
                 true_font_size: 50
                 color: (0, 0, 0, 1)
                 background_color: (0.1, 1, 0.1, 1)
+            Button:
+                pos_hint: (1600, 0)
+                size_hint: (300, 100)
+                text: "New Game"
+                on_release: app.root.current = "game_screen"
+                true_font_size: 50
+                color: (0, 0, 0, 1)
+                background_color: (0.1, 1, 0.1, 1)
+            Image:
+                id: ai_face_image
+                pos_hint: (1600, 780)
+                size_hint: (300, 300)
+                source: 'assets/img/blue3.png'
+            FixedLabel:
+                id: ai_name
+                pos_hint: (400, 800)
+                size_hint: (1200, 200)
+                text_size: self.size
+                true_font_size: 56
+                color: (0, 0, 0, 1)
+                markup: True
+                text: app.ai['rank']+" of 12: [size=80]"+app.ai['name']+"[/size]"
+            FixedLabel:
+                id: ai_description
+                pos_hint: (400, 400)
+                size_hint: (1100, 350)
+                text_size: self.size
+                true_font_size: 56
+                color: (0, 0, 0, 1)
+                valign: "top"
+                markup: True
+                text: app.ai['desc']
+            FixedLabel:
+                id: ai_play_style
+                pos_hint: (400, 200)
+                size_hint: (1100, 250)
+                text_size: self.size
+                true_font_size: 56
+                color: (0, 0, 0, 1)
+                markup: True
+                valign: "top"
+                text: "[i]"+app.ai['tagline']+"[/i]"
+            Button:
+                id: prev_ai
+                pos_hint: (400, 0)
+                size_hint: (200, 100)
+                text: "< Prev"
+                true_font_size: 56
+                color: (0, 0, 0, 1)
+                background_color: (0.9, 0.9, 0.9, 1)
+                on_release: root.previous_ai()
+            Button:
+                id: next_ai
+                pos_hint: (700, 0)
+                size_hint: (200, 100)
+                text: "Next >"
+                true_font_size: 56
+                color: (0, 0, 0, 1)
+                background_color: (0.9, 0.9, 0.9, 1)
+                on_release: root.next_ai()
 
 <SettingsRulesScreen>
     name: "settings_rules_screen"
@@ -67,13 +127,113 @@ AppScreenManager:
                 size_hint: (300, 200)
                 on_release: app.root.current = "settings_sound_screen"
             Button:
-                pos_hint: (1600, 0)
+                pos_hint: (1350, 0)
                 size_hint: (200, 100)
                 text: "Resume"
                 on_release: app.root.current = "game_screen"
                 true_font_size: 50
                 color: (0, 0, 0, 1)
                 background_color: (0.1, 1, 0.1, 1)
+            Button:
+                pos_hint: (1600, 0)
+                size_hint: (300, 100)
+                text: "New Game"
+                on_release: app.root.current = "game_screen"
+                true_font_size: 50
+                color: (0, 0, 0, 1)
+                background_color: (0.1, 1, 0.1, 1)
+            FixedSimpleMenu:
+                pos_hint: (400, 150)
+                size_hint: (1500, 768)
+                color: (0, 0, 0, 1)
+                FixedSimpleMenuItem:
+                    heading: "Game chosen"
+                    text: "Kalah"
+                    on_press: root.ids.game_choice_popup.active = True
+                FixedSimpleMenuItem:
+                    heading: "Who plays first"
+                    text: "You"
+                    on_press: root.ids.who_first_popup.active = True
+                FixedSimpleMenuItem:
+                    heading: "Capturing if last seed drops into own empty house"
+                    text: "Capture if oppposite house has seeds"
+                    on_press: root.ids.capture_rule_popup.active = True
+                FixedSimpleMenuItem:
+                    heading: "At end of game, how to handle remaining seeds"
+                    text: "Move seeds to the store/Kalaha on that side"
+                    on_press: root.ids.eog_rule_popup.active = True
+            FixedPopup:
+                id: game_choice_popup
+                active_pos_hint: (300, 100)
+                size_hint: (1600, 900)
+                FixedRadioButtons:
+                    pos_hint: (400, 200)
+                    size_hint: (1400, 192*1)
+                    selections: ["Kalah"]
+                    color: (0, 0, 0, 1)
+                    background_selected: "assets/img/selected.png"
+                    background_normal: "assets/img/not-selected.png"
+                FixedButton:
+                    pos_hint: (1700, 150)
+                    size_hint: (200, 100)
+                    color: (0, 0, 0, 1)
+                    true_font_size: 56
+                    text: "Done"
+                    on_press: root.ids.game_choice_popup.active = False
+            FixedPopup:
+                id: who_first_popup
+                active_pos_hint: (300, 100)
+                size_hint: (1600, 900)
+                FixedRadioButtons:
+                    pos_hint: (400, 200)
+                    size_hint: (1400, 192*2)
+                    selections: ["You", "Opponent (AI)"]
+                    color: (0, 0, 0, 1)
+                    background_selected: "assets/img/selected.png"
+                    background_normal: "assets/img/not-selected.png"
+                FixedButton:
+                    pos_hint: (1700, 150)
+                    size_hint: (200, 100)
+                    color: (0, 0, 0, 1)
+                    true_font_size: 56
+                    text: "Done"
+                    on_press: root.ids.who_first_popup.active = False
+            FixedPopup:
+                id: capture_rule_popup
+                active_pos_hint: (300, 100)
+                size_hint: (1600, 900)
+                FixedRadioButtons:
+                    pos_hint: (400, 200)
+                    size_hint: (1400, 192*3)
+                    selections: ["Capture if opposite house has seeds", "Always capture (even if opposite empty)", "Never allow capture"]
+                    color: (0, 0, 0, 1)
+                    background_selected: "assets/img/selected.png"
+                    background_normal: "assets/img/not-selected.png"
+                FixedButton:
+                    pos_hint: (1700, 150)
+                    size_hint: (200, 100)
+                    color: (0, 0, 0, 1)
+                    true_font_size: 56
+                    text: "Done"
+                    on_press: root.ids.capture_rule_popup.active = False
+            FixedPopup:
+                id: eog_rule_popup
+                active_pos_hint: (300, 100)
+                size_hint: (1600, 900)
+                FixedRadioButtons:
+                    pos_hint: (400, 200)
+                    size_hint: (1400, 192*4)
+                    selections: ["Move seeds to the store/Kalaha on that side", "Move seeds to the player with empty houses", "Move seeds to the player that ended the game", "Leave the seeds in the houses"]
+                    color: (0, 0, 0, 1)
+                    background_selected: "assets/img/selected.png"
+                    background_normal: "assets/img/not-selected.png"
+                FixedButton:
+                    pos_hint: (1700, 150)
+                    size_hint: (200, 100)
+                    color: (0, 0, 0, 1)
+                    true_font_size: 56
+                    text: "Done"
+                    on_press: root.ids.eog_rule_popup.active = False
 
 <SettingsScreenScreen>
     name: "settings_screen_screen"
@@ -100,13 +260,91 @@ AppScreenManager:
                 size_hint: (300, 200)
                 on_release: app.root.current = "settings_sound_screen"
             Button:
-                pos_hint: (1600, 0)
+                pos_hint: (1350, 0)
                 size_hint: (200, 100)
                 text: "Resume"
                 on_release: app.root.current = "game_screen"
                 true_font_size: 50
                 color: (0, 0, 0, 1)
                 background_color: (0.1, 1, 0.1, 1)
+            Button:
+                pos_hint: (1600, 0)
+                size_hint: (300, 100)
+                text: "New Game"
+                on_release: app.root.current = "game_screen"
+                true_font_size: 50
+                color: (0, 0, 0, 1)
+                background_color: (0.1, 1, 0.1, 1)
+            FixedSimpleMenu:
+                pos_hint: (400, 150)
+                size_hint: (1500, 576)
+                color: (0, 0, 0, 1)
+                FixedSimpleMenuItem:
+                    heading: "Board chosen"
+                    text: "Walnut"
+                    on_press: root.ids.board_choice_popup.active = True
+                FixedSimpleMenuItem:
+                    heading: "Seed chosen"
+                    text: "Teal glass gems"
+                    on_press: root.ids.seed_choice_popup.active = True
+                FixedSimpleMenuItem:
+                    heading: "Animated hand speed"
+                    text: "Medium"
+                    on_press: root.ids.animation_speed_popup.active = True
+            FixedPopup:
+                id: board_choice_popup
+                active_pos_hint: (300, 100)
+                size_hint: (1600, 900)
+                FixedRadioButtons:
+                    pos_hint: (400, 200)
+                    size_hint: (1400, 192*2)
+                    selections: ["Walnut", "Birch"]
+                    color: (0, 0, 0, 1)
+                    background_selected: "assets/img/selected.png"
+                    background_normal: "assets/img/not-selected.png"
+                FixedButton:
+                    pos_hint: (1700, 150)
+                    size_hint: (200, 100)
+                    color: (0, 0, 0, 1)
+                    true_font_size: 56
+                    text: "Done"
+                    on_press: root.ids.board_choice_popup.active = False
+            FixedPopup:
+                id: seed_choice_popup
+                active_pos_hint: (300, 100)
+                size_hint: (1600, 900)
+                FixedRadioButtons:
+                    pos_hint: (400, 200)
+                    size_hint: (1400, 192*3)
+                    selections: ["Teal green glass", "Tumbled rock", "Black river rock"]
+                    color: (0, 0, 0, 1)
+                    background_selected: "assets/img/selected.png"
+                    background_normal: "assets/img/not-selected.png"
+                FixedButton:
+                    pos_hint: (1700, 150)
+                    size_hint: (200, 100)
+                    color: (0, 0, 0, 1)
+                    true_font_size: 56
+                    text: "Done"
+                    on_press: root.ids.seed_choice_popup.active = False
+            FixedPopup:
+                id: animation_speed_popup
+                active_pos_hint: (300, 100)
+                size_hint: (1600, 900)
+                FixedRadioButtons:
+                    pos_hint: (400, 200)
+                    size_hint: (1400, 192*3)
+                    selections: ["Slow", "Medium", "Fast"]
+                    color: (0, 0, 0, 1)
+                    background_selected: "assets/img/selected.png"
+                    background_normal: "assets/img/not-selected.png"
+                FixedButton:
+                    pos_hint: (1700, 150)
+                    size_hint: (200, 100)
+                    color: (0, 0, 0, 1)
+                    true_font_size: 56
+                    text: "Done"
+                    on_press: root.ids.animation_speed_popup.active = False
 
 <SettingsSoundScreen>
     name: "settings_sound_screen"
@@ -133,13 +371,69 @@ AppScreenManager:
                 size_hint: (300, 200)
                 on_release: app.root.current = "settings_screen_screen"
             Button:
-                pos_hint: (1600, 0)
+                pos_hint: (1350, 0)
                 size_hint: (200, 100)
                 text: "Resume"
                 on_release: app.root.current = "game_screen"
                 true_font_size: 50
                 color: (0, 0, 0, 1)
                 background_color: (0.1, 1, 0.1, 1)
+            Button:
+                pos_hint: (1600, 0)
+                size_hint: (300, 100)
+                text: "New Game"
+                on_release: app.root.current = "game_screen"
+                true_font_size: 50
+                color: (0, 0, 0, 1)
+                background_color: (0.1, 1, 0.1, 1)
+            FixedSimpleMenu:
+                pos_hint: (400, 150)
+                size_hint: (1500, 192*2)
+                color: (0, 0, 0, 1)
+                FixedSimpleMenuItem:
+                    heading: "Notification volume"
+                    text: "Medium"
+                    on_press: root.ids.notification_volume_popup.active = True
+                FixedSimpleMenuItem:
+                    heading: "Environmental sound volume (seed drop, etc)"
+                    text: "Medium"
+                    on_press: root.ids.seed_volume_popup.active = True
+            FixedPopup:
+                id: notification_volume_popup
+                active_pos_hint: (300, 100)
+                size_hint: (1600, 900)
+                FixedRadioButtons:
+                    pos_hint: (400, 200)
+                    size_hint: (1400, 192*4)
+                    selections: ["Mute", "Soft", "Medium", "Loud"]
+                    color: (0, 0, 0, 1)
+                    background_selected: "assets/img/selected.png"
+                    background_normal: "assets/img/not-selected.png"
+                FixedButton:
+                    pos_hint: (1700, 150)
+                    size_hint: (200, 100)
+                    color: (0, 0, 0, 1)
+                    true_font_size: 56
+                    text: "Done"
+                    on_press: root.ids.notification_volume_popup.active = False
+            FixedPopup:
+                id: seed_volume_popup
+                active_pos_hint: (300, 100)
+                size_hint: (1600, 900)
+                FixedRadioButtons:
+                    pos_hint: (400, 200)
+                    size_hint: (1400, 192*4)
+                    selections: ["Mute", "Soft", "Medium", "Loud"]
+                    color: (0, 0, 0, 1)
+                    background_selected: "assets/img/selected.png"
+                    background_normal: "assets/img/not-selected.png"
+                FixedButton:
+                    pos_hint: (1700, 150)
+                    size_hint: (200, 100)
+                    color: (0, 0, 0, 1)
+                    true_font_size: 56
+                    text: "Done"
+                    on_press: root.ids.seed_volume_popup.active = False
 
 
 <GameScreen>
