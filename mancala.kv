@@ -1,5 +1,9 @@
 #:kivy 1.9.1
 #:import NoTransition kivy.uix.screenmanager.NoTransition
+#:import settings __main__.settings
+#:import character __main__.character
+#:import update_setting __main__.update_setting
+#:import visual_settings __main__.visual_settings
 
 AppScreenManager:
     transition: NoTransition()
@@ -45,7 +49,7 @@ AppScreenManager:
                 pos_hint: (1600, 0)
                 size_hint: (300, 100)
                 text: "New Game"
-                on_release: app.root.current = "game_screen"
+                on_release: app.start_new_game()
                 true_font_size: 50
                 color: (0, 0, 0, 1)
                 background_color: (0.1, 1, 0.1, 1)
@@ -62,7 +66,7 @@ AppScreenManager:
                 true_font_size: 56
                 color: (0, 0, 0, 1)
                 markup: True
-                text: app.ai['rank']+" of 12: [size=80]"+app.ai['name']+"[/size]"
+                text: character['rank']+" of 12: [size=80]"+character['name']+"[/size]"
             FixedLabel:
                 id: ai_description
                 pos_hint: (400, 400)
@@ -72,7 +76,7 @@ AppScreenManager:
                 color: (0, 0, 0, 1)
                 valign: "top"
                 markup: True
-                text: app.ai['desc']
+                text: character['desc']
             FixedLabel:
                 id: ai_play_style
                 pos_hint: (400, 200)
@@ -82,7 +86,7 @@ AppScreenManager:
                 color: (0, 0, 0, 1)
                 markup: True
                 valign: "top"
-                text: "[i]"+app.ai['tagline']+"[/i]"
+                text: "[i]"+character['tagline']+"[/i]"
             Button:
                 id: prev_ai
                 pos_hint: (400, 0)
@@ -138,27 +142,37 @@ AppScreenManager:
                 pos_hint: (1600, 0)
                 size_hint: (300, 100)
                 text: "New Game"
-                on_release: app.root.current = "game_screen"
+                on_release: app.start_new_game()
                 true_font_size: 50
                 color: (0, 0, 0, 1)
                 background_color: (0.1, 1, 0.1, 1)
             FixedSimpleMenu:
+                id: rules_screen_menu
                 pos_hint: (400, 150)
                 size_hint: (1500, 768)
                 color: (0, 0, 0, 1)
                 FixedSimpleMenuItem:
+                    name: "game_chosen"
                     heading: "Game chosen"
                     text: "Kalah"
                     on_press: root.ids.game_choice_popup.active = True
                 FixedSimpleMenuItem:
+                    name: "who_plays_first"
                     heading: "Who plays first"
-                    text: "You"
+                    text: visual_settings["who_plays_first"][settings["who_plays_first"]]
                     on_press: root.ids.who_first_popup.active = True
                 FixedSimpleMenuItem:
+                    name: "seeds_per_house_selection"
+                    heading: "Seeds per house"
+                    text: "4"
+                    on_press: root.ids.seeds_per_house_selection_popup.active = True
+                FixedSimpleMenuItem:
+                    name: "capture_rule"
                     heading: "Capturing if last seed drops into own empty house"
                     text: "Capture if oppposite house has seeds"
                     on_press: root.ids.capture_rule_popup.active = True
                 FixedSimpleMenuItem:
+                    name: "eog_rule"
                     heading: "At end of game, how to handle remaining seeds"
                     text: "Move seeds to the store/Kalaha on that side"
                     on_press: root.ids.eog_rule_popup.active = True
@@ -185,12 +199,14 @@ AppScreenManager:
                 active_pos_hint: (300, 100)
                 size_hint: (1600, 900)
                 FixedRadioButtons:
+                    selected: settings["who_plays_first"]
                     pos_hint: (400, 200)
                     size_hint: (1400, 192*2)
-                    selections: ["You", "Opponent (AI)"]
+                    selections: visual_settings["who_plays_first"]
                     color: (0, 0, 0, 1)
                     background_selected: "assets/img/selected.png"
                     background_normal: "assets/img/not-selected.png"
+                    on_selection: update_setting("who_plays_first", self.selected)
                 FixedButton:
                     pos_hint: (1700, 150)
                     size_hint: (200, 100)
@@ -199,16 +215,38 @@ AppScreenManager:
                     text: "Done"
                     on_press: root.ids.who_first_popup.active = False
             FixedPopup:
+                id: seeds_per_house_selection_popup
+                active_pos_hint: (300, 100)
+                size_hint: (1600, 900)
+                FixedRadioButtons:
+                    selected: settings["seeds_per_house_selection"]
+                    pos_hint: (400, 200)
+                    size_hint: (1400, 192*4)
+                    selections: visual_settings["seeds_per_house_selection"]
+                    color: (0, 0, 0, 1)
+                    background_selected: "assets/img/selected.png"
+                    background_normal: "assets/img/not-selected.png"
+                    on_selection: update_setting("seeds_per_house_selection", self.selected)
+                FixedButton:
+                    pos_hint: (1700, 150)
+                    size_hint: (200, 100)
+                    color: (0, 0, 0, 1)
+                    true_font_size: 56
+                    text: "Done"
+                    on_press: root.ids.seeds_per_house_selection_popup.active = False
+            FixedPopup:
                 id: capture_rule_popup
                 active_pos_hint: (300, 100)
                 size_hint: (1600, 900)
                 FixedRadioButtons:
+                    selected: settings["capture_rule"]
                     pos_hint: (400, 200)
                     size_hint: (1400, 192*3)
-                    selections: ["Capture if opposite house has seeds", "Always capture (even if opposite empty)", "Never allow capture"]
+                    selections: visual_settings["capture_rule"]
                     color: (0, 0, 0, 1)
                     background_selected: "assets/img/selected.png"
                     background_normal: "assets/img/not-selected.png"
+                    on_selection: update_setting("capture_rule", self.selected)
                 FixedButton:
                     pos_hint: (1700, 150)
                     size_hint: (200, 100)
@@ -221,12 +259,14 @@ AppScreenManager:
                 active_pos_hint: (300, 100)
                 size_hint: (1600, 900)
                 FixedRadioButtons:
+                    selected: settings["eog_rule"]
                     pos_hint: (400, 200)
                     size_hint: (1400, 192*4)
-                    selections: ["Move seeds to the store/Kalaha on that side", "Move seeds to the player with empty houses", "Move seeds to the player that ended the game", "Leave the seeds in the houses"]
+                    selections: visual_settings["eog_rule"]
                     color: (0, 0, 0, 1)
                     background_selected: "assets/img/selected.png"
                     background_normal: "assets/img/not-selected.png"
+                    on_selection: update_setting("eog_rule", self.selected)
                 FixedButton:
                     pos_hint: (1700, 150)
                     size_hint: (200, 100)
@@ -271,7 +311,7 @@ AppScreenManager:
                 pos_hint: (1600, 0)
                 size_hint: (300, 100)
                 text: "New Game"
-                on_release: app.root.current = "game_screen"
+                on_release: app.start_new_game()
                 true_font_size: 50
                 color: (0, 0, 0, 1)
                 background_color: (0.1, 1, 0.1, 1)
@@ -382,7 +422,7 @@ AppScreenManager:
                 pos_hint: (1600, 0)
                 size_hint: (300, 100)
                 text: "New Game"
-                on_release: app.root.current = "game_screen"
+                on_release: app.start_new_game()
                 true_font_size: 50
                 color: (0, 0, 0, 1)
                 background_color: (0.1, 1, 0.1, 1)

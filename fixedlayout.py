@@ -283,11 +283,17 @@ class FixedSimpleMenu(Widget, FixedBase):
             widget.true_scaler = self.true_scaler
         return super(FixedSimpleMenu, self).add_widget(widget, index)
 
+    def set_text(self, child_name, text):
+        for child in self.children:
+            if child.name == child_name:
+                child.text = str(text)
+                # child.on_text(child, str(text))
 
 class FixedSimpleMenuItem(Widget, FixedBase):
 
     heading = StringProperty("Menu item heading")
     text = StringProperty("current value")
+    name = StringProperty(None)
     
     def __init__(self, **kwargs):
         self.button_list = []

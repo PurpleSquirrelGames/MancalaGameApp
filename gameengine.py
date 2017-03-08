@@ -1,5 +1,7 @@
 import easyAI
 from copy import copy
+import random
+from characters import AI_LIST
 
 USER = 1
 AI = 2
@@ -54,11 +56,39 @@ P = {
     13: {OWNER: AI  , NEXT: {USER:  1, AI: 14}, ROLE: HOUSE, OPP:  1, DISTPIT: {USER:  7, AI:  1}},
     14: {OWNER: AI  , NEXT: {USER:  1, AI:  1}, ROLE: STORE, OPP: -1, DISTPIT: None},
 }
-ALL_PITS = range(1, 14)
+ALL_PITS = range(1, 15)
 
 ACTION = "action"
 COUNT = "count"
 LOC = "loc"
+
+BALANCE = 0
+GREED = 1
+CAUTION = 2
+
+class MancalaAI(easyAI.Negamax, object):
+
+    def __init__(self, settings, character):
+        self.settings = settings
+        self.character = character
+        super(MancalaAI, self).__init__(character['lookahead'])
+
+    def _random_move(self, game):
+        possible_moves = game.possible_moves()
+        return random.choice(possible_moves)
+
+    def set_character(self, character):
+        self.character = character
+        self.depth = self.character['lookahead']
+
+    def __call__(self, game):
+        if self.character['strategy'] == "random":
+            return self._random_move(game)
+        if self.character['error_rate'] > 0.0:
+            chance = random.random()
+            if chance < self.character['error_rate']:
+                return self._random_move(game)
+        return super(MancalaAI, self).__call__(game)
 
 
 class KalahHumanPlayer(easyAI.Human_Player):
@@ -69,14 +99,17 @@ class KalahAIPlayer(easyAI.AI_Player):
 
 class KalahGame(easyAI.TwoPlayersGame):
 
-    def __init__(self):
-        self.players = [KalahHumanPlayer(), KalahAIPlayer(easyAI.Negamax(6))]
-        self.nplayer = 1
+    def __init__(self, settings, character):
+        self.settings = settings
+        self.character = character
+        self.players = [
+            KalahHumanPlayer(),
+            KalahAIPlayer(MancalaAI(self.settings, self.character))
+        ]
+        self.nplayer = self.settings['first_player']
         self.animate = []
         self.want_animation = True
         self.board = [0]*15
-        self.seeds_per_house = 4
-        self.board[HAND] = 12*self.seeds_per_house
         self.reset_board()
 
     def is_stopping_in_own_store(self, pit):
@@ -133,27 +166,68 @@ class KalahGame(easyAI.TwoPlayersGame):
             next_house = P[current_house][NEXT][self.nplayer]
             self._drop(next_house)
             current_house = next_house
-        # steal if possible
-        if self.board[current_house]==1:
-            if P[current_house][OWNER]==self.nplayer:
-                if P[current_house][ROLE]==HOUSE:
-                    if self.board[P[current_house][OPP]]:
+        #
+        # capture if possible
+        #
+        if self.settings['capture_rule'] == 0:  # capture if opposite is full
+            if self.board[current_house] == 1:
+                if P[current_house][OWNER] == self.nplayer:
+                    if P[current_house][ROLE] == HOUSE:
+                        if self.board[P[current_house][OPP]]:
+                            if self.want_animation:
+                                self.animate.append({ACTION: "steal"})
+                            self._scoop(current_house)
+                            self._scoop(P[current_house][OPP])
+                            self._drop_all(STORE_IDX[self.nplayer])
+        elif self.settings['capture_rule'] == 1: # capture even if opposite is empty       
+            if self.board[current_house] == 1:
+                if P[current_house][OWNER] == self.nplayer:
+                    if P[current_house][ROLE] == HOUSE:
                         if self.want_animation:
                             self.animate.append({ACTION: "steal"})
                         self._scoop(current_house)
-                        self._scoop(P[current_house][OPP])
+                        if self.board[P[current_house][OPP]]:
+                            self._scoop(P[current_house][OPP])
                         self._drop_all(STORE_IDX[self.nplayer])
+        # elif settings['capture_rule'] == 2: # no capture
+        #     pass
+        #
         # end of game scooping
+        #
         if self.is_over():
             if self.want_animation:
                 self.animate.append({ACTION: "game_over"})
-            # traditional end-of-game handling: both players scoop own houses into store
-            for player in PLAYER_LIST:
-                for house in HOUSE_LIST[player]:
-                    if self.board[house]:
-                        self._scoop(house)
-                if self.board[HAND]:
-                    self._drop_all(STORE_IDX[player])
+            if self.settings['eog_rule'] == 0:
+                # traditional end-of-game handling: both players scoop own houses into store
+                for player in PLAYER_LIST:
+                    for house in HOUSE_LIST[player]:
+                        if self.board[house]:
+                            self._scoop(house)
+                    if self.board[HAND]:
+                        self._drop_all(STORE_IDX[player])
+            elif self.settings['eog_rule'] == 1:
+                # put seed in store of player who does not have seeds
+                if any([self.board[house] for house in HOUSE_LIST[USER]]):
+                    empty_player = AI
+                else:
+                    empty_player = USER
+                for player in PLAYER_LIST:
+                    for house in HOUSE_LIST[player]:
+                        if self.board[house]:
+                            self._scoop(house)
+                    if self.board[HAND]:
+                        self._drop_all(STORE_IDX[empty_player])
+            elif self.settings['eog_rule'] == 2:
+                # put seeds in store of player who ended game (current player)
+                for player in PLAYER_LIST:
+                    for house in HOUSE_LIST[player]:
+                        if self.board[house]:
+                            self._scoop(house)
+                    if self.board[HAND]:
+                        self._drop_all(STORE_IDX[self.nplayer])
+            # elif self.settings['eog_rule'] == 3:
+            #     # leave seeds alone
+            #     pass
     
     def is_over(self):
         for player in PLAYER_LIST:
@@ -194,11 +268,13 @@ class KalahGame(easyAI.TwoPlayersGame):
         return "Mancala (Kalah) Game"
 
     def reset_board(self):
+        self.seeds_per_house = self.settings['seeds_per_house']
         if self.want_animation:
             self.animate = [{ACTION: "setting_up"}]
         for pit in ALL_PITS:
             if self.board[pit]:
                 self._scoop(pit)
+        self.board[HAND] = 12*self.seeds_per_house
         for player in PLAYER_LIST:
             for pit in HOUSE_LIST[player]:
                 self._drop(pit, count=self.seeds_per_house)
@@ -249,9 +325,22 @@ class KalahGame(easyAI.TwoPlayersGame):
 
 
 if __name__=="__main__":
-    game = KalahGame()
+    settings = {
+        "ai_chosen": 1,
+        "who_plays_first": 0,
+        "first_player": USER,
+        "seeds_per_house_selection": 1,
+        "seeds_per_house": 4,
+        "capture_rule": 0,
+        "eog_rule": 0,
+        "seed_drop_rate": 0.4,
+    }
+    character = AI_LIST[settings['ai_chosen']]
+
+    game = KalahGame(settings, character)
 
     while not game.is_over():
+        print game.animate
         game.show()
         if game.nplayer==USER:
             poss = game.possible_moves()

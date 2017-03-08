@@ -29,12 +29,79 @@ AI = 2
 
 PARKED = (2000, 2000)
 HAND = 0
+
+#############################
+#
+#  SETTINGS
+#
+#############################
+
 settings = {
     "ai_chosen": 0,
-    "user_first_player": True,
+    "who_plays_first": 0,
+    "first_player": USER,
+    "seeds_per_house_selection": 1,
+    "seeds_per_house": 4,
+    "capture_rule": 0,
+    "eog_rule": 0,
     "seed_drop_rate": 0.4,
-    "seeds_per_house": 4
 }
+character = AI_LIST[settings['ai_chosen']]
+
+visual_settings = {
+    "who_plays_first": [
+        "You",
+        "Opponent (AI)"
+    ],
+    "seeds_per_house_selection": [
+        "3",
+        "4",
+        "5",
+        "6"
+    ],
+    "capture_rule": [
+        "Capture if opposite house has seeds",
+        "Always capture (even if opposite empty)",
+        "Never allow capture"
+    ],
+    "eog_rule": [
+        "Move seeds to the store/Kalaha on that side",
+        "Move seeds to the player with empty houses",
+        "Move seeds to the player that ended the game",
+        "Leave the seeds in the houses"
+    ],
+}
+
+def update_setting(setting_name, value):
+    global settings
+    global visual_settings
+    global character
+    global app
+
+    settings[setting_name] = value
+    if setting_name == "ai_chosen":
+        settings["ai_chosen"] = value
+        character = AI_LIST[value]
+        print "CHARACTER", character
+        return
+    if setting_name == "who_plays_first":
+        if value == 0:
+            settings["first_player"] = USER
+        else:
+            settings["first_player"] = AI
+    if setting_name == "seeds_per_house_selection":
+        settings["seeds_per_house"] = value + 3
+    if setting_name not in visual_settings:
+        return
+    app.root.screens[SETTINGS_RULES_SCREEN].ids.rules_screen_menu.\
+        set_text(setting_name, visual_settings[setting_name][value])
+    print "SETTINGS", settings
+
+def generically_apply_settings():
+    global settings
+
+    for key in settings:
+        update_setting(key, settings[key])
 
 
 ##############################
@@ -83,13 +150,17 @@ class GameScreen(Screen):
 class SettingsOpponentScreen(Screen):
 
     global settings
+    global character
     global AI_LIST
     
     def _update_details(self, ai_chosen):
-        ai = AI_LIST[ai_chosen]
-        self.ids.ai_description.text = ai['desc']
-        self.ids.ai_play_style.text = ai['tagline']
-        self.ids.ai_name.text = format("{} of 12: [size=80]{}[/size]").format(ai['rank'], ai['name'])
+        update_setting("ai_chosen", ai_chosen)
+        self.ids.ai_description.text = character['desc']
+        self.ids.ai_play_style.text = character['tagline']
+        self.ids.ai_name.text = format("{} of 12: [size=80]{}[/size]").format(
+            character['rank'],
+            character['name']
+        )
         # self.ids.ai_face_image
 
     def previous_ai(self):
@@ -119,20 +190,17 @@ class AppScreenManager(ScreenManager):
 
 class MancalaApp(App):
 
-    global settings
-    global AI_LIST
-
-    def __init__(self, **kwargs):
-        self.settings = settings
-        self.ai = AI_LIST[self.settings["ai_chosen"]]
-        super(MancalaApp, self).__init__(**kwargs)
-
     def build(self):
         presentation = Builder.load_file('mancala.kv')
 
     def on_start(self):
         machine.bind_reference("kivy", self.root.screens[GAME_SCREEN].ids)
         machine.change_state("init_game")
+        generically_apply_settings()
+
+    def start_new_game(self):
+        self.root.current = "game_screen"
+        machine.input("request_new_game")
 
 
 ##############################
@@ -178,7 +246,7 @@ class HandSeedAnimation(object):
     global seeds
     global settings
 
-    def __init__(self, player, board, display):
+    def __init__(self, player, board, display, clear_first=False):
         self.nplayer = player
         self.idx = 0
         self.board = copy(board)
@@ -190,6 +258,9 @@ class HandSeedAnimation(object):
             self.hand = display.user_hand
         else:
             self.hand = display.ai_hand
+        if clear_first:
+            for pit in range(1, 15):
+                seeds.scoop(pit)
         self.play_one_step(None, None)
 
     def play_one_step(self, sequence, widget):
@@ -277,22 +348,27 @@ class PendingStartState(State):
     global settings
 
     def on_exit(self):
+        global seeds
         self.ref['game'].board = [settings["seeds_per_house"]*12] + [0]*14
+        seeds = Seeds(self.ref["kivy"])
 
 class InitGameState(State):
 
     def on_entry(self):
-        global seeds
-        seeds = Seeds(self.ref["kivy"])
         self.ref['kivy'].wait_on_ai.stop_spinning()
         board_prior = copy(self.ref["game"].board)
         self.ref["game"].reset_board()
-        self.animation = HandSeedAnimation(AI, board_prior, self.ref['kivy'])
+        if any([board_prior[i] for i in range(1, 15)]):
+            self.animation = HandSeedAnimation(AI, board_prior, self.ref['kivy'], clear_first=True)
+        else:
+            self.animation = HandSeedAnimation(AI, board_prior, self.ref['kivy'])
         return self.same_state
 
     def input(self, input_name, *args, **kwargs):
         if input_name=="animation_done":
             return self.change_state("start_turn")
+        if input_name == "request_new_game":
+            self.change_state("init_game")
 
 
 def grab(alist, index):
@@ -321,6 +397,10 @@ class StartTurn(State):
             return self.change_state("wait_for_pit")
         return self.change_state("ai_thinking")
 
+    def input(self, input_name, *args, **kwargs):
+        if input_name == "request_new_game":
+            self.change_state("init_game")
+
 class WaitForPitButtons(State):
 
     def on_entry(self):
@@ -337,6 +417,8 @@ class WaitForPitButtons(State):
                 self.change_state("animate_user")
             else:
                 self.ref['kivy'].center_message.text = "cannot play empty house. try again."
+        if input_name == "request_new_game":
+            self.change_state("init_game")
 
 class AnitmateUserChoiceState(State):
 
@@ -355,6 +437,8 @@ class AnitmateUserChoiceState(State):
                 return self.change_state("start_turn")
             self.ref['kivy'].center_message.text ="landed in store. play again."
             return self.change_state("wait_for_pit")
+        if input_name == "request_new_game":
+            self.change_state("init_game")
 
     def on_exit(self):
         display_board(self.ref['game'].board, self.ref['kivy'])
@@ -379,6 +463,8 @@ class AIThinkingState(State):
             self.ref["ai_choices"] = args[0]
             self.ref["kivy"].wait_on_ai.stop_spinning()
             self.change_state("animate_ai")
+        if input_name == "request_new_game":
+            self.change_state("init_game")
 
 class AnimateAIChoicesState(State):
 
@@ -390,6 +476,8 @@ class AnimateAIChoicesState(State):
     def input(self, input_name, *args, **kwargs):
         if input_name=="animation_done":
             self.change_state('start_turn')
+        if input_name == "request_new_game":
+            self.change_state("init_game")
 
     def on_exit(self):
         display_board(self.ref['game'].board, self.ref['kivy'])
@@ -400,9 +488,13 @@ class EndOfGameDisplayState(State):
         winner = self.ref['game'].get_winner()    
         self.ref["kivy"].center_message.text = ["Tie Game.", "You won!", "AI won."][game.get_winner()]
 
+    def input(self, input_name, *args, **kwargs):
+        if input_name == "request_new_game":
+            self.change_state("init_game")
+
 
 if __name__=='__main__':
-    game = KalahGame()
+    game = KalahGame(settings, character)
     machine.bind_reference("game", game)
     machine.bind_reference("settings", settings)
     machine.register_state(StartTurn("start_turn"))
@@ -414,4 +506,5 @@ if __name__=='__main__':
     machine.register_state(AnimateAIChoicesState("animate_ai"))
     machine.register_state(EndOfGameDisplayState("eog"))
     machine.start("pending_start")
-    MancalaApp().run()
+    app = MancalaApp()
+    app.run()
