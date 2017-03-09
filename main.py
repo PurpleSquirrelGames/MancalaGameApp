@@ -4,6 +4,7 @@ from copy import copy
 from kivy.app import App
 from kivy.animation import Animation
 from kivy.clock import Clock
+from kivy.core.audio import SoundLoader
 from kivy.factory import Factory 
 from kivy.garden.progressspinner import ProgressSpinner
 from kivy.lang import Builder
@@ -45,6 +46,10 @@ settings = {
     "capture_rule": 0,
     "eog_rule": 0,
     "seed_drop_rate": 0.4,
+    "board_choice": 0,
+    "seed_choice": 0,
+    "notification_volume": 2,
+    "seed_volume": 2
 }
 character = AI_LIST[settings['ai_chosen']]
 
@@ -70,6 +75,27 @@ visual_settings = {
         "Move seeds to the player that ended the game",
         "Leave the seeds in the houses"
     ],
+    "board_choice": [
+        "Walnut",
+        "Birch"
+    ],
+    "seed_choice": [
+        "Teal Green Glass Gems",
+        "Tumbled Pebbles",
+        "Black River Rock"
+    ],
+    "notification_volume": [
+        "Mute",
+        "Soft",
+        "Medium",
+        "Loud"
+    ],
+    "seed_volume": [
+        "Mute",
+        "Soft",
+        "Medium",
+        "Loud"
+    ]
 }
 
 def update_setting(setting_name, value):
@@ -103,6 +129,65 @@ def generically_apply_settings():
     for key in settings:
         update_setting(key, settings[key])
 
+##############################
+#
+#  KIVY SOUNDS & BACKGROUNDS
+#
+##############################
+
+WALNUT = 0
+BIRCH = 1
+
+TEAL = 0
+PEBBLE = 1
+BLACK = 2
+
+SOUND_FILE = 0
+
+MANY = 3
+
+EMPTY_PIT = 0
+FILLED_PIT = 1
+
+VOL_MUTE = 0
+VOL_SOFT = 1
+VOL_MEDIUM = 2
+VOL_LOUD = 3
+
+PLAY_IDX = 4
+
+COMBO_LIST = {}
+for board_num, board_str in enumerate(["walnut", "birch"]):
+    COMBO_LIST[board_num] = {}
+    for seed_num, seed_str in enumerate(["teal", "pebble", "black"]):
+        COMBO_LIST[board_num][seed_num] = {}
+        COMBO_LIST[board_num][seed_num][SOUND_FILE] = {}
+        for qty_num, qty_str in enumerate(["1", "2", "many"]):
+            qty = (qty_num+1) if qty_num<2 else MANY
+            COMBO_LIST[board_num][seed_num][SOUND_FILE][qty] = {}
+            for pit_type, pit_str in enumerate(["empty", "filled"]):
+                file_name = "assets/audio/{}-{}-{}-{}.wav".format(
+                    board_str,
+                    seed_str,
+                    qty_str,
+                    pit_str
+                )
+                COMBO_LIST[board_num][seed_num][SOUND_FILE][qty][pit_type] = []
+                for _ in range(PLAY_IDX):
+                    COMBO_LIST[board_num][seed_num][SOUND_FILE][qty][pit_type].\
+                        append(SoundLoader.load(file_name))
+                COMBO_LIST[board_num][seed_num][SOUND_FILE][qty][pit_type].append(0)                            
+
+SCOOP_SOUND = {}
+for qty_num, qty_str in enumerate(["1", "2", "many"]):
+    qty = (qty_num+1) if qty_num<2 else MANY
+    SCOOP_SOUND[qty] = []
+    file_name = "assets/audio/scoop-{}.wav".format(qty_str)
+    for _ in range(PLAY_IDX):
+        SCOOP_SOUND[qty].append(SoundLoader.load(file_name))
+    SCOOP_SOUND[qty].append(0)                            
+
+# print COMBO_LIST
 
 ##############################
 #
@@ -226,12 +311,26 @@ class Seeds(object):
             seed = self.board[pit].pop()
             self.board[HAND].append(seed)
             self._move(seed, HAND)
+        scoop_size = seed_count if seed_count<3 else MANY
+        sf = SCOOP_SOUND[scoop_size]
+        sf[PLAY_IDX] = (sf[PLAY_IDX] + 1) % PLAY_IDX
+        current = sf[PLAY_IDX]
+        sf[current].play()
 
     def drop(self, pit, count):
+        global COMBO_LIST
+        pit_type = FILLED_PIT if self.board[pit] else EMPTY_PIT
         for _ in range(count):
             seed = self.board[HAND].pop()
             self.board[pit].append(seed)
             self._move(seed, pit)
+        drop_size = count if count<3 else MANY
+        sf = COMBO_LIST[settings['board_choice']][settings['seed_choice']]
+        sf = sf[SOUND_FILE][drop_size]
+        sf = sf[pit_type]
+        sf[PLAY_IDX] = (sf[PLAY_IDX] + 1) % PLAY_IDX
+        current = sf[PLAY_IDX]
+        sf[current].play()
 
     def _move(self, seed, pit):
         pos_hint = GameScreen.PITS[pit]['pos']
