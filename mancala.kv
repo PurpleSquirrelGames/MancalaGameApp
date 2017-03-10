@@ -316,18 +316,22 @@ AppScreenManager:
                 color: (0, 0, 0, 1)
                 background_color: (0.1, 1, 0.1, 1)
             FixedSimpleMenu:
+                id: screen_screen_menu
                 pos_hint: (400, 150)
                 size_hint: (1500, 576)
                 color: (0, 0, 0, 1)
                 FixedSimpleMenuItem:
+                    name: "board_choice"
                     heading: "Board chosen"
                     text: "Walnut"
                     on_press: root.ids.board_choice_popup.active = True
                 FixedSimpleMenuItem:
+                    name: "seed_choice"
                     heading: "Seed chosen"
                     text: "Teal glass gems"
                     on_press: root.ids.seed_choice_popup.active = True
                 FixedSimpleMenuItem:
+                    name: "animation_speed_choice"
                     heading: "Animated hand speed"
                     text: "Medium"
                     on_press: root.ids.animation_speed_popup.active = True
@@ -336,12 +340,14 @@ AppScreenManager:
                 active_pos_hint: (300, 100)
                 size_hint: (1600, 900)
                 FixedRadioButtons:
+                    selected: settings['board_choice']
                     pos_hint: (400, 200)
                     size_hint: (1400, 192*2)
-                    selections: ["Walnut", "Birch"]
+                    selections: visual_settings['board_choice']
                     color: (0, 0, 0, 1)
                     background_selected: "assets/img/selected.png"
                     background_normal: "assets/img/not-selected.png"
+                    on_selection: update_setting("board_choice", self.selected)
                 FixedButton:
                     pos_hint: (1700, 150)
                     size_hint: (200, 100)
@@ -354,12 +360,14 @@ AppScreenManager:
                 active_pos_hint: (300, 100)
                 size_hint: (1600, 900)
                 FixedRadioButtons:
+                    selected: settings['seed_choice']
                     pos_hint: (400, 200)
                     size_hint: (1400, 192*3)
-                    selections: ["Teal green glass", "Tumbled rock", "Black river rock"]
+                    selections: visual_settings['seed_choice']
                     color: (0, 0, 0, 1)
                     background_selected: "assets/img/selected.png"
                     background_normal: "assets/img/not-selected.png"
+                    on_selection: update_setting("seed_choice", self.selected)
                 FixedButton:
                     pos_hint: (1700, 150)
                     size_hint: (200, 100)
@@ -372,12 +380,14 @@ AppScreenManager:
                 active_pos_hint: (300, 100)
                 size_hint: (1600, 900)
                 FixedRadioButtons:
+                    selected: settings['animation_speed_choice']
                     pos_hint: (400, 200)
                     size_hint: (1400, 192*3)
-                    selections: ["Slow", "Medium", "Fast"]
+                    selections: visual_settings['animation_speed_choice']
                     color: (0, 0, 0, 1)
                     background_selected: "assets/img/selected.png"
                     background_normal: "assets/img/not-selected.png"
+                    on_selection: update_setting("animation_speed_choice", self.selected)
                 FixedButton:
                     pos_hint: (1700, 150)
                     size_hint: (200, 100)
@@ -427,14 +437,17 @@ AppScreenManager:
                 color: (0, 0, 0, 1)
                 background_color: (0.1, 1, 0.1, 1)
             FixedSimpleMenu:
+                id: sound_screen_menu
                 pos_hint: (400, 150)
                 size_hint: (1500, 192*2)
                 color: (0, 0, 0, 1)
                 FixedSimpleMenuItem:
+                    name: "notification_volume"
                     heading: "Notification volume"
                     text: "Medium"
                     on_press: root.ids.notification_volume_popup.active = True
                 FixedSimpleMenuItem:
+                    name: "seed_volume"
                     heading: "Environmental sound volume (seed drop, etc)"
                     text: "Medium"
                     on_press: root.ids.seed_volume_popup.active = True
@@ -443,12 +456,14 @@ AppScreenManager:
                 active_pos_hint: (300, 100)
                 size_hint: (1600, 900)
                 FixedRadioButtons:
+                    selected: settings['notification_volume']
                     pos_hint: (400, 200)
                     size_hint: (1400, 192*4)
-                    selections: ["Mute", "Soft", "Medium", "Loud"]
+                    selections: visual_settings['notification_volume']
                     color: (0, 0, 0, 1)
                     background_selected: "assets/img/selected.png"
                     background_normal: "assets/img/not-selected.png"
+                    on_selection: update_setting("notification_volume", self.selected)
                 FixedButton:
                     pos_hint: (1700, 150)
                     size_hint: (200, 100)
@@ -461,12 +476,14 @@ AppScreenManager:
                 active_pos_hint: (300, 100)
                 size_hint: (1600, 900)
                 FixedRadioButtons:
+                    selected: settings['seed_volume']
                     pos_hint: (400, 200)
                     size_hint: (1400, 192*4)
-                    selections: ["Mute", "Soft", "Medium", "Loud"]
+                    selections: visual_settings['seed_volume']
                     color: (0, 0, 0, 1)
                     background_selected: "assets/img/selected.png"
                     background_normal: "assets/img/not-selected.png"
+                    on_selection: update_setting("seed_volume", self.selected)
                 FixedButton:
                     pos_hint: (1700, 150)
                     size_hint: (200, 100)
@@ -480,9 +497,10 @@ AppScreenManager:
     name: "game_screen"
     FixedLayoutRoot:
         FixedLayout:
+            id: game_screen_root
             Image:
                 id: board_image
-                source: 'assets/img/birch-game-board.png'
+                source: 'assets/img/walnut-game-board.png'
                 pos_hint: (0, 0)
                 size_hint: (1920, 1080)
             FixedImageButton:
@@ -658,298 +676,3 @@ AppScreenManager:
                 size_hint: (100, 100)
                 pos_hint: (10, 500)
                 color: (0, 0, 0, 1)
-
-            FixedImage:
-                id: seed,0
-                source: 'assets/img/seed-br-0.png'
-                pos_hint: (2000, 2000)
-                true_spot: (20, 20)
-                size_hint: (40, 40)
-            FixedImage:
-                id: seed,1
-                source: 'assets/img/seed-br-0.png'
-                pos_hint: (2000, 2000)
-                true_spot: (20, 20)
-                size_hint: (40, 40)
-            FixedImage:
-                id: seed,2
-                source: 'assets/img/seed-br-0.png'
-                pos_hint: (2000, 2000)
-                true_spot: (20, 20)
-                size_hint: (40, 40)
-            FixedImage:
-                id: seed,3
-                source: 'assets/img/seed-br-0.png'
-                pos_hint: (2000, 2000)
-                true_spot: (20, 20)
-                size_hint: (40, 40)
-            FixedImage:
-                id: seed,4
-                source: 'assets/img/seed-br-0.png'
-                pos_hint: (2000, 2000)
-                true_spot: (20, 20)
-                size_hint: (40, 40)
-            FixedImage:
-                id: seed,5
-                source: 'assets/img/seed-br-0.png'
-                pos_hint: (2000, 2000)
-                true_spot: (20, 20)
-                size_hint: (40, 40)
-            FixedImage:
-                id: seed,6
-                source: 'assets/img/seed-br-0.png'
-                pos_hint: (2000, 2000)
-                true_spot: (20, 20)
-                size_hint: (40, 40)
-            FixedImage:
-                id: seed,7
-                source: 'assets/img/seed-br-0.png'
-                pos_hint: (2000, 2000)
-                true_spot: (20, 20)
-                size_hint: (40, 40)
-            FixedImage:
-                id: seed,8
-                source: 'assets/img/seed-br-0.png'
-                pos_hint: (2000, 2000)
-                true_spot: (20, 20)
-                size_hint: (40, 40)
-            FixedImage:
-                id: seed,9
-                source: 'assets/img/seed-br-0.png'
-                pos_hint: (2000, 2000)
-                true_spot: (20, 20)
-                size_hint: (40, 40)
-            FixedImage:
-                id: seed,10
-                source: 'assets/img/seed-br-0.png'
-                pos_hint: (2000, 2000)
-                true_spot: (20, 20)
-                size_hint: (40, 40)
-            FixedImage:
-                id: seed,11
-                source: 'assets/img/seed-br-0.png'
-                pos_hint: (2000, 2000)
-                true_spot: (20, 20)
-                size_hint: (40, 40)
-            FixedImage:
-                id: seed,12
-                source: 'assets/img/seed-br-0.png'
-                pos_hint: (2000, 2000)
-                true_spot: (20, 20)
-                size_hint: (40, 40)
-            FixedImage:
-                id: seed,13
-                source: 'assets/img/seed-br-0.png'
-                pos_hint: (2000, 2000)
-                true_spot: (20, 20)
-                size_hint: (40, 40)
-            FixedImage:
-                id: seed,14
-                source: 'assets/img/seed-br-0.png'
-                pos_hint: (2000, 2000)
-                true_spot: (20, 20)
-                size_hint: (40, 40)
-            FixedImage:
-                id: seed,15
-                source: 'assets/img/seed-br-0.png'
-                pos_hint: (2000, 2000)
-                true_spot: (20, 20)
-                size_hint: (40, 40)
-            FixedImage:
-                id: seed,16
-                source: 'assets/img/seed-br-0.png'
-                pos_hint: (2000, 2000)
-                true_spot: (20, 20)
-                size_hint: (40, 40)
-            FixedImage:
-                id: seed,17
-                source: 'assets/img/seed-br-0.png'
-                pos_hint: (2000, 2000)
-                true_spot: (20, 20)
-                size_hint: (40, 40)
-            FixedImage:
-                id: seed,18
-                source: 'assets/img/seed-br-0.png'
-                pos_hint: (2000, 2000)
-                true_spot: (20, 20)
-                size_hint: (40, 40)
-            FixedImage:
-                id: seed,19
-                source: 'assets/img/seed-br-0.png'
-                pos_hint: (2000, 2000)
-                true_spot: (20, 20)
-                size_hint: (40, 40)
-            FixedImage:
-                id: seed,20
-                source: 'assets/img/seed-br-0.png'
-                pos_hint: (2000, 2000)
-                true_spot: (20, 20)
-                size_hint: (40, 40)
-            FixedImage:
-                id: seed,21
-                source: 'assets/img/seed-br-0.png'
-                pos_hint: (2000, 2000)
-                true_spot: (20, 20)
-                size_hint: (40, 40)
-            FixedImage:
-                id: seed,22
-                source: 'assets/img/seed-br-0.png'
-                pos_hint: (2000, 2000)
-                true_spot: (20, 20)
-                size_hint: (40, 40)
-            FixedImage:
-                id: seed,23
-                source: 'assets/img/seed-br-0.png'
-                pos_hint: (2000, 2000)
-                true_spot: (20, 20)
-                size_hint: (40, 40)
-            FixedImage:
-                id: seed,24
-                source: 'assets/img/seed-br-0.png'
-                pos_hint: (2000, 2000)
-                true_spot: (20, 20)
-                size_hint: (40, 40)
-            FixedImage:
-                id: seed,25
-                source: 'assets/img/seed-br-0.png'
-                pos_hint: (2000, 2000)
-                true_spot: (20, 20)
-                size_hint: (40, 40)
-            FixedImage:
-                id: seed,26
-                source: 'assets/img/seed-br-0.png'
-                pos_hint: (2000, 2000)
-                true_spot: (20, 20)
-                size_hint: (40, 40)
-            FixedImage:
-                id: seed,27
-                source: 'assets/img/seed-br-0.png'
-                pos_hint: (2000, 2000)
-                true_spot: (20, 20)
-                size_hint: (40, 40)
-            FixedImage:
-                id: seed,28
-                source: 'assets/img/seed-br-0.png'
-                pos_hint: (2000, 2000)
-                true_spot: (20, 20)
-                size_hint: (40, 40)
-            FixedImage:
-                id: seed,29
-                source: 'assets/img/seed-br-0.png'
-                pos_hint: (2000, 2000)
-                true_spot: (20, 20)
-                size_hint: (40, 40)
-            FixedImage:
-                id: seed,30
-                source: 'assets/img/seed-br-0.png'
-                pos_hint: (2000, 2000)
-                true_spot: (20, 20)
-                size_hint: (40, 40)
-            FixedImage:
-                id: seed,31
-                source: 'assets/img/seed-br-0.png'
-                pos_hint: (2000, 2000)
-                true_spot: (20, 20)
-                size_hint: (40, 40)
-            FixedImage:
-                id: seed,32
-                source: 'assets/img/seed-br-0.png'
-                pos_hint: (2000, 2000)
-                true_spot: (20, 20)
-                size_hint: (40, 40)
-            FixedImage:
-                id: seed,33
-                source: 'assets/img/seed-br-0.png'
-                pos_hint: (2000, 2000)
-                true_spot: (20, 20)
-                size_hint: (40, 40)
-            FixedImage:
-                id: seed,34
-                source: 'assets/img/seed-br-0.png'
-                pos_hint: (2000, 2000)
-                true_spot: (20, 20)
-                size_hint: (40, 40)
-            FixedImage:
-                id: seed,35
-                source: 'assets/img/seed-br-0.png'
-                pos_hint: (2000, 2000)
-                true_spot: (20, 20)
-                size_hint: (40, 40)
-            FixedImage:
-                id: seed,36
-                source: 'assets/img/seed-br-0.png'
-                pos_hint: (2000, 2000)
-                true_spot: (20, 20)
-                size_hint: (40, 40)
-            FixedImage:
-                id: seed,37
-                source: 'assets/img/seed-br-0.png'
-                pos_hint: (2000, 2000)
-                true_spot: (20, 20)
-                size_hint: (40, 40)
-            FixedImage:
-                id: seed,38
-                source: 'assets/img/seed-br-0.png'
-                pos_hint: (2000, 2000)
-                true_spot: (20, 20)
-                size_hint: (40, 40)
-            FixedImage:
-                id: seed,39
-                source: 'assets/img/seed-br-0.png'
-                pos_hint: (2000, 2000)
-                true_spot: (20, 20)
-                size_hint: (40, 40)
-            FixedImage:
-                id: seed,40
-                source: 'assets/img/seed-br-0.png'
-                pos_hint: (2000, 2000)
-                true_spot: (20, 20)
-                size_hint: (40, 40)
-            FixedImage:
-                id: seed,41
-                source: 'assets/img/seed-br-0.png'
-                pos_hint: (2000, 2000)
-                true_spot: (20, 20)
-                size_hint: (40, 40)
-            FixedImage:
-                id: seed,42
-                source: 'assets/img/seed-br-0.png'
-                pos_hint: (2000, 2000)
-                true_spot: (20, 20)
-                size_hint: (40, 40)
-            FixedImage:
-                id: seed,43
-                source: 'assets/img/seed-br-0.png'
-                pos_hint: (2000, 2000)
-                true_spot: (20, 20)
-                size_hint: (40, 40)
-            FixedImage:
-                id: seed,44
-                source: 'assets/img/seed-br-0.png'
-                pos_hint: (2000, 2000)
-                true_spot: (20, 20)
-                size_hint: (40, 40)
-            FixedImage:
-                id: seed,45
-                source: 'assets/img/seed-br-0.png'
-                pos_hint: (2000, 2000)
-                true_spot: (20, 20)
-                size_hint: (40, 40)
-            FixedImage:
-                id: seed,46
-                source: 'assets/img/seed-br-0.png'
-                pos_hint: (2000, 2000)
-                true_spot: (20, 20)
-                size_hint: (40, 40)
-            FixedImage:
-                id: seed,47
-                source: 'assets/img/seed-br-0.png'
-                pos_hint: (2000, 2000)
-                true_spot: (20, 20)
-                size_hint: (40, 40)
-            FixedImage:
-                id: seed,48
-                source: 'assets/img/seed-br-0.png'
-                pos_hint: (2000, 2000)
-                true_spot: (20, 20)
-                size_hint: (40, 40)

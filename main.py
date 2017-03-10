@@ -45,6 +45,7 @@ settings = {
     "seeds_per_house": 4,
     "capture_rule": 0,
     "eog_rule": 0,
+    "animation_speed_choice": 1,
     "seed_drop_rate": 0.4,
     "board_choice": 0,
     "seed_choice": 0,
@@ -84,6 +85,11 @@ visual_settings = {
         "Tumbled Pebbles",
         "Black River Rock"
     ],
+    "animation_speed_choice": [
+        "Fast",
+        "Medium",
+        "Slow"
+    ],
     "notification_volume": [
         "Mute",
         "Soft",
@@ -103,6 +109,9 @@ def update_setting(setting_name, value):
     global visual_settings
     global character
     global app
+    global seeds
+
+    print setting_name
 
     settings[setting_name] = value
     if setting_name == "ai_chosen":
@@ -115,13 +124,43 @@ def update_setting(setting_name, value):
             settings["first_player"] = USER
         else:
             settings["first_player"] = AI
+        app.root.screens[SETTINGS_RULES_SCREEN].ids.rules_screen_menu.\
+            set_text(setting_name, visual_settings[setting_name][value])
     if setting_name == "seeds_per_house_selection":
         settings["seeds_per_house"] = value + 3
+        app.root.screens[SETTINGS_RULES_SCREEN].ids.rules_screen_menu.\
+            set_text(setting_name, visual_settings[setting_name][value])
+    if setting_name == "capture_rule":
+        app.root.screens[SETTINGS_RULES_SCREEN].ids.rules_screen_menu.\
+            set_text(setting_name, visual_settings[setting_name][value])
+    if setting_name == "eog_rule":
+        app.root.screens[SETTINGS_RULES_SCREEN].ids.rules_screen_menu.\
+            set_text(setting_name, visual_settings[setting_name][value])
+    if setting_name == "seed_choice":
+        seeds.change_picture()
+        app.root.screens[SETTINGS_SCREEN_SCREEN].ids.screen_screen_menu.\
+            set_text(setting_name, visual_settings[setting_name][value])
+    if setting_name == "board_choice":
+        filename = [
+            'assets/img/walnut-game-board.png',
+            'assets/img/birch-game-board.png',
+        ][value]
+        app.root.screens[GAME_SCREEN].ids.board_image.source = filename
+        app.root.screens[SETTINGS_SCREEN_SCREEN].ids.screen_screen_menu.\
+            set_text(setting_name, visual_settings[setting_name][value])
+    if setting_name == "animation_speed_choice":
+        settings["seed_drop_rate"] = 0.1 + value*0.3
+        app.root.screens[SETTINGS_SCREEN_SCREEN].ids.screen_screen_menu.\
+            set_text(setting_name, visual_settings[setting_name][value])
     if setting_name not in visual_settings:
         return
-    app.root.screens[SETTINGS_RULES_SCREEN].ids.rules_screen_menu.\
-        set_text(setting_name, visual_settings[setting_name][value])
-    print "SETTINGS", settings
+    if setting_name == "notification_volume":
+        app.root.screens[SETTINGS_SOUND_SCREEN].ids.sound_screen_menu.\
+            set_text(setting_name, visual_settings[setting_name][value])
+    if setting_name == "seed_volume":
+        app.root.screens[SETTINGS_SOUND_SCREEN].ids.sound_screen_menu.\
+            set_text(setting_name, visual_settings[setting_name][value])
+    # print "SETTINGS", settings
 
 def generically_apply_settings():
     global settings
@@ -143,6 +182,7 @@ PEBBLE = 1
 BLACK = 2
 
 SOUND_FILE = 0
+SEED_FILE = 1
 
 MANY = 3
 
@@ -161,6 +201,9 @@ for board_num, board_str in enumerate(["walnut", "birch"]):
     COMBO_LIST[board_num] = {}
     for seed_num, seed_str in enumerate(["teal", "pebble", "black"]):
         COMBO_LIST[board_num][seed_num] = {}
+        #
+        #  add sounds to COMBO LIST
+        #
         COMBO_LIST[board_num][seed_num][SOUND_FILE] = {}
         for qty_num, qty_str in enumerate(["1", "2", "many"]):
             qty = (qty_num+1) if qty_num<2 else MANY
@@ -176,7 +219,7 @@ for board_num, board_str in enumerate(["walnut", "birch"]):
                 for _ in range(PLAY_IDX):
                     COMBO_LIST[board_num][seed_num][SOUND_FILE][qty][pit_type].\
                         append(SoundLoader.load(file_name))
-                COMBO_LIST[board_num][seed_num][SOUND_FILE][qty][pit_type].append(0)                            
+                COMBO_LIST[board_num][seed_num][SOUND_FILE][qty][pit_type].append(0)
 
 SCOOP_SOUND = {}
 for qty_num, qty_str in enumerate(["1", "2", "many"]):
@@ -187,7 +230,28 @@ for qty_num, qty_str in enumerate(["1", "2", "many"]):
         SCOOP_SOUND[qty].append(SoundLoader.load(file_name))
     SCOOP_SOUND[qty].append(0)                            
 
-# print COMBO_LIST
+
+SEED_DICT = {}
+for seed_num, seed_str in enumerate(["teal", "pebble", "black"]):
+    SEED_DICT[seed_num] = {}
+    SEED_DICT[seed_num]['images'] = []
+    for _ in range(3):
+        file_name = [
+            'assets/img/seed-teal-01.png',
+            'assets/img/seed-pebble-01.png',
+            'assets/img/seed-black-01.png',
+        ][seed_num]
+        size = [
+            (56, 55),
+            (75, 71),
+            (75, 62)
+        ][seed_num]
+        true_spot = (size[0]/2.0, size[1]/2.0)
+        SEED_DICT[seed_num]['images'].append({
+            'file': file_name,
+            'size_hint': size,
+            'true_spot': true_spot
+        })
 
 ##############################
 #
@@ -228,9 +292,9 @@ class GameScreen(Screen):
         {"pos": (220,  770)}  # 14 ai store
     ]
 
+
     def pushed_pit(self, pit):
         machine.input("pushed_pit", pit)
-
 
 class SettingsOpponentScreen(Screen):
 
@@ -288,6 +352,15 @@ class MancalaApp(App):
         machine.input("request_new_game")
 
 
+                #     FixedImage:
+                # id: seed,0
+                # source: 'assets/img/seed-br-0.png'
+                # pos_hint: (2000, 2000)
+                # true_spot: (20, 20)
+                # size_hint: (40, 40)
+
+
+
 ##############################
 #
 #  ANIMATION
@@ -300,13 +373,33 @@ class Seeds(object):
 
     def __init__(self, display):
         self.board = [[] for x in xrange(15)]
-        for index in range(4*12):
-            seed = display["seed,{}".format(index)]
+        self.seed_ref = []
+        for index in range(6*12):
+            seed = FixedImage()
+            seed.id = "seed,{}".format(index)
+            seed_pic = random.choice(SEED_DICT[settings['seed_choice']]['images'])
+            seed.source = seed_pic['file']
+            seed.pos_hint = (2000, 2000)
+            seed.true_spot = seed_pic['true_spot']
+            seed.size_hint = seed_pic['size_hint']
+            display.game_screen_root.add_widget(seed)
             self.board[HAND].append(seed)
+            self.seed_ref.append(seed)
         self.display = display
 
+    def change_picture(self):
+        for s in self.seed_ref:
+            seed_pic = random.choice(SEED_DICT[settings['seed_choice']]['images'])
+            s.source = seed_pic['file']
+            s.true_spot = seed_pic['true_spot']
+            s.size_hint = seed_pic['size_hint']
+
     def scoop(self, pit):
+        global SCOOP_SOUND
+        global settings
         seed_count = len(self.board[pit])
+        if seed_count==0:
+            return
         for _ in range(seed_count):
             seed = self.board[pit].pop()
             self.board[HAND].append(seed)
@@ -315,10 +408,12 @@ class Seeds(object):
         sf = SCOOP_SOUND[scoop_size]
         sf[PLAY_IDX] = (sf[PLAY_IDX] + 1) % PLAY_IDX
         current = sf[PLAY_IDX]
+        sf[current].volume = settings['seed_volume']*0.3
         sf[current].play()
 
     def drop(self, pit, count):
         global COMBO_LIST
+        global settings
         pit_type = FILLED_PIT if self.board[pit] else EMPTY_PIT
         for _ in range(count):
             seed = self.board[HAND].pop()
@@ -330,6 +425,7 @@ class Seeds(object):
         sf = sf[pit_type]
         sf[PLAY_IDX] = (sf[PLAY_IDX] + 1) % PLAY_IDX
         current = sf[PLAY_IDX]
+        sf[current].volume = settings['seed_volume']*0.3
         sf[current].play()
 
     def _move(self, seed, pit):
