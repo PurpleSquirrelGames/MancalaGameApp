@@ -389,7 +389,8 @@ class FixedPopup(Widget, FixedBase):
         if self.active:
             self.pos_hint = self.active_pos_hint
             for c in self.children:
-                c.pos_hint = c.active_pos_hint
+                if c.active_pos_hint:
+                    c.pos_hint = c.active_pos_hint
         else:
             self.pos_hint = self._shift(self.active_pos_hint)
             for c in self.children:

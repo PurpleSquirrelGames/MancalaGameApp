@@ -8,6 +8,7 @@ from kivy.core.audio import SoundLoader
 from kivy.factory import Factory 
 from kivy.garden.progressspinner import ProgressSpinner
 from kivy.lang import Builder
+from kivy.storage.jsonstore import JsonStore
 from kivy.uix.screenmanager import ScreenManager, Screen, NoTransition
 from kivy.uix.widget import Widget 
 
@@ -19,11 +20,13 @@ from simplestate import StateMachine, State
 from gameengine import KalahGame
 from characters import AI_LIST
 
-__version__ = '0.0.6'
+__version__ = '0.0.14'
 
 machine = StateMachine(debug=True)
 
 seeds = None
+
+storage = JsonStore('mancala.json')
 
 USER = 1
 AI = 2
@@ -52,6 +55,12 @@ settings = {
     "notification_volume": 2,
     "seed_volume": 2
 }
+
+if storage.exists('settings'):
+    settings = storage.get('settings')
+else:
+    storage.put('settings', **settings)
+
 character = AI_LIST[settings['ai_chosen']]
 
 visual_settings = {
@@ -117,8 +126,6 @@ def update_setting(setting_name, value):
     if setting_name == "ai_chosen":
         settings["ai_chosen"] = value
         character = AI_LIST[value]
-        print "CHARACTER", character
-        return
     if setting_name == "who_plays_first":
         if value == 0:
             settings["first_player"] = USER
@@ -152,21 +159,48 @@ def update_setting(setting_name, value):
         settings["seed_drop_rate"] = 0.1 + value*0.3
         app.root.screens[SETTINGS_SCREEN_SCREEN].ids.screen_screen_menu.\
             set_text(setting_name, visual_settings[setting_name][value])
-    if setting_name not in visual_settings:
-        return
     if setting_name == "notification_volume":
         app.root.screens[SETTINGS_SOUND_SCREEN].ids.sound_screen_menu.\
             set_text(setting_name, visual_settings[setting_name][value])
     if setting_name == "seed_volume":
         app.root.screens[SETTINGS_SOUND_SCREEN].ids.sound_screen_menu.\
             set_text(setting_name, visual_settings[setting_name][value])
-    # print "SETTINGS", settings
+    storage.put('settings', **settings)
 
 def generically_apply_settings():
     global settings
 
     for key in settings:
         update_setting(key, settings[key])
+
+def save_game(force_new_game=False):
+    global machine
+    global game
+
+    game_state = {}
+    if machine.get_state() not in ["pending_start", "init_game", "eog"]:
+        if not force_new_game:
+            game_state["active_game"] = True
+        else:
+            game_state["active_game"] = False
+    else:
+        game_state["active_game"] = False
+    game_state["board"] = game.board
+    game_state["turn"] = game.nplayer
+    storage.put('game_state', **game_state)
+
+def restore_game():
+    global game
+
+    game.restoration = False
+    if not storage.exists('game_state'):
+        return
+    game_state = storage.get('game_state')
+    if not game_state['active_game']:
+        return
+    game.board = game_state['board']
+    game.nplayer = game_state['turn']
+    game.restoration = True
 
 ##############################
 #
@@ -349,16 +383,9 @@ class MancalaApp(App):
 
     def start_new_game(self):
         self.root.current = "game_screen"
+        self.root.screens[GAME_SCREEN].ids.eog_new_game_button.active = False
+        save_game(force_new_game=True)
         machine.input("request_new_game")
-
-
-                #     FixedImage:
-                # id: seed,0
-                # source: 'assets/img/seed-br-0.png'
-                # pos_hint: (2000, 2000)
-                # true_spot: (20, 20)
-                # size_hint: (40, 40)
-
 
 
 ##############################
@@ -441,21 +468,20 @@ class HandSeedAnimation(object):
     global seeds
     global settings
 
-    def __init__(self, player, board, display, clear_first=False):
+    def __init__(self, player, board, display, restoration=False):
+        self.restoration = restoration
         self.nplayer = player
         self.idx = 0
         self.board = copy(board)
         self.display = display
         self.animation_steps = game.animate
         self.animation_steps.append({"action": "home"})
+        print self.animation_steps
         self.last_step = {}
         if player==USER:
             self.hand = display.user_hand
         else:
             self.hand = display.ai_hand
-        if clear_first:
-            for pit in range(1, 15):
-                seeds.scoop(pit)
         self.play_one_step(None, None)
 
     def play_one_step(self, sequence, widget):
@@ -510,7 +536,10 @@ class HandSeedAnimation(object):
             elif step['action']=="game_over":
                 self.display.center_message.text = "Handling End of Game"
             elif step['action']=="setting_up":
-                self.display.center_message.text = "Setting Up Board"
+                if self.restoration:
+                    self.display.center_message.text = "Restoring Game"
+                else:
+                    self.display.center_message.text = "Setting Up Board"
             elif step['action']=="normal_move":
                 self.display.center_message.text = ""
             elif step['action']=="home":
@@ -544,7 +573,6 @@ class PendingStartState(State):
 
     def on_exit(self):
         global seeds
-        self.ref['game'].board = [settings["seeds_per_house"]*12] + [0]*14
         seeds = Seeds(self.ref["kivy"])
 
 class InitGameState(State):
@@ -552,10 +580,13 @@ class InitGameState(State):
     def on_entry(self):
         self.ref['kivy'].wait_on_ai.stop_spinning()
         board_prior = copy(self.ref["game"].board)
-        self.ref["game"].reset_board()
-        if any([board_prior[i] for i in range(1, 15)]):
-            self.animation = HandSeedAnimation(AI, board_prior, self.ref['kivy'], clear_first=True)
+        restore_game()
+        if self.ref["game"].restoration:
+            self.ref["game"].reset_board(restoration=True)
+            self.ref["game"].restoration = False
+            self.animation = HandSeedAnimation(AI, board_prior, self.ref['kivy'], restoration=True)
         else:
+            self.ref["game"].reset_board()
             self.animation = HandSeedAnimation(AI, board_prior, self.ref['kivy'])
         return self.same_state
 
@@ -581,6 +612,7 @@ def display_board(board, kivy_ids):
 class StartTurn(State):
 
     def on_entry(self):
+        save_game()
         self.ref["choices_so_far"] = []
         self.ref["ai_choices"] = []
         if self.ref["game"].is_over():
@@ -628,7 +660,7 @@ class AnitmateUserChoiceState(State):
             done = any([chlist==self.ref['choices_so_far'] for chlist in possible_moves])
             if done:
                 self.ref["game"].usermove_finish_simulation()
-                self.ref["game"].play_move(self.ref['choices_so_far'])
+                self.ref["game"].animated_play_move(self.ref['choices_so_far'])
                 return self.change_state("start_turn")
             self.ref['kivy'].center_message.text ="landed in store. play again."
             return self.change_state("wait_for_pit")
@@ -665,7 +697,7 @@ class AnimateAIChoicesState(State):
 
     def on_entry(self):
         board_prior = copy(self.ref['game'].board)
-        self.ref['game'].play_move(self.ref['ai_choices'])
+        self.ref['game'].animated_play_move(self.ref['ai_choices'])
         self.animation = HandSeedAnimation(AI, board_prior, self.ref['kivy'])
 
     def input(self, input_name, *args, **kwargs):
@@ -680,8 +712,11 @@ class AnimateAIChoicesState(State):
 class EndOfGameDisplayState(State):
 
     def on_entry(self):
+        save_game()
         winner = self.ref['game'].get_winner()    
-        self.ref["kivy"].center_message.text = ["Tie Game.", "You won!", "AI won."][game.get_winner()]
+        self.ref["kivy"].center_message.text = \
+            ["Tie Game.", "You won!", "AI won."][game.get_winner()]
+        self.ref["kivy"].eog_new_game_button.active = True
 
     def input(self, input_name, *args, **kwargs):
         if input_name == "request_new_game":
@@ -689,7 +724,7 @@ class EndOfGameDisplayState(State):
 
 
 if __name__=='__main__':
-    game = KalahGame(settings, character)
+    game = KalahGame(settings)
     machine.bind_reference("game", game)
     machine.bind_reference("settings", settings)
     machine.register_state(StartTurn("start_turn"))

@@ -17,7 +17,7 @@ AppScreenManager:
     name: "settings_opponent_screen"
     FixedLayoutRoot:
         FixedLayout:
-            Image:
+            FixedImage:
                 id: board_image
                 source: 'assets/img/settings-opponent-screen.png'
                 pos_hint: (0, 0)
@@ -53,7 +53,7 @@ AppScreenManager:
                 true_font_size: 50
                 color: (0, 0, 0, 1)
                 background_color: (0.1, 1, 0.1, 1)
-            Image:
+            FixedImage:
                 id: ai_face_image
                 pos_hint: (1600, 780)
                 size_hint: (300, 300)
@@ -110,7 +110,7 @@ AppScreenManager:
     name: "settings_rules_screen"
     FixedLayoutRoot:
         FixedLayout:
-            Image:
+            FixedImage:
                 id: board_image
                 source: 'assets/img/settings-rules-screen.png'
                 pos_hint: (0, 0)
@@ -279,7 +279,7 @@ AppScreenManager:
     name: "settings_screen_screen"
     FixedLayoutRoot:
         FixedLayout:
-            Image:
+            FixedImage:
                 id: board_image
                 source: 'assets/img/settings-screen-screen.png'
                 pos_hint: (0, 0)
@@ -400,7 +400,7 @@ AppScreenManager:
     name: "settings_sound_screen"
     FixedLayoutRoot:
         FixedLayout:
-            Image:
+            FixedImage:
                 id: board_image
                 source: 'assets/img/settings-sound-screen.png'
                 pos_hint: (0, 0)
@@ -533,6 +533,17 @@ AppScreenManager:
                 pos_hint: root.HANDS[2]['pos']
                 true_spot: (150, 150)
                 size_hint: (300, 300)
+            FixedPopup:
+                id: eog_new_game_button
+                active_pos_hint: (800, 500)
+                size_hint: (300, 100)
+                FixedButton:
+                    pos_hint: (800, 500)
+                    size_hint: (300, 100)
+                    color: (1, 0, 0, 1)
+                    true_font_size: 56
+                    text: "New Game"
+                    on_release: app.start_new_game()
 
             FixedImageButton:
                 source: 'assets/img/brown190x200.png'

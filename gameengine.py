@@ -68,17 +68,17 @@ CAUTION = 2
 
 class MancalaAI(easyAI.Negamax, object):
 
-    def __init__(self, settings, character):
+    def __init__(self, settings):
         self.settings = settings
-        self.character = character
-        super(MancalaAI, self).__init__(character['lookahead'])
+        self.set_character()
+        super(MancalaAI, self).__init__(self.character['lookahead'])
 
     def _random_move(self, game):
         possible_moves = game.possible_moves()
         return random.choice(possible_moves)
 
-    def set_character(self, character):
-        self.character = character
+    def set_character(self):
+        self.character = AI_LIST[self.settings["ai_chosen"]]
         self.depth = self.character['lookahead']
 
     def __call__(self, game):
@@ -95,22 +95,28 @@ class KalahHumanPlayer(easyAI.Human_Player):
     pass
 
 class KalahAIPlayer(easyAI.AI_Player):
-    pass
+    
+    def set_character(self):
+        self.AI_algo.set_character()
 
 class KalahGame(easyAI.TwoPlayersGame):
 
-    def __init__(self, settings, character):
+    def __init__(self, settings):
         self.settings = settings
-        self.character = character
         self.players = [
             KalahHumanPlayer(),
-            KalahAIPlayer(MancalaAI(self.settings, self.character))
+            KalahAIPlayer(MancalaAI(self.settings))
         ]
+        self.set_character()
         self.nplayer = self.settings['first_player']
         self.animate = []
-        self.want_animation = True
+        self.want_animation = False
         self.board = [0]*15
-        self.reset_board()
+        self.reset_board(empty=True)
+
+    def set_character(self):
+        self.character = AI_LIST[self.settings["ai_chosen"]]
+        self.players[1].set_character()
 
     def is_stopping_in_own_store(self, pit):
         count = self.board[pit] % 13  # if seeds > 12 then they wrap around board; so modulo 13
@@ -126,8 +132,6 @@ class KalahGame(easyAI.TwoPlayersGame):
         for move in move_list:
             last_pit = move[-1]
             if self.is_stopping_in_own_store(last_pit):
-                want_copy = self.want_animation
-                self.want_animation = False
                 board_copy = copy(self.board)
                 self.make_move_choice(last_pit)
                 more_choices = self.possible_moves_choices()
@@ -139,7 +143,6 @@ class KalahGame(easyAI.TwoPlayersGame):
                 else:
                     completed_list.append(move)
                 self.board = board_copy
-                self.want_animation = want_copy
             else:
                 completed_list.append(move)
 
@@ -149,6 +152,11 @@ class KalahGame(easyAI.TwoPlayersGame):
             if self.board[house]:
                 possible.append(house)
         return possible
+
+    def animated_play_move(self, move):
+        self.want_animation = True
+        self.play_move(move)
+        self.want_animation = False
 
     def make_move(self, move):
         self.animate = []
@@ -267,17 +275,48 @@ class KalahGame(easyAI.TwoPlayersGame):
     def ttentry(self):
         return "Mancala (Kalah) Game"
 
-    def reset_board(self):
+    def reset_board(self, restoration=False, empty=False):
+        self.want_animation = True
+        #
+        # manipulate basic settings
+        #
         self.seeds_per_house = self.settings['seeds_per_house']
+        #
+        # manipulate board
+        #
         if self.want_animation:
             self.animate = [{ACTION: "setting_up"}]
+        # determine new board
+        if restoration:
+            new_board = copy(self.board)
+            self.board = [12*self.seeds_per_house] + [0]*14
+        else:
+            if empty:
+                self.board = [12*self.seeds_per_house] + [0]*14
+                new_board = copy(self.board)
+            else:
+                new_board = [0] + \
+                            [self.seeds_per_house] * 6 + [0] + \
+                            [self.seeds_per_house] * 6 + [0]
         for pit in ALL_PITS:
             if self.board[pit]:
                 self._scoop(pit)
-        self.board[HAND] = 12*self.seeds_per_house
-        for player in PLAYER_LIST:
-            for pit in HOUSE_LIST[player]:
-                self._drop(pit, count=self.seeds_per_house)
+        for pit in ALL_PITS:
+            if new_board[pit]:
+                self._drop(pit, count=new_board[pit])
+        self.board[HAND] = 0  # this is for error recovery. In theory, you
+                              # should never needs this as the hand will be
+                              # empty already.
+        #
+        # manipulate AI character
+        #
+        self.set_character()
+        #
+        # set nplayer
+        #
+        if not restoration:
+            self.nplayer = self.settings['first_player']
+        self.want_animation = False
 
     def _scoop(self, pit):
         self.board[HAND] += self.board[pit]
@@ -311,6 +350,7 @@ class KalahGame(easyAI.TwoPlayersGame):
         return self.animate
 
     def usermove_start_simulation(self):
+        self.want_animation = True
         self.animate = []
         self.original_board = copy(self.board)
 
@@ -322,6 +362,7 @@ class KalahGame(easyAI.TwoPlayersGame):
     def usermove_finish_simulation(self):
         self.animate = []
         self.board = self.original_board
+        self.want_animation = False
 
 
 if __name__=="__main__":
@@ -337,7 +378,8 @@ if __name__=="__main__":
     }
     character = AI_LIST[settings['ai_chosen']]
 
-    game = KalahGame(settings, character)
+    game = KalahGame(settings)
+    game.reset_board()
 
     while not game.is_over():
         print game.animate
