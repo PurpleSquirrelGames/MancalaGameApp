@@ -31,7 +31,7 @@ AI_LIST = [
         "tagline": "Blunt errors are rare, but still easy to win against."
     },
     {
-        "name": "Emily",
+        "name": "Jacob",
         "rank": "4",
         "strategy": "negamax",  # options: "random", "negamax"
         "lookahead": 2,  # 1 to 6
