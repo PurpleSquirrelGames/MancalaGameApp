@@ -9,12 +9,14 @@ from kivy.factory import Factory
 from kivy.garden.progressspinner import ProgressSpinner
 from kivy.lang import Builder
 from kivy.storage.jsonstore import JsonStore
+from kivy.uix.image import Image
 from kivy.uix.screenmanager import ScreenManager, Screen, NoTransition
-from kivy.uix.widget import Widget 
+from kivy.uix.widget import Widget
 
-from fixedlayout import FixedLayout, FixedLayoutRoot, FixedImage,\
-    FixedImageButton, FixedPopup, FixedRadioButtons, FixedSimpleMenu,\
-    FixedSimpleMenuItem, FixedButton
+from kivy.uix.floatlayout import FloatLayout
+
+from fixedlayout import FixedLayout, FixedPopup, FixedRadioButtons, \
+    FixedSimpleMenu, FixedSimpleMenuItem
 
 from simplestate import StateMachine, State
 from gameengine import KalahGame
@@ -120,7 +122,7 @@ def update_setting(setting_name, value):
     global app
     global seeds
 
-    print setting_name
+    # print setting_name
 
     settings[setting_name] = value
     if setting_name == "ai_chosen":
@@ -283,7 +285,7 @@ for seed_num, seed_str in enumerate(["teal", "pebble", "black"]):
         true_spot = (size[0]/2.0, size[1]/2.0)
         SEED_DICT[seed_num]['images'].append({
             'file': file_name,
-            'size_hint': size,
+            'size_fixed': size,
             'true_spot': true_spot
         })
 
@@ -375,6 +377,7 @@ class MancalaApp(App):
 
     def build(self):
         presentation = Builder.load_file('mancala.kv')
+        return presentation
 
     def on_start(self):
         machine.bind_reference("kivy", self.root.screens[GAME_SCREEN].ids)
@@ -402,13 +405,13 @@ class Seeds(object):
         self.board = [[] for x in xrange(15)]
         self.seed_ref = []
         for index in range(6*12):
-            seed = FixedImage()
+            seed = Image()
             seed.id = "seed,{}".format(index)
             seed_pic = random.choice(SEED_DICT[settings['seed_choice']]['images'])
             seed.source = seed_pic['file']
-            seed.pos_hint = (2000, 2000)
+            seed.pos_fixed = (2000, 2000)
             seed.true_spot = seed_pic['true_spot']
-            seed.size_hint = seed_pic['size_hint']
+            seed.size_fixed = seed_pic['size_fixed']
             display.game_screen_root.add_widget(seed)
             self.board[HAND].append(seed)
             self.seed_ref.append(seed)
@@ -419,7 +422,7 @@ class Seeds(object):
             seed_pic = random.choice(SEED_DICT[settings['seed_choice']]['images'])
             s.source = seed_pic['file']
             s.true_spot = seed_pic['true_spot']
-            s.size_hint = seed_pic['size_hint']
+            s.size_fixed = seed_pic['size_fixed']
 
     def scoop(self, pit):
         global SCOOP_SOUND
@@ -456,10 +459,10 @@ class Seeds(object):
         sf[current].play()
 
     def _move(self, seed, pit):
-        pos_hint = GameScreen.PITS[pit]['pos']
-        x = pos_hint[0] + random.randint(-50, 50)
-        y = pos_hint[1] + random.randint(-50, 50)
-        seed.pos_hint = (x, y)
+        pos_fixed = GameScreen.PITS[pit]['pos']
+        x = pos_fixed[0] + random.randint(-50, 50)
+        y = pos_fixed[1] + random.randint(-50, 50)
+        seed.pos_fixed = (x, y)
 
 
 
@@ -476,7 +479,7 @@ class HandSeedAnimation(object):
         self.display = display
         self.animation_steps = game.animate
         self.animation_steps.append({"action": "home"})
-        print self.animation_steps
+        # print self.animation_steps
         self.last_step = {}
         if player==USER:
             self.hand = display.user_hand
@@ -515,19 +518,19 @@ class HandSeedAnimation(object):
             hand_animation = None # everything is timed by hand movement
             if step['action']=="scoop":
                 hand_animation = Animation(
-                    pos_hint=GameScreen.PITS[pit]["pos"],
+                    pos_fixed=GameScreen.PITS[pit]["pos"],
                     duration=settings['seed_drop_rate'],
                     t='in_out_sine'
                 )
             elif step['action']=="drop":
                 hand_animation = Animation(
-                    pos_hint=GameScreen.PITS[pit]["pos"],
+                    pos_fixed=GameScreen.PITS[pit]["pos"],
                     duration=settings['seed_drop_rate'],
                     t='in_out_sine'
                 )
             elif step['action']=="drop_all":
                 hand_animation = Animation(
-                    pos_hint=GameScreen.PITS[pit]["pos"],
+                    pos_fixed=GameScreen.PITS[pit]["pos"],
                     duration=settings['seed_drop_rate'],
                     t='in_out_sine'
                 )
@@ -545,14 +548,18 @@ class HandSeedAnimation(object):
             elif step['action']=="home":
                 self.display.center_message.text = ""
                 hand_animation = Animation(
-                    pos_hint = GameScreen.HANDS[self.nplayer]['pos'],
+                    pos_fixed = GameScreen.HANDS[self.nplayer]['pos'],
                     duration=settings['seed_drop_rate'],
                     t='in_out_sine'
                 )
             # update_numbers
             display_board(self.board, self.display)
             if not hand_animation:
-                hand_animation = Animation(pos_hint=self.hand.pos_hint)
+                if step['action'] in ['normal_move', 'setting_up']:
+                    duration = 0.1
+                else:
+                    duration = 1.0
+                hand_animation = Animation(pos_fixed=self.hand.pos_fixed, duration=duration)
             hand_animation.bind(on_complete = self.play_one_step)
             hand_animation.start(self.hand)
             self.idx += 1

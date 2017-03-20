@@ -153,6 +153,60 @@ class KalahGame(easyAI.TwoPlayersGame):
                 possible.append(house)
         return possible
 
+    def judge_best_of_equal_moves(self, move_tuples):
+        best_move, board = move_tuples[0]  # setting default
+        lowest_count = 9999
+        for move, board in move_tuples:
+            if board[STORE_IDX[AI]] < lowest_count:
+                lowest_count = board[STORE_IDX[AI]]
+        best_score = -9999
+        for index, tup in enumerate(move_tuples):
+            move, board = tup
+            score = self.judge_a_board(board, lowest_count)
+            print "JUDGE", move, board, score
+            if score > best_score:
+                best_score = score
+                best_move = move
+        return best_move
+
+    def judge_a_board(self, board, base_score):
+        # we will judge a board on
+        #   1. each seed above base in AI store: +5
+        #   2. empty pit 13: +8
+        #   3. empty pit 12: +4
+        #   4. pit 12 with 1: +2
+        # if capture allowed:
+        #   5. each pit with seeds across from empty: -1 per seed
+        #   6. easy next capture seen: 4 per seed
+        score = 0
+        score += (board[STORE_IDX[AI]] - base_score) * 5
+        if board[13] == 0:
+            score += 8
+        if board[12] == 0:
+            score += 4
+        if board[12] == 1:
+            score += 2
+        if self.settings['capture_rule'] != 0:
+            return score
+        for pit in HOUSE_LIST[AI]:
+            seeds = board[pit]
+            if seeds:
+                # each pit with seeds across from empty
+                opp_seeds = board[P[pit][OPP]]
+                if opp_seeds == 0:
+                    score -= seeds * 1
+                # easy next capture
+                future_pit = pit
+                for _ in range(seeds):
+                    future_pit = P[future_pit][NEXT][AI]
+                if board[future_pit] == 0:
+                    if P[future_pit][OWNER] == AI:
+                        if P[future_pit][ROLE] == HOUSE:
+                            opp_seeds = board[P[future_pit][OPP]]
+                            score += opp_seeds * 4
+        return score
+        
+
     def animated_play_move(self, move):
         self.want_animation = True
         self.play_move(move)
@@ -367,7 +421,7 @@ class KalahGame(easyAI.TwoPlayersGame):
 
 if __name__=="__main__":
     settings = {
-        "ai_chosen": 1,
+        "ai_chosen": 4,
         "who_plays_first": 0,
         "first_player": USER,
         "seeds_per_house_selection": 1,
@@ -382,7 +436,7 @@ if __name__=="__main__":
     game.reset_board()
 
     while not game.is_over():
-        print game.animate
+        # print game.animate
         game.show()
         if game.nplayer==USER:
             poss = game.possible_moves()
@@ -392,6 +446,8 @@ if __name__=="__main__":
             move = poss[index]
         else:
             move = game.get_move()
+            if "move_fitness_list" in dir(game):
+                print "Move rankings:", game.move_fitness_list
             print "AI plays", move
         game.play_move(move)
     print

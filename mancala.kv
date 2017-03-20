@@ -15,675 +15,660 @@ AppScreenManager:
 
 <SettingsOpponentScreen>
     name: "settings_opponent_screen"
-    FixedLayoutRoot:
-        FixedLayout:
-            FixedImage:
-                id: board_image
-                source: 'assets/img/settings-opponent-screen.png'
-                pos_hint: (0, 0)
-                size_hint: (1920, 1080)
-            FixedImageButton:
-                source: 'assets/img/not-rules.png'
-                pos_hint: (0, 600)
-                size_hint: (300, 200)
-                on_release: app.root.current = "settings_rules_screen"
-            FixedImageButton:
-                source: 'assets/img/not-screen.png'
-                pos_hint: (0, 400)
-                size_hint: (300, 200)
-                on_release: app.root.current = "settings_screen_screen"
-            FixedImageButton:
-                source: 'assets/img/not-sound.png'
-                pos_hint: (0, 200)
-                size_hint: (300, 200)
-                on_release: app.root.current = "settings_sound_screen"
-            Button:
-                pos_hint: (1350, 0)
-                size_hint: (200, 100)
-                text: "Resume"
-                on_release: app.root.current = "game_screen"
-                true_font_size: 50
-                color: (0, 0, 0, 1)
-                background_color: (0.1, 1, 0.1, 1)
-            Button:
-                pos_hint: (1600, 0)
-                size_hint: (300, 100)
-                text: "New Game"
-                on_release: app.start_new_game()
-                true_font_size: 50
-                color: (0, 0, 0, 1)
-                background_color: (0.1, 1, 0.1, 1)
-            FixedImage:
-                id: ai_face_image
-                pos_hint: (1600, 780)
-                size_hint: (300, 300)
-                source: 'assets/img/blue3.png'
-            FixedLabel:
-                id: ai_name
-                pos_hint: (400, 800)
-                size_hint: (1200, 200)
-                text_size: self.size
-                true_font_size: 56
-                color: (0, 0, 0, 1)
-                markup: True
-                text: character['rank']+" of 12: [size=80]"+character['name']+"[/size]"
-            FixedLabel:
-                id: ai_description
-                pos_hint: (400, 400)
-                size_hint: (1100, 350)
-                text_size: self.size
-                true_font_size: 56
-                color: (0, 0, 0, 1)
-                valign: "top"
-                markup: True
-                text: character['desc']
-            FixedLabel:
-                id: ai_play_style
-                pos_hint: (400, 200)
-                size_hint: (1100, 250)
-                text_size: self.size
-                true_font_size: 56
-                color: (0, 0, 0, 1)
-                markup: True
-                valign: "top"
-                text: "[i]"+character['tagline']+"[/i]"
-            Button:
-                id: prev_ai
-                pos_hint: (400, 0)
-                size_hint: (200, 100)
-                text: "< Prev"
-                true_font_size: 56
-                color: (0, 0, 0, 1)
-                background_color: (0.9, 0.9, 0.9, 1)
-                on_release: root.previous_ai()
-            Button:
-                id: next_ai
-                pos_hint: (700, 0)
-                size_hint: (200, 100)
-                text: "Next >"
-                true_font_size: 56
-                color: (0, 0, 0, 1)
-                background_color: (0.9, 0.9, 0.9, 1)
-                on_release: root.next_ai()
+    FixedLayout:
+        Image:
+            id: board_image
+            source: 'assets/img/settings-opponent-screen.png'
+            pos_fixed: (0, 0)
+            size_fixed: (1920, 1080)
+        Button:
+            background_normal: 'assets/img/not-rules.png'
+            pos_fixed: (0, 600)
+            size_fixed: (300, 200)
+            on_release: app.root.current = "settings_rules_screen"
+        Button:
+            background_normal: 'assets/img/not-screen.png'
+            pos_fixed: (0, 400)
+            size_fixed: (300, 200)
+            on_release: app.root.current = "settings_screen_screen"
+        Button:
+            background_normal: 'assets/img/not-sound.png'
+            pos_fixed: (0, 200)
+            size_fixed: (300, 200)
+            on_release: app.root.current = "settings_sound_screen"
+        Button:
+            pos_fixed: (1350, 0)
+            size_fixed: (200, 100)
+            text: "Resume"
+            on_release: app.root.current = "game_screen"
+            true_font_size: 50
+            color: (0, 0, 0, 1)
+            background_color: (0.1, 1, 0.1, 1)
+        Button:
+            pos_fixed: (1600, 0)
+            size_fixed: (300, 100)
+            text: "New Game"
+            on_release: app.start_new_game()
+            true_font_size: 50
+            color: (0, 0, 0, 1)
+            background_color: (0.1, 1, 0.1, 1)
+        Image:
+            id: ai_face_image
+            pos_fixed: (1600, 780)
+            size_fixed: (300, 300)
+            source: 'assets/img/blue3.png'
+        Label:
+            id: ai_name
+            pos_fixed: (400, 800)
+            size_fixed: (1200, 200)
+            text_size: self.size
+            true_font_size: 56
+            color: (0, 0, 0, 1)
+            markup: True
+            text: character['rank']+" of 12: [size=80]"+character['name']+"[/size]"
+        Label:
+            id: ai_description
+            pos_fixed: (400, 400)
+            size_fixed: (1100, 350)
+            text_size: self.size
+            true_font_size: 56
+            color: (0, 0, 0, 1)
+            valign: "top"
+            markup: True
+            text: character['desc']
+        Label:
+            id: ai_play_style
+            pos_fixed: (400, 200)
+            size_fixed: (1100, 250)
+            text_size: self.size
+            true_font_size: 56
+            color: (0, 0, 0, 1)
+            markup: True
+            valign: "top"
+            text: "[i]"+character['tagline']+"[/i]"
+        Button:
+            id: prev_ai
+            pos_fixed: (400, 0)
+            size_fixed: (200, 100)
+            text: "< Prev"
+            true_font_size: 56
+            color: (0, 0, 0, 1)
+            background_color: (0.9, 0.9, 0.9, 1)
+            on_release: root.previous_ai()
+        Button:
+            id: next_ai
+            pos_fixed: (700, 0)
+            size_fixed: (200, 100)
+            text: "Next >"
+            true_font_size: 56
+            color: (0, 0, 0, 1)
+            background_color: (0.9, 0.9, 0.9, 1)
+            on_release: root.next_ai()
 
 <SettingsRulesScreen>
     name: "settings_rules_screen"
-    FixedLayoutRoot:
-        FixedLayout:
-            FixedImage:
-                id: board_image
-                source: 'assets/img/settings-rules-screen.png'
-                pos_hint: (0, 0)
-                size_hint: (1920, 1080)
-            FixedImageButton:
-                source: 'assets/img/not-opponent.png'
-                pos_hint: (0, 800)
-                size_hint: (300, 200)
-                on_release: app.root.current = "settings_opponent_screen"
-            FixedImageButton:
-                source: 'assets/img/not-screen.png'
-                pos_hint: (0, 400)
-                size_hint: (300, 200)
-                on_release: app.root.current = "settings_screen_screen"
-            FixedImageButton:
-                source: 'assets/img/not-sound.png'
-                pos_hint: (0, 200)
-                size_hint: (300, 200)
-                on_release: app.root.current = "settings_sound_screen"
+    FixedLayout:
+        Image:
+            id: board_image
+            source: 'assets/img/settings-rules-screen.png'
+            pos_fixed: (0, 0)
+            size_fixed: (1920, 1080)
+        Button:
+            background_normal: 'assets/img/not-opponent.png'
+            pos_fixed: (0, 800)
+            size_fixed: (300, 200)
+            on_release: app.root.current = "settings_opponent_screen"
+        Button:
+            background_normal: 'assets/img/not-screen.png'
+            pos_fixed: (0, 400)
+            size_fixed: (300, 200)
+            on_release: app.root.current = "settings_screen_screen"
+        Button:
+            background_normal: 'assets/img/not-sound.png'
+            pos_fixed: (0, 200)
+            size_fixed: (300, 200)
+            on_release: app.root.current = "settings_sound_screen"
+        Button:
+            pos_fixed: (1350, 0)
+            size_fixed: (200, 100)
+            text: "Resume"
+            on_release: app.root.current = "game_screen"
+            true_font_size: 50
+            color: (0, 0, 0, 1)
+            background_color: (0.1, 1, 0.1, 1)
+        Button:
+            pos_fixed: (1600, 0)
+            size_fixed: (300, 100)
+            text: "New Game"
+            on_release: app.start_new_game()
+            true_font_size: 50
+            color: (0, 0, 0, 1)
+            background_color: (0.1, 1, 0.1, 1)
+        FixedSimpleMenu:
+            id: rules_screen_menu
+            pos_fixed: (400, 150)
+            size_fixed: (1500, 768)
+            color: (0, 0, 0, 1)
+            FixedSimpleMenuItem:
+                name: "game_chosen"
+                heading: "Game chosen"
+                text: "Kalah"
+                on_press: root.ids.game_choice_popup.active = True
+            FixedSimpleMenuItem:
+                name: "who_plays_first"
+                heading: "Who plays first"
+                text: visual_settings["who_plays_first"][settings["who_plays_first"]]
+                on_press: root.ids.who_first_popup.active = True
+            FixedSimpleMenuItem:
+                name: "seeds_per_house_selection"
+                heading: "Seeds per house"
+                text: "4"
+                on_press: root.ids.seeds_per_house_selection_popup.active = True
+            FixedSimpleMenuItem:
+                name: "capture_rule"
+                heading: "Capturing if last seed drops into own empty house"
+                text: "Capture if oppposite house has seeds"
+                on_press: root.ids.capture_rule_popup.active = True
+            FixedSimpleMenuItem:
+                name: "eog_rule"
+                heading: "At end of game, how to handle remaining seeds"
+                text: "Move seeds to the store/Kalaha on that side"
+                on_press: root.ids.eog_rule_popup.active = True
+        FixedPopup:
+            id: game_choice_popup
+            active_pos_fixed: (300, 100)
+            size_fixed: (1600, 900)
+            FixedRadioButtons:
+                pos_fixed: (400, 200)
+                size_fixed: (1400, 192*1)
+                selections: ["Kalah"]
+                color: (0, 0, 0, 1)
+                background_selected: "assets/img/selected.png"
+                background_normal: "assets/img/not-selected.png"
             Button:
-                pos_hint: (1350, 0)
-                size_hint: (200, 100)
-                text: "Resume"
-                on_release: app.root.current = "game_screen"
-                true_font_size: 50
+                pos_fixed: (1700, 150)
+                size_fixed: (200, 100)
                 color: (0, 0, 0, 1)
-                background_color: (0.1, 1, 0.1, 1)
+                true_font_size: 56
+                text: "Done"
+                on_press: root.ids.game_choice_popup.active = False
+        FixedPopup:
+            id: who_first_popup
+            active_pos_fixed: (300, 100)
+            size_fixed: (1600, 900)
+            FixedRadioButtons:
+                selected: settings["who_plays_first"]
+                pos_fixed: (400, 200)
+                size_fixed: (1400, 192*2)
+                selections: visual_settings["who_plays_first"]
+                color: (0, 0, 0, 1)
+                background_selected: "assets/img/selected.png"
+                background_normal: "assets/img/not-selected.png"
+                on_selection: update_setting("who_plays_first", self.selected)
             Button:
-                pos_hint: (1600, 0)
-                size_hint: (300, 100)
-                text: "New Game"
-                on_release: app.start_new_game()
-                true_font_size: 50
+                pos_fixed: (1700, 150)
+                size_fixed: (200, 100)
                 color: (0, 0, 0, 1)
-                background_color: (0.1, 1, 0.1, 1)
-            FixedSimpleMenu:
-                id: rules_screen_menu
-                pos_hint: (400, 150)
-                size_hint: (1500, 768)
+                true_font_size: 56
+                text: "Done"
+                on_press: root.ids.who_first_popup.active = False
+        FixedPopup:
+            id: seeds_per_house_selection_popup
+            active_pos_fixed: (300, 100)
+            size_fixed: (1600, 900)
+            FixedRadioButtons:
+                selected: settings["seeds_per_house_selection"]
+                pos_fixed: (400, 200)
+                size_fixed: (1400, 192*4)
+                selections: visual_settings["seeds_per_house_selection"]
                 color: (0, 0, 0, 1)
-                FixedSimpleMenuItem:
-                    name: "game_chosen"
-                    heading: "Game chosen"
-                    text: "Kalah"
-                    on_press: root.ids.game_choice_popup.active = True
-                FixedSimpleMenuItem:
-                    name: "who_plays_first"
-                    heading: "Who plays first"
-                    text: visual_settings["who_plays_first"][settings["who_plays_first"]]
-                    on_press: root.ids.who_first_popup.active = True
-                FixedSimpleMenuItem:
-                    name: "seeds_per_house_selection"
-                    heading: "Seeds per house"
-                    text: "4"
-                    on_press: root.ids.seeds_per_house_selection_popup.active = True
-                FixedSimpleMenuItem:
-                    name: "capture_rule"
-                    heading: "Capturing if last seed drops into own empty house"
-                    text: "Capture if oppposite house has seeds"
-                    on_press: root.ids.capture_rule_popup.active = True
-                FixedSimpleMenuItem:
-                    name: "eog_rule"
-                    heading: "At end of game, how to handle remaining seeds"
-                    text: "Move seeds to the store/Kalaha on that side"
-                    on_press: root.ids.eog_rule_popup.active = True
-            FixedPopup:
-                id: game_choice_popup
-                active_pos_hint: (300, 100)
-                size_hint: (1600, 900)
-                FixedRadioButtons:
-                    pos_hint: (400, 200)
-                    size_hint: (1400, 192*1)
-                    selections: ["Kalah"]
-                    color: (0, 0, 0, 1)
-                    background_selected: "assets/img/selected.png"
-                    background_normal: "assets/img/not-selected.png"
-                FixedButton:
-                    pos_hint: (1700, 150)
-                    size_hint: (200, 100)
-                    color: (0, 0, 0, 1)
-                    true_font_size: 56
-                    text: "Done"
-                    on_press: root.ids.game_choice_popup.active = False
-            FixedPopup:
-                id: who_first_popup
-                active_pos_hint: (300, 100)
-                size_hint: (1600, 900)
-                FixedRadioButtons:
-                    selected: settings["who_plays_first"]
-                    pos_hint: (400, 200)
-                    size_hint: (1400, 192*2)
-                    selections: visual_settings["who_plays_first"]
-                    color: (0, 0, 0, 1)
-                    background_selected: "assets/img/selected.png"
-                    background_normal: "assets/img/not-selected.png"
-                    on_selection: update_setting("who_plays_first", self.selected)
-                FixedButton:
-                    pos_hint: (1700, 150)
-                    size_hint: (200, 100)
-                    color: (0, 0, 0, 1)
-                    true_font_size: 56
-                    text: "Done"
-                    on_press: root.ids.who_first_popup.active = False
-            FixedPopup:
-                id: seeds_per_house_selection_popup
-                active_pos_hint: (300, 100)
-                size_hint: (1600, 900)
-                FixedRadioButtons:
-                    selected: settings["seeds_per_house_selection"]
-                    pos_hint: (400, 200)
-                    size_hint: (1400, 192*4)
-                    selections: visual_settings["seeds_per_house_selection"]
-                    color: (0, 0, 0, 1)
-                    background_selected: "assets/img/selected.png"
-                    background_normal: "assets/img/not-selected.png"
-                    on_selection: update_setting("seeds_per_house_selection", self.selected)
-                FixedButton:
-                    pos_hint: (1700, 150)
-                    size_hint: (200, 100)
-                    color: (0, 0, 0, 1)
-                    true_font_size: 56
-                    text: "Done"
-                    on_press: root.ids.seeds_per_house_selection_popup.active = False
-            FixedPopup:
-                id: capture_rule_popup
-                active_pos_hint: (300, 100)
-                size_hint: (1600, 900)
-                FixedRadioButtons:
-                    selected: settings["capture_rule"]
-                    pos_hint: (400, 200)
-                    size_hint: (1400, 192*3)
-                    selections: visual_settings["capture_rule"]
-                    color: (0, 0, 0, 1)
-                    background_selected: "assets/img/selected.png"
-                    background_normal: "assets/img/not-selected.png"
-                    on_selection: update_setting("capture_rule", self.selected)
-                FixedButton:
-                    pos_hint: (1700, 150)
-                    size_hint: (200, 100)
-                    color: (0, 0, 0, 1)
-                    true_font_size: 56
-                    text: "Done"
-                    on_press: root.ids.capture_rule_popup.active = False
-            FixedPopup:
-                id: eog_rule_popup
-                active_pos_hint: (300, 100)
-                size_hint: (1600, 900)
-                FixedRadioButtons:
-                    selected: settings["eog_rule"]
-                    pos_hint: (400, 200)
-                    size_hint: (1400, 192*4)
-                    selections: visual_settings["eog_rule"]
-                    color: (0, 0, 0, 1)
-                    background_selected: "assets/img/selected.png"
-                    background_normal: "assets/img/not-selected.png"
-                    on_selection: update_setting("eog_rule", self.selected)
-                FixedButton:
-                    pos_hint: (1700, 150)
-                    size_hint: (200, 100)
-                    color: (0, 0, 0, 1)
-                    true_font_size: 56
-                    text: "Done"
-                    on_press: root.ids.eog_rule_popup.active = False
+                background_selected: "assets/img/selected.png"
+                background_normal: "assets/img/not-selected.png"
+                on_selection: update_setting("seeds_per_house_selection", self.selected)
+            Button:
+                pos_fixed: (1700, 150)
+                size_fixed: (200, 100)
+                color: (0, 0, 0, 1)
+                true_font_size: 56
+                text: "Done"
+                on_press: root.ids.seeds_per_house_selection_popup.active = False
+        FixedPopup:
+            id: capture_rule_popup
+            active_pos_fixed: (300, 100)
+            size_fixed: (1600, 900)
+            FixedRadioButtons:
+                selected: settings["capture_rule"]
+                pos_fixed: (400, 200)
+                size_fixed: (1400, 192*3)
+                selections: visual_settings["capture_rule"]
+                color: (0, 0, 0, 1)
+                background_selected: "assets/img/selected.png"
+                background_normal: "assets/img/not-selected.png"
+                on_selection: update_setting("capture_rule", self.selected)
+            Button:
+                pos_fixed: (1700, 150)
+                size_fixed: (200, 100)
+                color: (0, 0, 0, 1)
+                true_font_size: 56
+                text: "Done"
+                on_press: root.ids.capture_rule_popup.active = False
+        FixedPopup:
+            id: eog_rule_popup
+            active_pos_fixed: (300, 100)
+            size_fixed: (1600, 900)
+            FixedRadioButtons:
+                selected: settings["eog_rule"]
+                pos_fixed: (400, 200)
+                size_fixed: (1400, 192*4)
+                selections: visual_settings["eog_rule"]
+                color: (0, 0, 0, 1)
+                background_selected: "assets/img/selected.png"
+                background_normal: "assets/img/not-selected.png"
+                on_selection: update_setting("eog_rule", self.selected)
+            Button:
+                pos_fixed: (1700, 150)
+                size_fixed: (200, 100)
+                color: (0, 0, 0, 1)
+                true_font_size: 56
+                text: "Done"
+                on_press: root.ids.eog_rule_popup.active = False
 
 <SettingsScreenScreen>
     name: "settings_screen_screen"
-    FixedLayoutRoot:
-        FixedLayout:
-            FixedImage:
-                id: board_image
-                source: 'assets/img/settings-screen-screen.png'
-                pos_hint: (0, 0)
-                size_hint: (1920, 1080)
-            FixedImageButton:
-                source: 'assets/img/not-opponent.png'
-                pos_hint: (0, 800)
-                size_hint: (300, 200)
-                on_release: app.root.current = "settings_opponent_screen"
-            FixedImageButton:
-                source: 'assets/img/not-rules.png'
-                pos_hint: (0, 600)
-                size_hint: (300, 200)
-                on_release: app.root.current = "settings_rules_screen"
-            FixedImageButton:
-                source: 'assets/img/not-sound.png'
-                pos_hint: (0, 200)
-                size_hint: (300, 200)
-                on_release: app.root.current = "settings_sound_screen"
+    FixedLayout:
+        Image:
+            id: board_image
+            source: 'assets/img/settings-screen-screen.png'
+            pos_fixed: (0, 0)
+            size_fixed: (1920, 1080)
+        Button:
+            background_normal: 'assets/img/not-opponent.png'
+            pos_fixed: (0, 800)
+            size_fixed: (300, 200)
+            on_release: app.root.current = "settings_opponent_screen"
+        Button:
+            background_normal: 'assets/img/not-rules.png'
+            pos_fixed: (0, 600)
+            size_fixed: (300, 200)
+            on_release: app.root.current = "settings_rules_screen"
+        Button:
+            background_normal: 'assets/img/not-sound.png'
+            pos_fixed: (0, 200)
+            size_fixed: (300, 200)
+            on_release: app.root.current = "settings_sound_screen"
+        Button:
+            pos_fixed: (1350, 0)
+            size_fixed: (200, 100)
+            text: "Resume"
+            on_release: app.root.current = "game_screen"
+            true_font_size: 50
+            color: (0, 0, 0, 1)
+            background_color: (0.1, 1, 0.1, 1)
+        Button:
+            pos_fixed: (1600, 0)
+            size_fixed: (300, 100)
+            text: "New Game"
+            on_release: app.start_new_game()
+            true_font_size: 50
+            color: (0, 0, 0, 1)
+            background_color: (0.1, 1, 0.1, 1)
+        FixedSimpleMenu:
+            id: screen_screen_menu
+            pos_fixed: (400, 150)
+            size_fixed: (1500, 576)
+            color: (0, 0, 0, 1)
+            FixedSimpleMenuItem:
+                name: "board_choice"
+                heading: "Board chosen"
+                text: "Walnut"
+                on_press: root.ids.board_choice_popup.active = True
+            FixedSimpleMenuItem:
+                name: "seed_choice"
+                heading: "Seed chosen"
+                text: "Teal glass gems"
+                on_press: root.ids.seed_choice_popup.active = True
+            FixedSimpleMenuItem:
+                name: "animation_speed_choice"
+                heading: "Animated hand speed"
+                text: "Medium"
+                on_press: root.ids.animation_speed_popup.active = True
+        FixedPopup:
+            id: board_choice_popup
+            active_pos_fixed: (300, 100)
+            size_fixed: (1600, 900)
+            FixedRadioButtons:
+                selected: settings['board_choice']
+                pos_fixed: (400, 200)
+                size_fixed: (1400, 192*2)
+                selections: visual_settings['board_choice']
+                color: (0, 0, 0, 1)
+                background_selected: "assets/img/selected.png"
+                background_normal: "assets/img/not-selected.png"
+                on_selection: update_setting("board_choice", self.selected)
             Button:
-                pos_hint: (1350, 0)
-                size_hint: (200, 100)
-                text: "Resume"
-                on_release: app.root.current = "game_screen"
-                true_font_size: 50
+                pos_fixed: (1700, 150)
+                size_fixed: (200, 100)
                 color: (0, 0, 0, 1)
-                background_color: (0.1, 1, 0.1, 1)
+                true_font_size: 56
+                text: "Done"
+                on_press: root.ids.board_choice_popup.active = False
+        FixedPopup:
+            id: seed_choice_popup
+            active_pos_fixed: (300, 100)
+            size_fixed: (1600, 900)
+            FixedRadioButtons:
+                selected: settings['seed_choice']
+                pos_fixed: (400, 200)
+                size_fixed: (1400, 192*3)
+                selections: visual_settings['seed_choice']
+                color: (0, 0, 0, 1)
+                background_selected: "assets/img/selected.png"
+                background_normal: "assets/img/not-selected.png"
+                on_selection: update_setting("seed_choice", self.selected)
             Button:
-                pos_hint: (1600, 0)
-                size_hint: (300, 100)
-                text: "New Game"
-                on_release: app.start_new_game()
-                true_font_size: 50
+                pos_fixed: (1700, 150)
+                size_fixed: (200, 100)
                 color: (0, 0, 0, 1)
-                background_color: (0.1, 1, 0.1, 1)
-            FixedSimpleMenu:
-                id: screen_screen_menu
-                pos_hint: (400, 150)
-                size_hint: (1500, 576)
+                true_font_size: 56
+                text: "Done"
+                on_press: root.ids.seed_choice_popup.active = False
+        FixedPopup:
+            id: animation_speed_popup
+            active_pos_fixed: (300, 100)
+            size_fixed: (1600, 900)
+            FixedRadioButtons:
+                selected: settings['animation_speed_choice']
+                pos_fixed: (400, 200)
+                size_fixed: (1400, 192*3)
+                selections: visual_settings['animation_speed_choice']
                 color: (0, 0, 0, 1)
-                FixedSimpleMenuItem:
-                    name: "board_choice"
-                    heading: "Board chosen"
-                    text: "Walnut"
-                    on_press: root.ids.board_choice_popup.active = True
-                FixedSimpleMenuItem:
-                    name: "seed_choice"
-                    heading: "Seed chosen"
-                    text: "Teal glass gems"
-                    on_press: root.ids.seed_choice_popup.active = True
-                FixedSimpleMenuItem:
-                    name: "animation_speed_choice"
-                    heading: "Animated hand speed"
-                    text: "Medium"
-                    on_press: root.ids.animation_speed_popup.active = True
-            FixedPopup:
-                id: board_choice_popup
-                active_pos_hint: (300, 100)
-                size_hint: (1600, 900)
-                FixedRadioButtons:
-                    selected: settings['board_choice']
-                    pos_hint: (400, 200)
-                    size_hint: (1400, 192*2)
-                    selections: visual_settings['board_choice']
-                    color: (0, 0, 0, 1)
-                    background_selected: "assets/img/selected.png"
-                    background_normal: "assets/img/not-selected.png"
-                    on_selection: update_setting("board_choice", self.selected)
-                FixedButton:
-                    pos_hint: (1700, 150)
-                    size_hint: (200, 100)
-                    color: (0, 0, 0, 1)
-                    true_font_size: 56
-                    text: "Done"
-                    on_press: root.ids.board_choice_popup.active = False
-            FixedPopup:
-                id: seed_choice_popup
-                active_pos_hint: (300, 100)
-                size_hint: (1600, 900)
-                FixedRadioButtons:
-                    selected: settings['seed_choice']
-                    pos_hint: (400, 200)
-                    size_hint: (1400, 192*3)
-                    selections: visual_settings['seed_choice']
-                    color: (0, 0, 0, 1)
-                    background_selected: "assets/img/selected.png"
-                    background_normal: "assets/img/not-selected.png"
-                    on_selection: update_setting("seed_choice", self.selected)
-                FixedButton:
-                    pos_hint: (1700, 150)
-                    size_hint: (200, 100)
-                    color: (0, 0, 0, 1)
-                    true_font_size: 56
-                    text: "Done"
-                    on_press: root.ids.seed_choice_popup.active = False
-            FixedPopup:
-                id: animation_speed_popup
-                active_pos_hint: (300, 100)
-                size_hint: (1600, 900)
-                FixedRadioButtons:
-                    selected: settings['animation_speed_choice']
-                    pos_hint: (400, 200)
-                    size_hint: (1400, 192*3)
-                    selections: visual_settings['animation_speed_choice']
-                    color: (0, 0, 0, 1)
-                    background_selected: "assets/img/selected.png"
-                    background_normal: "assets/img/not-selected.png"
-                    on_selection: update_setting("animation_speed_choice", self.selected)
-                FixedButton:
-                    pos_hint: (1700, 150)
-                    size_hint: (200, 100)
-                    color: (0, 0, 0, 1)
-                    true_font_size: 56
-                    text: "Done"
-                    on_press: root.ids.animation_speed_popup.active = False
+                background_selected: "assets/img/selected.png"
+                background_normal: "assets/img/not-selected.png"
+                on_selection: update_setting("animation_speed_choice", self.selected)
+            Button:
+                pos_fixed: (1700, 150)
+                size_fixed: (200, 100)
+                color: (0, 0, 0, 1)
+                true_font_size: 56
+                text: "Done"
+                on_press: root.ids.animation_speed_popup.active = False
 
 <SettingsSoundScreen>
     name: "settings_sound_screen"
-    FixedLayoutRoot:
-        FixedLayout:
-            FixedImage:
-                id: board_image
-                source: 'assets/img/settings-sound-screen.png'
-                pos_hint: (0, 0)
-                size_hint: (1920, 1080)
-            FixedImageButton:
-                source: 'assets/img/not-opponent.png'
-                pos_hint: (0, 800)
-                size_hint: (300, 200)
-                on_release: app.root.current = "settings_opponent_screen"
-            FixedImageButton:
-                source: 'assets/img/not-rules.png'
-                pos_hint: (0, 600)
-                size_hint: (300, 200)
-                on_release: app.root.current = "settings_rules_screen"
-            FixedImageButton:
-                source: 'assets/img/not-screen.png'
-                pos_hint: (0, 400)
-                size_hint: (300, 200)
-                on_release: app.root.current = "settings_screen_screen"
+    FixedLayout:
+        Image:
+            id: board_image
+            source: 'assets/img/settings-sound-screen.png'
+            pos_fixed: (0, 0)
+            size_fixed: (1920, 1080)
+        Button:
+            background_normal: 'assets/img/not-opponent.png'
+            pos_fixed: (0, 800)
+            size_fixed: (300, 200)
+            on_release: app.root.current = "settings_opponent_screen"
+        Button:
+            background_normal: 'assets/img/not-rules.png'
+            pos_fixed: (0, 600)
+            size_fixed: (300, 200)
+            on_release: app.root.current = "settings_rules_screen"
+        Button:
+            background_normal: 'assets/img/not-screen.png'
+            pos_fixed: (0, 400)
+            size_fixed: (300, 200)
+            on_release: app.root.current = "settings_screen_screen"
+        Button:
+            pos_fixed: (1350, 0)
+            size_fixed: (200, 100)
+            text: "Resume"
+            on_release: app.root.current = "game_screen"
+            true_font_size: 50
+            color: (0, 0, 0, 1)
+            background_color: (0.1, 1, 0.1, 1)
+        Button:
+            pos_fixed: (1600, 0)
+            size_fixed: (300, 100)
+            text: "New Game"
+            on_release: app.start_new_game()
+            true_font_size: 50
+            color: (0, 0, 0, 1)
+            background_color: (0.1, 1, 0.1, 1)
+        FixedSimpleMenu:
+            id: sound_screen_menu
+            pos_fixed: (400, 150)
+            size_fixed: (1500, 192*2)
+            color: (0, 0, 0, 1)
+            FixedSimpleMenuItem:
+                name: "notification_volume"
+                heading: "Notification volume"
+                text: "Medium"
+                on_press: root.ids.notification_volume_popup.active = True
+            FixedSimpleMenuItem:
+                name: "seed_volume"
+                heading: "Environmental sound volume (seed drop, etc)"
+                text: "Medium"
+                on_press: root.ids.seed_volume_popup.active = True
+        FixedPopup:
+            id: notification_volume_popup
+            active_pos_fixed: (300, 100)
+            size_fixed: (1600, 900)
+            FixedRadioButtons:
+                selected: settings['notification_volume']
+                pos_fixed: (400, 200)
+                size_fixed: (1400, 192*4)
+                selections: visual_settings['notification_volume']
+                color: (0, 0, 0, 1)
+                background_selected: "assets/img/selected.png"
+                background_normal: "assets/img/not-selected.png"
+                on_selection: update_setting("notification_volume", self.selected)
             Button:
-                pos_hint: (1350, 0)
-                size_hint: (200, 100)
-                text: "Resume"
-                on_release: app.root.current = "game_screen"
-                true_font_size: 50
+                pos_fixed: (1700, 150)
+                size_fixed: (200, 100)
                 color: (0, 0, 0, 1)
-                background_color: (0.1, 1, 0.1, 1)
+                true_font_size: 56
+                text: "Done"
+                on_press: root.ids.notification_volume_popup.active = False
+        FixedPopup:
+            id: seed_volume_popup
+            active_pos_fixed: (300, 100)
+            size_fixed: (1600, 900)
+            FixedRadioButtons:
+                selected: settings['seed_volume']
+                pos_fixed: (400, 200)
+                size_fixed: (1400, 192*4)
+                selections: visual_settings['seed_volume']
+                color: (0, 0, 0, 1)
+                background_selected: "assets/img/selected.png"
+                background_normal: "assets/img/not-selected.png"
+                on_selection: update_setting("seed_volume", self.selected)
             Button:
-                pos_hint: (1600, 0)
-                size_hint: (300, 100)
-                text: "New Game"
-                on_release: app.start_new_game()
-                true_font_size: 50
+                pos_fixed: (1700, 150)
+                size_fixed: (200, 100)
                 color: (0, 0, 0, 1)
-                background_color: (0.1, 1, 0.1, 1)
-            FixedSimpleMenu:
-                id: sound_screen_menu
-                pos_hint: (400, 150)
-                size_hint: (1500, 192*2)
-                color: (0, 0, 0, 1)
-                FixedSimpleMenuItem:
-                    name: "notification_volume"
-                    heading: "Notification volume"
-                    text: "Medium"
-                    on_press: root.ids.notification_volume_popup.active = True
-                FixedSimpleMenuItem:
-                    name: "seed_volume"
-                    heading: "Environmental sound volume (seed drop, etc)"
-                    text: "Medium"
-                    on_press: root.ids.seed_volume_popup.active = True
-            FixedPopup:
-                id: notification_volume_popup
-                active_pos_hint: (300, 100)
-                size_hint: (1600, 900)
-                FixedRadioButtons:
-                    selected: settings['notification_volume']
-                    pos_hint: (400, 200)
-                    size_hint: (1400, 192*4)
-                    selections: visual_settings['notification_volume']
-                    color: (0, 0, 0, 1)
-                    background_selected: "assets/img/selected.png"
-                    background_normal: "assets/img/not-selected.png"
-                    on_selection: update_setting("notification_volume", self.selected)
-                FixedButton:
-                    pos_hint: (1700, 150)
-                    size_hint: (200, 100)
-                    color: (0, 0, 0, 1)
-                    true_font_size: 56
-                    text: "Done"
-                    on_press: root.ids.notification_volume_popup.active = False
-            FixedPopup:
-                id: seed_volume_popup
-                active_pos_hint: (300, 100)
-                size_hint: (1600, 900)
-                FixedRadioButtons:
-                    selected: settings['seed_volume']
-                    pos_hint: (400, 200)
-                    size_hint: (1400, 192*4)
-                    selections: visual_settings['seed_volume']
-                    color: (0, 0, 0, 1)
-                    background_selected: "assets/img/selected.png"
-                    background_normal: "assets/img/not-selected.png"
-                    on_selection: update_setting("seed_volume", self.selected)
-                FixedButton:
-                    pos_hint: (1700, 150)
-                    size_hint: (200, 100)
-                    color: (0, 0, 0, 1)
-                    true_font_size: 56
-                    text: "Done"
-                    on_press: root.ids.seed_volume_popup.active = False
-
+                true_font_size: 56
+                text: "Done"
+                on_press: root.ids.seed_volume_popup.active = False
 
 <GameScreen>
     name: "game_screen"
-    FixedLayoutRoot:
-        FixedLayout:
-            id: game_screen_root
-            Image:
-                id: board_image
-                source: 'assets/img/walnut-game-board.png'
-                pos_hint: (0, 0)
-                size_hint: (1920, 1080)
-            FixedImageButton:
-                id: settings_button
-                source: 'assets/img/blue.png'
-                pos_hint: (1820, 980)
-                size_hint: (100, 100)
-                on_release: app.root.current = "settings_opponent_screen"
-            ProgressSpinner:
-                id: wait_on_ai
-                size_hint: (100, 100)
-                pos_hint: (300, 500)
-                auto_start: False
-            Label:
-                id: center_message
-                text: 'here'
-                pos_hint: (800, 600)
-                true_font_size: 100
-                size_hint: (100, 100)
-                color: (0, 0, 0, 1)
-            FixedImage:
-                id: user_hand
-                source: 'assets/img/blue3.png'
-                pos_hint: root.HANDS[1]['pos']
-                true_spot: (150, 150)
-                size_hint: (300, 300)
-            FixedImage:
-                id: ai_hand
-                source: 'assets/img/blue3.png'
-                pos_hint: root.HANDS[2]['pos']
-                true_spot: (150, 150)
-                size_hint: (300, 300)
-            FixedPopup:
-                id: eog_new_game_button
-                active_pos_hint: (800, 500)
-                size_hint: (300, 100)
-                FixedButton:
-                    pos_hint: (800, 500)
-                    size_hint: (300, 100)
-                    color: (1, 0, 0, 1)
-                    true_font_size: 56
-                    text: "New Game"
-                    on_release: app.start_new_game()
-
-            FixedImageButton:
-                source: 'assets/img/brown190x200.png'
-                size_hint: (190, 200)
-                pos_hint: root.PITS[1]['pos']
-                true_spot: (95, 100)
-                on_release: root.pushed_pit(1)
-            Label:
-                id: counter,1
-                text: '0'
-                true_font_size: 100
-                size_hint: (100, 100)
-                pos_hint: (330, 130)
-                color: (0, 0, 0, 1)
-
-            FixedImageButton:
-                source: 'assets/img/brown190x200.png'
-                size_hint: (190, 200)
-                pos_hint: root.PITS[2]['pos']
-                true_spot: (95, 100)
-                on_release: root.pushed_pit(2)
-            Label:
-                id: counter,2
-                text: '0'
-                true_font_size: 100
-                size_hint: (100, 100)
-                pos_hint: (540, 130)
-                color: (0, 0, 0, 1)
-
-            FixedImageButton:
-                source: 'assets/img/brown190x200.png'
-                size_hint: (190, 200)
-                pos_hint: root.PITS[3]['pos']
-                true_spot: (95, 100)
-                on_release: root.pushed_pit(3)
-            Label:
-                id: counter,3
-                text: '0'
-                true_font_size: 100
-                size_hint: (100, 100)
-                pos_hint: (750, 130)
-                color: (0, 0, 0, 1)
-
-            FixedImageButton:
-                source: 'assets/img/brown190x200.png'
-                size_hint: (190, 200)
-                pos_hint: root.PITS[4]['pos']
-                true_spot: (95, 100)
-                on_release: root.pushed_pit(4)
-            Label:
-                id: counter,4
-                text: '0'
-                true_font_size: 100
-                size_hint: (100, 100)
-                pos_hint: (960, 130)
-                color: (0, 0, 0, 1)
-
-            FixedImageButton:
-                source: 'assets/img/brown190x200.png'
-                size_hint: (190, 200)
-                pos_hint: root.PITS[5]['pos']
-                true_spot: (95, 100)
-                on_release: root.pushed_pit(5)
-            Label:
-                id: counter,5
-                text: '0'
-                true_font_size: 100
-                size_hint: (100, 100)
-                pos_hint: (1170, 130)
-                color: (0, 0, 0, 1)
-
-            FixedImageButton:
-                source: 'assets/img/brown190x200.png'
-                size_hint: (190, 200)
-                pos_hint: root.PITS[6]['pos']
-                true_spot: (95, 100)
-                on_release: root.pushed_pit(6)
-            Label:
-                id: counter,6
-                text: '0'
-                true_font_size: 100
-                size_hint: (100, 100)
-                pos_hint: (1380, 130)
-                color: (0, 0, 0, 1)
-
-            Label:
-                id: counter,7
-                text: '0'
-                true_font_size: 100
-                size_hint: (100, 100)
-                pos_hint: (1840, 500)
-                color: (0, 0, 0, 1)
-
-            Label:
-                id: counter,8
-                text: '0'
-                true_font_size: 100
-                size_hint: (100, 100)
-                pos_hint: (1380, 930)
-                color: (0, 0, 0, 1)
-            Label:
-                id: counter,9
-                text: '0'
-                true_font_size: 100
-                size_hint: (100, 100)
-                pos_hint: (1170, 930)
-                color: (0, 0, 0, 1)
-            Label:
-                id: counter,10
-                text: '0'
-                true_font_size: 100
-                size_hint: (100, 100)
-                pos_hint: (960, 930)
-                color: (0, 0, 0, 1)
-            Label:
-                id: counter,11
-                text: '0'
-                true_font_size: 100
-                size_hint: (100, 100)
-                pos_hint: (750, 930)
-                color: (0, 0, 0, 1)
-            Label:
-                id: counter,12
-                text: '0'
-                true_font_size: 100
-                size_hint: (100, 100)
-                pos_hint: (540, 930)
-                color: (0, 0, 0, 1)
-            Label:
-                id: counter,13
-                text: '0'
-                true_font_size: 100
-                size_hint: (100, 100)
-                pos_hint: (330, 930)
-                color: (0, 0, 0, 1)
-
-            Label:
-                id: counter,14
-                text: '0'
-                true_font_size: 100
-                size_hint: (100, 100)
-                pos_hint: (10, 500)
-                color: (0, 0, 0, 1)
+    FixedLayout:
+        id: game_screen_root
+        Image:
+            id: board_image
+            source: 'assets/img/walnut-game-board.png'
+            pos_fixed: (0, 0)
+            size_fixed: (1920, 1080)
+        Button:
+            id: settings_button
+            background_normal: 'assets/img/blue.png'
+            pos_fixed: (1820, 980)
+            size_fixed: (100, 100)
+            on_release: app.root.current = "settings_opponent_screen"
+        ProgressSpinner:
+            id: wait_on_ai
+            size_fixed: (100, 100)
+            pos_fixed: (300, 500)
+            auto_start: False
+        Label:
+            id: center_message
+            text: 'here'
+            pos_fixed: (800, 600)
+            true_font_size: 100
+            size_fixed: (100, 100)
+            color: (0, 0, 0, 1)
+        Image:
+            id: user_hand
+            source: 'assets/img/blue3.png'
+            pos_fixed: root.HANDS[1]['pos']
+            spot_fixed: (150, 150)
+            size_fixed: (300, 300)
+        Image:
+            id: ai_hand
+            source: 'assets/img/blue3.png'
+            pos_fixed: root.HANDS[2]['pos']
+            spot_fixed: (150, 150)
+            size_fixed: (300, 300)
+        FixedPopup:
+            id: eog_new_game_button
+            active_pos_fixed: (800, 500)
+            size_fixed: (300, 100)
+            Button:
+                active_pos_fixed: (800, 500)
+                size_fixed: (300, 100)
+                color: (1, 0, 0, 1)
+                true_font_size: 56
+                text: "New Game"
+                on_release: app.start_new_game()
+        Button:
+            background_normal: 'assets/img/brown190x200.png'
+            size_fixed: (190, 200)
+            pos_fixed: root.PITS[1]['pos']
+            spot_fixed: (95, 100)
+            on_release: root.pushed_pit(1)
+        Label:
+            id: counter,1
+            text: '0'
+            true_font_size: 100
+            size_fixed: (100, 100)
+            pos_fixed: (330, 130)
+            color: (0, 0, 0, 1)
+        Button:
+            background_normal: 'assets/img/brown190x200.png'
+            size_fixed: (190, 200)
+            pos_fixed: root.PITS[2]['pos']
+            spot_fixed: (95, 100)
+            on_release: root.pushed_pit(2)
+        Label:
+            id: counter,2
+            text: '0'
+            true_font_size: 100
+            size_fixed: (100, 100)
+            pos_fixed: (540, 130)
+            color: (0, 0, 0, 1)
+        Button:
+            background_normal: 'assets/img/brown190x200.png'
+            size_fixed: (190, 200)
+            pos_fixed: root.PITS[3]['pos']
+            spot_fixed: (95, 100)
+            on_release: root.pushed_pit(3)
+        Label:
+            id: counter,3
+            text: '0'
+            true_font_size: 100
+            size_fixed: (100, 100)
+            pos_fixed: (750, 130)
+            color: (0, 0, 0, 1)
+        Button:
+            background_normal: 'assets/img/brown190x200.png'
+            size_fixed: (190, 200)
+            pos_fixed: root.PITS[4]['pos']
+            spot_fixed: (95, 100)
+            on_release: root.pushed_pit(4)
+        Label:
+            id: counter,4
+            text: '0'
+            true_font_size: 100
+            size_fixed: (100, 100)
+            pos_fixed: (960, 130)
+            color: (0, 0, 0, 1)
+        Button:
+            background_normal: 'assets/img/brown190x200.png'
+            size_fixed: (190, 200)
+            pos_fixed: root.PITS[5]['pos']
+            spot_fixed: (95, 100)
+            on_release: root.pushed_pit(5)
+        Label:
+            id: counter,5
+            text: '0'
+            true_font_size: 100
+            size_fixed: (100, 100)
+            pos_fixed: (1170, 130)
+            color: (0, 0, 0, 1)
+        Button:
+            background_normal: 'assets/img/brown190x200.png'
+            size_fixed: (190, 200)
+            pos_fixed: root.PITS[6]['pos']
+            spot_fixed: (95, 100)
+            on_release: root.pushed_pit(6)
+        Label:
+            id: counter,6
+            text: '0'
+            true_font_size: 100
+            size_fixed: (100, 100)
+            pos_fixed: (1380, 130)
+            color: (0, 0, 0, 1)
+        Label:
+            id: counter,7
+            text: '0'
+            true_font_size: 100
+            size_fixed: (100, 100)
+            pos_fixed: (1840, 500)
+            color: (0, 0, 0, 1)
+        Label:
+            id: counter,8
+            text: '0'
+            true_font_size: 100
+            size_fixed: (100, 100)
+            pos_fixed: (1380, 930)
+            color: (0, 0, 0, 1)
+        Label:
+            id: counter,9
+            text: '0'
+            true_font_size: 100
+            size_fixed: (100, 100)
+            pos_fixed: (1170, 930)
+            color: (0, 0, 0, 1)
+        Label:
+            id: counter,10
+            text: '0'
+            true_font_size: 100
+            size_fixed: (100, 100)
+            pos_fixed: (960, 930)
+            color: (0, 0, 0, 1)
+        Label:
+            id: counter,11
+            text: '0'
+            true_font_size: 100
+            size_fixed: (100, 100)
+            pos_fixed: (750, 930)
+            color: (0, 0, 0, 1)
+        Label:
+            id: counter,12
+            text: '0'
+            true_font_size: 100
+            size_fixed: (100, 100)
+            pos_fixed: (540, 930)
+            color: (0, 0, 0, 1)
+        Label:
+            id: counter,13
+            text: '0'
+            true_font_size: 100
+            size_fixed: (100, 100)
+            pos_fixed: (330, 930)
+            color: (0, 0, 0, 1)
+        Label:
+            id: counter,14
+            text: '0'
+            true_font_size: 100
+            size_fixed: (100, 100)
+            pos_fixed: (10, 500)
+            color: (0, 0, 0, 1)

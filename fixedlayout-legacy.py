@@ -27,201 +27,191 @@ def grab(alist, index):
 class FixedProperties(object):
 
     true_screen_size = VariableListProperty([1920, 1080], limit=2)
+    true_spot = ObjectProperty((0,0))
     # initial sizing somewhat inspired by Google Material
     true_title_font_size = NumericProperty(80.0)
     true_subheading_font_size = NumericProperty(64.0)
     true_font_size = NumericProperty(56.0)
-    #
-    pos_fixed = ObjectProperty((0,0))
-    size_fixed = ObjectProperty((1920, 1080))
-    spot_fixed = ObjectProperty((0,0))
-    #
-    active_pos_fixed = ObjectProperty((0,0))
 
 
 class FixedBase(FixedProperties):
 
-    def __init__(self, *args, **kwargs):
-        return
+    def on_parent(self, instance, parent):
+        if not parent.__class__.__name__.startswith("Fixed"):
+            raise Exception("{} must be under a FixedLayout class.".format(instance.__class__.__name__))
 
-    # # this routine is replaced by parent or override
-    # def scale_size(self, xy_tuple):
-    #     return [1.0, 1.0]
+    # def on_size(self, instance, value):
+    #     if self.true_font_size:
+    #         if 'true_scaler' in dir(self):  # this is only assigned when it has parent
+    #             self.font_size = self.true_scaler(self.true_font_size)
+    #             print instance.__class__.__name__, "SCALED"
 
-    # # this routine is generally replaced by parent or override
-    # def scale_pos(self, xy_tuple, xy_offset):
-    #     return {'x': 0.0, 'y': 0.0}
-
-    def scale_size(self, *args):
-        return self.parent.scale_size(*args)
-
-    def scale_pos(self, *args):
-        return self.parent.scale_pos(*args)
-
-    def super_size_me(self, obj, value):
-        print "SUPER SIZE ME FIXED BASE"
-        return self.parent.super_size_me(obj, value)
-
-    # deprecate
-    def true_scaler(self, value):
-        return 1.0
-
-    # def on_parent(self, instance, value):
-    #     if hasattr(self.parent, "scale_size"):
-    #         self.scale_size = self.parent.scale_size
-    #     if hasattr(self.parent, "scale_pos"):
-    #         self.scale_pos = self.parent.scale_pos
-
-    # def add_widget(self, widget, index=0):
-    #     if not hasattr(widget, "pos_fixed"):
-    #         widget.apply_property(pos_fixed=ObjectProperty((0, 0)))
-    #     if not hasattr(widget, "size_fixed"):
-    #         widget.apply_property(size_fixed=ObjectProperty((100, 100)))
-    #     if not hasattr(widget, "spot_fixed"):
-    #         widget.apply_property(spot_fixed=ObjectProperty((0, 0)))
-    #     widget.bind(
-    #        pos_fixed=self.super_size_me
-    #     )
-    #     widget.bind(
-    #        size_fixed=self.super_size_me
-    #     )
-    #     widget.bind(
-    #        spot_fixed=self.super_size_me
-    #     )
-    #     # return super(FixedBase, self).add_widget(widget, index)
-
-    # def remove_widget(self, widget):
-    #     return super(FixedBase, self).remove_widget(widget)
+    # def on_true_font_size(self, instance, value):
+    #     if 'true_scaler' in dir(self):  # this is only assigned when it has parent
+    #         self.font_size = self.true_scaler(self.true_font_size)
+    #         print instance.__class__.__name__, "SCALED on TFS"
 
 
-class FixedLayout(FloatLayout, FixedProperties):
+
+
+
+class FixedLayoutRoot(Layout):
+
+    true_screen_size = VariableListProperty([1920, 1080], limit=2)
 
     def __init__(self, **kwargs):
-        self.pcnt_per_pixel = [0.1, 0.1]
-        self.pcnt_margin = [0.0, 0.0]
+        super(FixedLayoutRoot, self).__init__(**kwargs)
+        fbind = self.fbind
+        update = self._trigger_layout
+        #fbind('children', update)
+        # fbind('parent', update)
+        fbind('size', update)
+        fbind('pos', update)
+        self.calc_scale_to_window()
+
+
+    def calc_scale_to_window(self, *args, **kwargs):
+        self.window_width, self.window_height = self.size
+        screen_ratio = self.true_screen_size[WIDTH]/float(self.true_screen_size[HEIGHT])
+        window_ratio = self.window_width/float(self.window_height)
+        if screen_ratio > window_ratio:
+            self.ratio = self.window_width/float(self.true_screen_size[WIDTH])
+            pixel_height = self.ratio*self.true_screen_size[HEIGHT]
+            self.x_offset = 0
+            self.y_offset = int((self.window_height - pixel_height) / 2)
+        else:
+            self.ratio = self.window_height/float(self.true_screen_size[HEIGHT])
+            pixel_width = self.ratio*self.true_screen_size[WIDTH]
+            self.x_offset = int((self.window_width - pixel_width) / 2)
+            self.y_offset = 0
+
+    def pos_hint_to_pos(self, pos_hint):
+        pos = [
+            int(self.ratio * float(pos_hint[X])) + self.x_offset,
+            int(self.ratio * float(pos_hint[Y])) + self.y_offset
+        ]
+        return pos
+
+    def size_hint_to_size(self, size_hint):
+        #return size_hint
+        size = [
+            int(self.ratio * float(size_hint[X])),
+            int(self.ratio * float(size_hint[Y]))
+        ]
+        return size
+
+    def do_layout(self, *args, **kwargs):
+        self.calc_scale_to_window()
+        # self.redraw_canvas()
+        for c in self.children:
+            c.size = self.size_hint_to_size(c.true_screen_size)
+            c.pos = self.pos_hint_to_pos((0,0))
+            c.x_offset = self.x_offset
+            c.y_offset = self.y_offset
+
+
+class FixedLayout(Layout, FixedProperties):
+
+    def __init__(self, **kwargs):
+        self.x_offset, self.y_offset = (0,0)
         super(FixedLayout, self).__init__(**kwargs)
         fbind = self.fbind
         update = self._trigger_layout
+        # fbind('children', update)
+        # fbind('parent', update)
         fbind('size', update)
         fbind('pos', update)
         self.calc_scale_to_window()
 
     def calc_scale_to_window(self, *args, **kwargs):
-        # the goal here, is to figure out the percentage per-pixel to map
-        #    pos_fixed or size_fixed into pos_hint and size_hint
+        #print "FL size", self.size
         self.window_width, self.window_height = self.size
-        wh = float(self.window_height)
-        ww = float(self.window_width)
-        sh = float(self.true_screen_size[HEIGHT])
-        sw = float(self.true_screen_size[WIDTH])
-        screen_ratio = sw/sh
-        window_ratio = ww/wh
-        if screen_ratio < window_ratio:
-            overall_width = (sw / (sh / wh)) / ww
-            overall_height = 1.0
+        screen_ratio = self.true_screen_size[WIDTH]/float(self.true_screen_size[HEIGHT])
+        window_ratio = self.window_width/float(self.window_height)
+        if screen_ratio > window_ratio:
+            self.ratio = self.window_width/float(self.true_screen_size[WIDTH])
+            pixel_height = self.ratio*self.true_screen_size[HEIGHT]
         else:
-            overall_width = 1.0
-            overall_height = (sh / (sw / ww)) / wh
-        overall_margin_width = (1.0 - overall_width) / 2.0
-        overall_margin_height = (1.0 - overall_height) / 2.0
-        self.pcnt_per_pixel[WIDTH] = overall_width / sw
-        self.pcnt_per_pixel[HEIGHT] = overall_height / sh
-        self.pcnt_margin[WIDTH] = overall_margin_width
-        self.pcnt_margin[HEIGHT] = overall_margin_height
+            self.ratio = self.window_height/float(self.true_screen_size[HEIGHT])
+            pixel_width = self.ratio*self.true_screen_size[WIDTH]
 
-    def true_scaler(self, value):
-        if not value:
+    def true_scaler(self, something):
+        if not something:
             return 0
-        return value * self.pcnt_per_pixel[HEIGHT]
+        return int(self.ratio * float(something))
 
-    def scale_size(self, xy_tuple):
-        if not xy_tuple:
-            xy_tuple=(0, 0)
-        x, y = xy_tuple
-        pcnt = [1, 1]
-        pcnt[X] = x * self.pcnt_per_pixel[WIDTH]
-        pcnt[Y] = y * self.pcnt_per_pixel[HEIGHT]
-        return pcnt
+    def pos_hint_to_pos(self, pos_hint, spot):
+        truex = pos_hint[X] - spot[X]
+        truey = pos_hint[Y] - spot[Y]
+        pos = [
+            self.true_scaler(truex) + self.x_offset,
+            self.true_scaler(truey) + self.y_offset
+        ]
+        return pos
 
-    def scale_pos(self, xy_tuple, xy_offset):
-        if not xy_tuple:
-            xy_tuple=(0, 0)
-        x, y = xy_tuple
-        xo, yo = xy_offset
-        pcnt = {}
-        pcnt['x'] = (x - xo) * self.pcnt_per_pixel[WIDTH] + self.pcnt_margin[WIDTH]
-        pcnt['y'] = (y - yo) * self.pcnt_per_pixel[HEIGHT] + self.pcnt_margin[HEIGHT]
-        return pcnt
+    def size_hint_to_size(self, size_hint):
+        size = [
+            self.true_scaler(size_hint[X]),
+            self.true_scaler(size_hint[Y])
+        ]
+        return size
 
     def do_layout(self, *args, **kwargs):
         self.calc_scale_to_window()
         for c in self.children:
             self.process_child(c)
-            # if isinstance(c, FixedBase):
-            #     for sub in c.children:
-            #         self.process_child(sub)
-        super(FixedLayout, self).do_layout(*args, **kwargs)
+            if c.__class__.__name__ == "FixedPopup":
+                for sub in c.children:
+                    self.process_child(sub)
 
     def process_child(self, c):
-        #
-        # handle size
-        #
-        s = self.scale_size(c.size_fixed)
-        c.size_hint_x = s[WIDTH]
-        c.size_hint_y = s[HEIGHT]
-        #
-        # handle position
-        #
-        if hasattr(c, "spot_fixed"):
-            c.pos_hint = self.scale_pos(c.pos_fixed, c.spot_fixed)
-        # if 'true_font_size' in dir(c):
-        #     c.font_size = self.true_scaler(c.true_font_size)
+        if 'true_spot' not in dir(c):
+            c.true_spot = (0, 0)
+        if 'size_hint' in dir(c):
+            c.size = self.size_hint_to_size(c.size_hint)
+        if 'pos_hint' in dir(c):
+            c.pos = self.pos_hint_to_pos(c.pos_hint, c.true_spot)
+        if 'true_font_size' in dir(c):
+            c.font_size = self.true_scaler(c.true_font_size)
 
-    def super_size_me(self, instance, value):
-        self.process_child(instance)
-        print "SUPER SIZE ", instance, instance.pos_fixed
-
-    def add_to_root(self, widget):
-        self.add_widget(widget)
-
-    def delete_from_root(self, widget):
-        self.remove_widget(widget)
-
-    # we override the FixedBase version because FixedLayout is the parent
     def add_widget(self, widget, index=0):
-        if not hasattr(widget, "pos_fixed"):
-            widget.apply_property(pos_fixed=ObjectProperty((0, 0)))
-        if not hasattr(widget, "size_fixed"):
-            widget.apply_property(size_fixed=ObjectProperty((100, 100)))
-        if not hasattr(widget, "spot_fixed"):
-            widget.apply_property(spot_fixed=ObjectProperty((0, 0)))
-        if not hasattr(widget, "active_pos_fixed"):
-            widget.apply_property(active_pos_fixed=ObjectProperty((0, 0)))
+        widget.size = (1920, 1080)
         widget.bind(
-           pos_fixed=self._trigger_layout
+           pos_hint=self._trigger_layout
         )
         widget.bind(
-           size_fixed=self._trigger_layout
+           size_hint=self._trigger_layout
         )
-        widget.bind(
-           spot_fixed=self._trigger_layout
-        )
-        widget.add_to_root = self.add_to_root
-        widget.delete_from_root = self.delete_from_root
-        return FloatLayout.add_widget(self, widget, index)
+        widget.true_scaler = self.true_scaler
+        return super(FixedLayout, self).add_widget(widget, index)
 
     def remove_widget(self, widget):
         widget.unbind(
-            spot_fixed=self._trigger_layout
+            size_hint=self._trigger_layout
         )
         widget.unbind(
-            size_fixed=self._trigger_layout
+            pos_hint=self._trigger_layout
         )
-        widget.unbind(
-            pos_fixed=self._trigger_layout
-        )
-        return FloatLayout.remove_widget(self, widget)
+        return super(FixedLayout, self).remove_widget(widget)
 
+
+class FixedImage(Image, FixedBase):
+    pass
+
+
+class ImageButton(ButtonBehavior, Image):
+    pass
+
+
+class FixedImageButton(ButtonBehavior, FixedImage):
+    pass
+
+
+class FixedLabel(Label, FixedBase):
+    pass
+
+class FixedButton(Button, FixedBase):
+    pass
 
 class FixedSimpleMenu(Widget, FixedBase):
     '''
@@ -356,22 +346,14 @@ class FixedPopup(Widget, FixedBase):
     '''
     FixedPopup
 
-    Don't set pos_fixed. It is used to communicate with FixedLayout.
-    Instead, set 'active_pos_fixed' to change it after building.
-
-    To make Floatation work properly, all children are added to the root
-    FixedLayout. However, a list of references to children are kept (self.child_references)
-    to move the child widgets with the PopUp. This movement only goes "one layer deep".
+    Don't set pos_hint. It is used to communicate with FixedLayout.
+    Instead, set 'active_pos_hint' to change it after building.
     '''
 
     background_color = ListProperty([0.8, 0.8, 0.8, 1.0])
-    active_pos_fixed = ListProperty(None)
+    active_pos_hint = ListProperty(None)
     off_screen_shift = ListProperty([1920*2, 1920*2])
     active = BooleanProperty(False)
-
-    def __init__(self, *args, **kwargs):
-        self.child_references = []
-        super(FixedPopup, self).__init__(*args, **kwargs)
 
     # this is defined to block event propogation to items below the popup
     def on_touch_down(self, touch):
@@ -402,18 +384,18 @@ class FixedPopup(Widget, FixedBase):
         return (x, y)
 
     def _placement(self):
-        if not self.active_pos_fixed:
+        if not self.active_pos_hint:
             return
         if self.active:
-            self.pos_fixed = self.active_pos_fixed
-            for c in self.child_references:
-                if c.active_pos_fixed:
-                    c.pos_fixed = c.active_pos_fixed
+            self.pos_hint = self.active_pos_hint
+            for c in self.children:
+                if c.active_pos_hint:
+                    c.pos_hint = c.active_pos_hint
         else:
-            self.pos_fixed = self._shift(self.active_pos_fixed)
-            for c in self.child_references:
-                if c.active_pos_fixed:
-                    c.pos_fixed = self._shift(c.active_pos_fixed)
+            self.pos_hint = self._shift(self.active_pos_hint)
+            for c in self.children:
+                if c.active_pos_hint:
+                    c.pos_hint = self._shift(c.active_pos_hint)
 
     def on_size(self, instance, value):
         self._draw_background()
@@ -427,22 +409,30 @@ class FixedPopup(Widget, FixedBase):
         self._draw_background()
         self._placement()
 
-    def add_widget(self, widget):
-        self.add_to_root(widget)
-        self.child_references.append(widget)
+    def handle_child_pos_hint(self, instance, value):
+        if instance.active_pos_hint is None:
+            instance.active_pos_hint = value
+        self.parent._trigger_layout(instance, value)
+
+    def add_widget(self, widget, index=0):
+        widget.active_pos_hint = None
+        widget.bind(
+           pos_hint=self.handle_child_pos_hint
+        )
+        widget.bind(
+           size_hint=self.parent._trigger_layout
+        )
+        widget.true_scaler = self.parent.true_scaler
+        return super(FixedPopup, self).add_widget(widget, index)
 
     def remove_widget(self, widget):
-        self.delete_from_root(widget)
-        self.child_references.append(widget)
-
-    # def add_widget(self, widget, index=0):
-    #     return super(FixedPopup, self).add_widget(widget, index)
-
-    # def remove_widget(self, widget):
-    #     widget.unbind(
-    #         active_pos_fixed=self.handle_child_pos_fixed
-    #     )
-    #     return super(FixedPopup, self).add_widget(widget, index)
+        widget.unbind(
+            size_hint=self.parent._trigger_layout
+        )
+        widget.unbind(
+            pos_hint=self.parent._trigger_layout
+        )
+        return super(FixedPopup, self).add_widget(widget, index)
 
 
 class FixedRadioButtons(Widget, FixedBase):
@@ -578,7 +568,7 @@ class FixedRadioButtons(Widget, FixedBase):
             new_label.bind(on_press=self.selection_made)
             self.add_widget(new_label)
             self.label_list.append(new_label)
-            new_sel = Button()
+            new_sel = ImageButton()
             new_sel.pos = self._calc_sel_pos(self.pos, index)
             new_sel.color = self.color
             new_sel.size = self._calc_sel_size()
@@ -591,12 +581,10 @@ class FixedRadioButtons(Widget, FixedBase):
 
     def _update_selected(self, index):
         for s in self.selector_list:
-            pass
-            # TODO: restore
-            # if s.selected_number==index:
-            #     s.background_normal = self.background_selected
-            # else:
-            #     s.background_normal = self.background_normal
+            if s.selected_number==index:
+                s.source = self.background_selected
+            else:
+                s.source = self.background_normal
             
     def on_selected(self, instance, index):
         self._update_selected(index)
