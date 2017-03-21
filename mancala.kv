@@ -500,39 +500,31 @@ AppScreenManager:
             id: game_screen_root
             Image:
                 id: board_image
-                source: 'assets/img/walnut-game-board.png'
-                pos_hint: (0, 0)
-                size_hint: (1920, 1080)
+                source: 'assets/img/walnut-board-green.png'
+                pos_hint: (-240, -660)
+                size_hint: (2400, 2400)
             FixedImageButton:
                 id: settings_button
-                source: 'assets/img/blue.png'
-                pos_hint: (1820, 980)
-                size_hint: (100, 100)
+                source: 'assets/img/gear.png'
+                pos_hint: (1720, 880)
+                size_hint: (200, 200)
                 on_release: app.root.current = "settings_opponent_screen"
-            ProgressSpinner:
-                id: wait_on_ai
-                size_hint: (100, 100)
-                pos_hint: (300, 500)
-                auto_start: False
+            Button:
+                pos_hint: (370, 540-80)
+                size_hint: (1180, 160)
+                true_font_size: 100
             Label:
                 id: center_message
                 text: 'here'
-                pos_hint: (800, 600)
+                pos_hint: (960-50, 540-50)
                 true_font_size: 100
                 size_hint: (100, 100)
                 color: (0, 0, 0, 1)
-            FixedImage:
-                id: user_hand
-                source: 'assets/img/blue3.png'
-                pos_hint: root.HANDS[1]['pos']
-                true_spot: (150, 150)
-                size_hint: (300, 300)
-            FixedImage:
-                id: ai_hand
-                source: 'assets/img/blue3.png'
-                pos_hint: root.HANDS[2]['pos']
-                true_spot: (150, 150)
-                size_hint: (300, 300)
+            ProgressSpinner:
+                id: wait_on_ai
+                size_hint: (100, 100)
+                pos_hint: (500, 500)
+                auto_start: False
             FixedPopup:
                 id: eog_new_game_button
                 active_pos_hint: (800, 500)
@@ -546,7 +538,7 @@ AppScreenManager:
                     on_release: app.start_new_game()
 
             FixedImageButton:
-                source: 'assets/img/brown190x200.png'
+                opacity: 0
                 size_hint: (190, 200)
                 pos_hint: root.PITS[1]['pos']
                 true_spot: (95, 100)
@@ -556,11 +548,11 @@ AppScreenManager:
                 text: '0'
                 true_font_size: 100
                 size_hint: (100, 100)
-                pos_hint: (330, 130)
+                pos_hint: (root.PITS[1]['pos'][0]-85, root.LOWER_LABEL)
                 color: (0, 0, 0, 1)
 
             FixedImageButton:
-                source: 'assets/img/brown190x200.png'
+                opacity: 0
                 size_hint: (190, 200)
                 pos_hint: root.PITS[2]['pos']
                 true_spot: (95, 100)
@@ -570,11 +562,11 @@ AppScreenManager:
                 text: '0'
                 true_font_size: 100
                 size_hint: (100, 100)
-                pos_hint: (540, 130)
+                pos_hint: (root.PITS[2]['pos'][0]-85, root.LOWER_LABEL)
                 color: (0, 0, 0, 1)
 
             FixedImageButton:
-                source: 'assets/img/brown190x200.png'
+                opacity: 0
                 size_hint: (190, 200)
                 pos_hint: root.PITS[3]['pos']
                 true_spot: (95, 100)
@@ -584,11 +576,11 @@ AppScreenManager:
                 text: '0'
                 true_font_size: 100
                 size_hint: (100, 100)
-                pos_hint: (750, 130)
+                pos_hint: (root.PITS[3]['pos'][0]-85, root.LOWER_LABEL)
                 color: (0, 0, 0, 1)
 
             FixedImageButton:
-                source: 'assets/img/brown190x200.png'
+                opacity: 0
                 size_hint: (190, 200)
                 pos_hint: root.PITS[4]['pos']
                 true_spot: (95, 100)
@@ -598,11 +590,11 @@ AppScreenManager:
                 text: '0'
                 true_font_size: 100
                 size_hint: (100, 100)
-                pos_hint: (960, 130)
+                pos_hint: (root.PITS[4]['pos'][0]-85, root.LOWER_LABEL)
                 color: (0, 0, 0, 1)
 
             FixedImageButton:
-                source: 'assets/img/brown190x200.png'
+                opacity: 0
                 size_hint: (190, 200)
                 pos_hint: root.PITS[5]['pos']
                 true_spot: (95, 100)
@@ -612,11 +604,11 @@ AppScreenManager:
                 text: '0'
                 true_font_size: 100
                 size_hint: (100, 100)
-                pos_hint: (1170, 130)
+                pos_hint: (root.PITS[5]['pos'][0]-85, root.LOWER_LABEL)
                 color: (0, 0, 0, 1)
 
             FixedImageButton:
-                source: 'assets/img/brown190x200.png'
+                opacity: 0
                 size_hint: (190, 200)
                 pos_hint: root.PITS[6]['pos']
                 true_spot: (95, 100)
@@ -626,15 +618,17 @@ AppScreenManager:
                 text: '0'
                 true_font_size: 100
                 size_hint: (100, 100)
-                pos_hint: (1380, 130)
+                pos_hint: (root.PITS[6]['pos'][0]-85, root.LOWER_LABEL)
                 color: (0, 0, 0, 1)
 
             Label:
                 id: counter,7
                 text: '0'
-                true_font_size: 100
+                true_font_size: 200
+                outline_width: 1
+                outline_color: (0.97, 0.94, 0.58, 1)
                 size_hint: (100, 100)
-                pos_hint: (1840, 500)
+                pos_hint: (root.PITS[7]['pos'][0]-85, root.LOWER_LABEL)
                 color: (0, 0, 0, 1)
 
             Label:
@@ -642,48 +636,56 @@ AppScreenManager:
                 text: '0'
                 true_font_size: 100
                 size_hint: (100, 100)
-                pos_hint: (1380, 930)
+                pos_hint: (root.PITS[8]['pos'][0]-85, root.UPPER_LABEL)
                 color: (0, 0, 0, 1)
             Label:
                 id: counter,9
                 text: '0'
                 true_font_size: 100
                 size_hint: (100, 100)
-                pos_hint: (1170, 930)
+                pos_hint: (root.PITS[9]['pos'][0]-85, root.UPPER_LABEL)
                 color: (0, 0, 0, 1)
             Label:
                 id: counter,10
                 text: '0'
                 true_font_size: 100
                 size_hint: (100, 100)
-                pos_hint: (960, 930)
+                pos_hint: (root.PITS[10]['pos'][0]-85, root.UPPER_LABEL)
                 color: (0, 0, 0, 1)
             Label:
                 id: counter,11
                 text: '0'
                 true_font_size: 100
                 size_hint: (100, 100)
-                pos_hint: (750, 930)
+                pos_hint: (root.PITS[11]['pos'][0]-85, root.UPPER_LABEL)
                 color: (0, 0, 0, 1)
             Label:
                 id: counter,12
                 text: '0'
                 true_font_size: 100
                 size_hint: (100, 100)
-                pos_hint: (540, 930)
+                pos_hint: (root.PITS[12]['pos'][0]-85, root.UPPER_LABEL)
                 color: (0, 0, 0, 1)
             Label:
                 id: counter,13
                 text: '0'
                 true_font_size: 100
                 size_hint: (100, 100)
-                pos_hint: (330, 930)
+                pos_hint: (root.PITS[13]['pos'][0]-85, root.UPPER_LABEL)
                 color: (0, 0, 0, 1)
 
             Label:
                 id: counter,14
                 text: '0'
-                true_font_size: 100
+                true_font_size: 200
                 size_hint: (100, 100)
-                pos_hint: (10, 500)
+                outline_width: 1
+                outline_color: (0.97, 0.94, 0.58, 1)
+                pos_hint: (root.PITS[14]['pos'][0]-85, root.UPPER_LABEL)
                 color: (0, 0, 0, 1)
+
+            Image:
+                id: ai_picture
+                source: 'assets/img/ai-pic.png'
+                pos_hint: (0, 1080)
+                size_hint: (300, 300)

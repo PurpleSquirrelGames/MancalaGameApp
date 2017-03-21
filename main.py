@@ -149,8 +149,8 @@ def update_setting(setting_name, value):
             set_text(setting_name, visual_settings[setting_name][value])
     if setting_name == "board_choice":
         filename = [
-            'assets/img/walnut-game-board.png',
-            'assets/img/birch-game-board.png',
+            'assets/img/walnut-board-green.png',
+            'assets/img/birch-board-white.png',
         ][value]
         app.root.screens[GAME_SCREEN].ids.board_image.source = filename
         app.root.screens[SETTINGS_SCREEN_SCREEN].ids.screen_screen_menu.\
@@ -269,14 +269,15 @@ SEED_DICT = {}
 for seed_num, seed_str in enumerate(["teal", "pebble", "black"]):
     SEED_DICT[seed_num] = {}
     SEED_DICT[seed_num]['images'] = []
-    for _ in range(3):
+    for index in range(1, 4):
         file_name = [
-            'assets/img/seed-teal-01.png',
-            'assets/img/seed-pebble-01.png',
-            'assets/img/seed-black-01.png',
+            'assets/img/seed-teal-0{}.png',
+            'assets/img/seed-pebble-0{}.png',
+            'assets/img/seed-black-0{}.png',
         ][seed_num]
+        file_name = file_name.format(index)
         size = [
-            (56, 55),
+            (90, 90),
             (75, 71),
             (75, 62)
         ][seed_num]
@@ -304,28 +305,30 @@ class GameScreen(Screen):
 
     HANDS = [
         {}, # 0, nobody
-        {"pos": (500, 0)},       # 1 user
-        {"pos": (500, 1080)}     # 2 ai
+        {"pos": (500, -300)},       # 1 user
+        {"pos": (500, 1080+300)}     # 2 ai
     ]
 
     PITS = [
         {"pos": PARKED     }, #  0, hand
-        {"pos": (430,  350)}, #  1
-        {"pos": (640,  350)}, #  2
-        {"pos": (850,  350)}, #  3
-        {"pos": (1060, 350)}, #  4
-        {"pos": (1270, 350)}, #  5
-        {"pos": (1480, 350)}, #  6
-        {"pos": (1690, 350)}, #  7 user store
-        {"pos": (1480, 770)}, #  8
-        {"pos": (1270, 770)}, #  9
-        {"pos": (1060, 770)}, # 10
-        {"pos": (850,  770)}, # 11
-        {"pos": (640,  770)}, # 12
-        {"pos": (430,  770)}, # 13
-        {"pos": (220,  770)}  # 14 ai store
+        {"pos": (420,  300)}, #  1
+        {"pos": (636,  300)}, #  2
+        {"pos": (852,  300)}, #  3
+        {"pos": (1068, 300)}, #  4
+        {"pos": (1284, 300)}, #  5
+        {"pos": (1500, 300)}, #  6
+        {"pos": (1716, 480)}, #  7 user store
+        {"pos": (1500, 700)}, #  8
+        {"pos": (1284, 760)}, #  9
+        {"pos": (1068, 760)}, # 10
+        {"pos": (852,  760)}, # 11
+        {"pos": (636,  760)}, # 12
+        {"pos": (420,  760)}, # 13
+        {"pos": (220,  600)}  # 14 ai store
     ]
 
+    LOWER_LABEL = 30
+    UPPER_LABEL = 1080-100-30
 
     def pushed_pit(self, pit):
         machine.input("pushed_pit", pit)
@@ -412,6 +415,34 @@ class Seeds(object):
             display.game_screen_root.add_widget(seed)
             self.board[HAND].append(seed)
             self.seed_ref.append(seed)
+        # FixedImage:
+        #     id: user_hand
+        #     source: 'assets/img/user-hand-01.png'
+        #     pos_hint: root.HANDS[1]['pos']
+        #     true_spot: (300, 300)
+        #     size_hint: (600, 600)
+        # FixedImage:
+        #     id: ai_hand
+        #     source: 'assets/img/ai-hand-01.png'
+        #     pos_hint: root.HANDS[2]['pos']
+        #     true_spot: (300, 300)
+        #     size_hint: (600, 600)
+        hand = FixedImage()
+        hand.id = "user_hand"
+        hand.source = "assets/img/user-hand-01.png"
+        hand.pos_hint = GameScreen.HANDS[USER]['pos']
+        hand.true_spot = (300, 300)
+        hand.size_hint = (600, 600)
+        display.game_screen_root.add_widget(hand)
+        self.user_hand = hand
+        hand = FixedImage()
+        hand.id = "ai_hand"
+        hand.source = "assets/img/ai-hand-01.png"
+        hand.pos_hint = GameScreen.HANDS[AI]['pos']
+        hand.true_spot = (300, 300)
+        hand.size_hint = (600, 600)
+        display.game_screen_root.add_widget(hand)
+        self.ai_hand = hand
         self.display = display
 
     def change_picture(self):
@@ -458,10 +489,21 @@ class Seeds(object):
     def _move(self, seed, pit):
         pos_hint = GameScreen.PITS[pit]['pos']
         x = pos_hint[0] + random.randint(-50, 50)
-        y = pos_hint[1] + random.randint(-50, 50)
+        if pit in [7, 14]:
+            y = pos_hint[1] + random.randint(-150, 150)
+        else:
+            y = pos_hint[1] + random.randint(-50, 50)
         seed.pos_hint = (x, y)
 
 
+def animate_ai_start(display):
+    a = Animation(pos_hint=(0, 1080-300))
+    a.start(display.ai_picture)
+    pass
+
+def animate_ai_end(display):
+    a = Animation(pos_hint=(0, 1080))
+    a.start(display.ai_picture)
 
 class HandSeedAnimation(object):
 
@@ -479,9 +521,9 @@ class HandSeedAnimation(object):
         print self.animation_steps
         self.last_step = {}
         if player==USER:
-            self.hand = display.user_hand
+            self.hand = seeds.user_hand
         else:
-            self.hand = display.ai_hand
+            self.hand = seeds.ai_hand
         self.play_one_step(None, None)
 
     def play_one_step(self, sequence, widget):
@@ -532,7 +574,7 @@ class HandSeedAnimation(object):
                     t='in_out_sine'
                 )
             elif step['action']=="steal":
-                self.display.center_message.text = "Stealing!"
+                self.display.center_message.text = "Capture!"
             elif step['action']=="game_over":
                 self.display.center_message.text = "Handling End of Game"
             elif step['action']=="setting_up":
@@ -683,6 +725,7 @@ class AIThinkingState(State):
     def on_entry(self):
         self.ref['kivy'].center_message.text = "AI is thinking"
         self.ref['kivy'].wait_on_ai.start_spinning()
+        animate_ai_start(self.ref["kivy"])
         thread.start_new_thread(get_ai_move, ())
 
     def input(self, input_name, *args, **kwargs):
@@ -692,6 +735,9 @@ class AIThinkingState(State):
             self.change_state("animate_ai")
         if input_name == "request_new_game":
             self.change_state("init_game")
+
+    def on_exit(self):
+        animate_ai_end(self.ref["kivy"])
 
 class AnimateAIChoicesState(State):
 
