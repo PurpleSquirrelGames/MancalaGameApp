@@ -18,6 +18,13 @@ Y = 1
 WIDTH = 0
 HEIGHT = 1
 
+
+# Font sizes are measured in "pixel character height". I don't really
+# know what Kivy uses; can't find any documentation for that information.
+# So I'm using the PIXEL_SCALE below as the ratio.
+
+PIXEL_SCALE = 0.7
+
 def grab(alist, index):
     try:
         return alist[index]
@@ -26,31 +33,48 @@ def grab(alist, index):
 
 class FixedProperties(object):
 
-    true_screen_size = VariableListProperty([1920, 1080], limit=2)
+    fixed_screen_size = VariableListProperty([1920, 1080], limit=2)
+    #
     # initial sizing somewhat inspired by Google Material
-    true_title_font_size = NumericProperty(80.0)
-    true_subheading_font_size = NumericProperty(64.0)
-    true_font_size = NumericProperty(56.0)
+    font_title_size_fixed = NumericProperty(80.0)
+    font_subheading_size_fixed = NumericProperty(64.0)
+    font_size_fixed = NumericProperty(56.0)
     #
     pos_fixed = ObjectProperty((0,0))
-    size_fixed = ObjectProperty((1920, 1080))
+    size_fixed = ObjectProperty((100, 100))
     spot_fixed = ObjectProperty((0,0))
     #
     active_pos_fixed = ObjectProperty((0,0))
+
+    def apply_fixed_properties(self, widget):
+        if not hasattr(widget, "fixed_screen_size"):
+            x = self.fixed_screen_size[X]
+            y = self.fixed_screen_size[Y]
+            widget.apply_property(fixed_screen_size=ObjectProperty([x, y]))
+        #
+        if not hasattr(widget, "font_title_size_fixed"):
+            widget.apply_property(font_title_size_fixed=ObjectProperty((80.0)))
+        if not hasattr(widget, "font_subheading_size_fixed"):
+            widget.apply_property(font_subheading_size_fixed=ObjectProperty((56.0)))
+        if not hasattr(widget, "font_size_fixed"):
+            widget.apply_property(font_size_fixed=ObjectProperty((56.0)))
+        #
+        if not hasattr(widget, "pos_fixed"):
+            widget.apply_property(pos_fixed=ObjectProperty((0, 0)))
+        if not hasattr(widget, "size_fixed"):
+            widget.apply_property(size_fixed=ObjectProperty((100, 100)))
+        if not hasattr(widget, "spot_fixed"):
+            widget.apply_property(spot_fixed=ObjectProperty((0, 0)))
+        #
+        if not hasattr(widget, "active_pos_fixed"):
+            widget.apply_property(active_pos_fixed=ObjectProperty((0, 0)))
 
 
 class FixedBase(FixedProperties):
 
     def __init__(self, *args, **kwargs):
+        self.child_references = []
         return
-
-    # # this routine is replaced by parent or override
-    # def scale_size(self, xy_tuple):
-    #     return [1.0, 1.0]
-
-    # # this routine is generally replaced by parent or override
-    # def scale_pos(self, xy_tuple, xy_offset):
-    #     return {'x': 0.0, 'y': 0.0}
 
     def scale_size(self, *args):
         return self.parent.scale_size(*args)
@@ -58,40 +82,13 @@ class FixedBase(FixedProperties):
     def scale_pos(self, *args):
         return self.parent.scale_pos(*args)
 
-    def super_size_me(self, obj, value):
-        print "SUPER SIZE ME FIXED BASE"
-        return self.parent.super_size_me(obj, value)
+    def scale_font(self, *args):
+        return self.parent.scale_font(*args)
 
     # deprecate
-    def true_scaler(self, value):
+    def fixed_scaler(self, value):
         return 1.0
 
-    # def on_parent(self, instance, value):
-    #     if hasattr(self.parent, "scale_size"):
-    #         self.scale_size = self.parent.scale_size
-    #     if hasattr(self.parent, "scale_pos"):
-    #         self.scale_pos = self.parent.scale_pos
-
-    # def add_widget(self, widget, index=0):
-    #     if not hasattr(widget, "pos_fixed"):
-    #         widget.apply_property(pos_fixed=ObjectProperty((0, 0)))
-    #     if not hasattr(widget, "size_fixed"):
-    #         widget.apply_property(size_fixed=ObjectProperty((100, 100)))
-    #     if not hasattr(widget, "spot_fixed"):
-    #         widget.apply_property(spot_fixed=ObjectProperty((0, 0)))
-    #     widget.bind(
-    #        pos_fixed=self.super_size_me
-    #     )
-    #     widget.bind(
-    #        size_fixed=self.super_size_me
-    #     )
-    #     widget.bind(
-    #        spot_fixed=self.super_size_me
-    #     )
-    #     # return super(FixedBase, self).add_widget(widget, index)
-
-    # def remove_widget(self, widget):
-    #     return super(FixedBase, self).remove_widget(widget)
 
 
 class FixedLayout(FloatLayout, FixedProperties):
@@ -112,8 +109,8 @@ class FixedLayout(FloatLayout, FixedProperties):
         self.window_width, self.window_height = self.size
         wh = float(self.window_height)
         ww = float(self.window_width)
-        sh = float(self.true_screen_size[HEIGHT])
-        sw = float(self.true_screen_size[WIDTH])
+        sh = float(self.fixed_screen_size[HEIGHT])
+        sw = float(self.fixed_screen_size[WIDTH])
         screen_ratio = sw/sh
         window_ratio = ww/wh
         if screen_ratio < window_ratio:
@@ -128,8 +125,9 @@ class FixedLayout(FloatLayout, FixedProperties):
         self.pcnt_per_pixel[HEIGHT] = overall_height / sh
         self.pcnt_margin[WIDTH] = overall_margin_width
         self.pcnt_margin[HEIGHT] = overall_margin_height
+        self.pixels_per_fixed_pixel = wh / sh
 
-    def true_scaler(self, value):
+    def fixed_scaler(self, value):
         if not value:
             return 0
         return value * self.pcnt_per_pixel[HEIGHT]
@@ -153,6 +151,11 @@ class FixedLayout(FloatLayout, FixedProperties):
         pcnt['y'] = (y - yo) * self.pcnt_per_pixel[HEIGHT] + self.pcnt_margin[HEIGHT]
         return pcnt
 
+    def scale_font(self, value):
+        if not value:
+            return 1.0
+        return value * PIXEL_SCALE * self.pixels_per_fixed_pixel
+
     def do_layout(self, *args, **kwargs):
         self.calc_scale_to_window()
         for c in self.children:
@@ -174,12 +177,15 @@ class FixedLayout(FloatLayout, FixedProperties):
         #
         if hasattr(c, "spot_fixed"):
             c.pos_hint = self.scale_pos(c.pos_fixed, c.spot_fixed)
-        # if 'true_font_size' in dir(c):
-        #     c.font_size = self.true_scaler(c.true_font_size)
-
-    def super_size_me(self, instance, value):
-        self.process_child(instance)
-        print "SUPER SIZE ", instance, instance.pos_fixed
+        #
+        # handle font
+        #
+        if hasattr(c, 'font_size_fixed'):
+            c.font_size = self.scale_font(c.font_size_fixed)
+        #
+        # if hasattr(c, "text"):
+        #     if c.text == "Kalah":
+        #         print "KALAH Button Found", c.pos_hint, c.size_hint
 
     def add_to_root(self, widget):
         self.add_widget(widget)
@@ -187,16 +193,8 @@ class FixedLayout(FloatLayout, FixedProperties):
     def delete_from_root(self, widget):
         self.remove_widget(widget)
 
-    # we override the FixedBase version because FixedLayout is the parent
     def add_widget(self, widget, index=0):
-        if not hasattr(widget, "pos_fixed"):
-            widget.apply_property(pos_fixed=ObjectProperty((0, 0)))
-        if not hasattr(widget, "size_fixed"):
-            widget.apply_property(size_fixed=ObjectProperty((100, 100)))
-        if not hasattr(widget, "spot_fixed"):
-            widget.apply_property(spot_fixed=ObjectProperty((0, 0)))
-        if not hasattr(widget, "active_pos_fixed"):
-            widget.apply_property(active_pos_fixed=ObjectProperty((0, 0)))
+        self.apply_fixed_properties(widget)
         widget.bind(
            pos_fixed=self._trigger_layout
         )
@@ -206,11 +204,17 @@ class FixedLayout(FloatLayout, FixedProperties):
         widget.bind(
            spot_fixed=self._trigger_layout
         )
+        widget.bind(
+           font_size_fixed=self._trigger_layout
+        )
         widget.add_to_root = self.add_to_root
         widget.delete_from_root = self.delete_from_root
         return FloatLayout.add_widget(self, widget, index)
 
     def remove_widget(self, widget):
+        widget.unbind(
+           font_size_fixed=self._trigger_layout
+        )
         widget.unbind(
             spot_fixed=self._trigger_layout
         )
@@ -230,8 +234,8 @@ class FixedSimpleMenu(Widget, FixedBase):
     a FixedPopup to assign a new value.
 
     Each menu item is a pair of buttons with a transparent background. See
-    FixedSimpleMenuItem for details. If true_subheading_font_size or 
-    true_font_size are assigned, those values are used as defaults for the
+    FixedSimpleMenuItem for details. If font_subheading_size_fixed or 
+    font_size_fixed are assigned, those values are used as defaults for the
     menu items.
 
     Sizing Note: to work best with the default font sizing on a 1920x1080 screen,
@@ -252,6 +256,9 @@ class FixedSimpleMenu(Widget, FixedBase):
 
     def shape_children(self):
         if self.menu_items:
+            #
+            # step one: calculate background based on physical pixels
+            #
             item_frame_height = self.size[HEIGHT]/float(len(self.menu_items))
             padding = item_frame_height * self.vertical_padding
             bottom_padding = padding / 2.0
@@ -270,10 +277,20 @@ class FixedSimpleMenu(Widget, FixedBase):
                         for index in range(middles):
                             line_y = self.pos[Y] + top_y - (index * item_frame_height)
                             Line(points=[self.pos[X], line_y, self.pos[X]+self.size[WIDTH], line_y])
+            #
+            # step two: calculate child placement based on fixed pixels
+            #
+            item_frame_height = self.size_fixed[HEIGHT]/float(len(self.menu_items))
+            padding = item_frame_height * self.vertical_padding
+            bottom_padding = padding / 2.0
+            top_y = (len(self.menu_items) - 1) * item_frame_height
+            item_height = item_frame_height - padding
+            item_width = self.size_fixed[WIDTH] - (padding * 2.0)
+            item_x = self.pos_fixed[X] + padding
             for index, item in enumerate(self.menu_items):
-                item_y = self.pos[Y] + top_y - (index * item_frame_height) + bottom_padding
-                item.size = (item_width, item_height)
-                item.pos = (item_x, item_y)
+                item_y = self.pos_fixed[Y] + top_y - (index * item_frame_height) + bottom_padding
+                item.size_fixed = (item_width, item_height)
+                item.pos_fixed = (item_x, item_y)
 
     def on_size(self, instance, value):
         self.shape_children()
@@ -285,19 +302,23 @@ class FixedSimpleMenu(Widget, FixedBase):
         self.shape_children()
 
     def add_widget(self, widget, index=0):
+        self.child_references.append(widget)
         if isinstance(widget, FixedSimpleMenuItem):
-            self.menu_items.append(widget)
-            widget.true_subheading_font_size = self.true_subheading_font_size
-            widget.true_font_size = self.true_font_size
+            # set defaults:
             widget.color = self.color
-            widget.true_scaler = self.true_scaler
-        return super(FixedSimpleMenu, self).add_widget(widget, index)
+            widget.font_subheading_size_fixed = self.font_subheading_size_fixed
+            widget.font_size_fixed = self.font_size_fixed
+            self.menu_items.append(widget)
+        self.add_to_root(widget)
+
+    def remove_widget(self, widget):
+        self.delete_from_root(widget)
 
     def set_text(self, child_name, text):
-        for child in self.children:
+        for child in self.child_references:
             if child.name == child_name:
                 child.text = str(text)
-                # child.on_text(child, str(text))
+
 
 class FixedSimpleMenuItem(Widget, FixedBase):
 
@@ -323,14 +344,14 @@ class FixedSimpleMenuItem(Widget, FixedBase):
         self.heading_button.pos = (self.pos[X], self.pos[Y]+half)
         self.heading_button.size = (self.size[WIDTH], half)
         self.heading_button.text_size = self.heading_button.size
-        self.heading_button.font_size = self.true_scaler(self.true_subheading_font_size)
+        self.heading_button.font_size = self.scale_font(self.font_subheading_size_fixed)
         self.heading_button.background_color = [0.0, 0.0, 0.0, 0.0]
         self.heading_button.markup = True
         self.heading_button.color = self.color
         self.text_button.pos = (self.pos[X], self.pos[Y])
         self.text_button.size = (self.size[WIDTH], half)
         self.text_button.text_size = self.text_button.size
-        self.text_button.font_size = self.true_scaler(self.true_font_size)
+        self.text_button.font_size = self.scale_font(self.font_size_fixed)
         self.text_button.background_color = [0.0, 0.0, 0.0, 0.0]
         self.text_button.color = self.color
 
@@ -352,6 +373,8 @@ class FixedSimpleMenuItem(Widget, FixedBase):
     def press_detected(self):
         self.dispatch('on_press')
 
+
+
 class FixedPopup(Widget, FixedBase):
     '''
     FixedPopup
@@ -368,10 +391,6 @@ class FixedPopup(Widget, FixedBase):
     active_pos_fixed = ListProperty(None)
     off_screen_shift = ListProperty([1920*2, 1920*2])
     active = BooleanProperty(False)
-
-    def __init__(self, *args, **kwargs):
-        self.child_references = []
-        super(FixedPopup, self).__init__(*args, **kwargs)
 
     # this is defined to block event propogation to items below the popup
     def on_touch_down(self, touch):
@@ -433,16 +452,6 @@ class FixedPopup(Widget, FixedBase):
 
     def remove_widget(self, widget):
         self.delete_from_root(widget)
-        self.child_references.append(widget)
-
-    # def add_widget(self, widget, index=0):
-    #     return super(FixedPopup, self).add_widget(widget, index)
-
-    # def remove_widget(self, widget):
-    #     widget.unbind(
-    #         active_pos_fixed=self.handle_child_pos_fixed
-    #     )
-    #     return super(FixedPopup, self).add_widget(widget, index)
 
 
 class FixedRadioButtons(Widget, FixedBase):
@@ -463,7 +472,6 @@ class FixedRadioButtons(Widget, FixedBase):
         self.label_y_incr = 100
         self.label_x_shift = 150
         self.label_x_incr = 100
-        self.register_event_type('on_selection')
         super(FixedRadioButtons, self).__init__(**kwargs)
 
     def on_color(self, instance, value):
@@ -532,8 +540,8 @@ class FixedRadioButtons(Widget, FixedBase):
         for index, label in enumerate(self.label_list):
             label.size = self._calc_button_size()
             label.text_size = label.size
-            if self.true_font_size:
-                label.font_size = self.parent.true_scaler(self.true_font_size)
+            if self.font_size_fixed:
+                label.font_size = self.parent.scale_font(self.font_size_fixed)
             self.selector_list[index].size = self._calc_sel_size()
 
     def on_separation_factor(self, instance, value):
@@ -555,12 +563,13 @@ class FixedRadioButtons(Widget, FixedBase):
     def on_selections(self, instance, value_list):
         # FAIR WARNING: Do not confuse this with 'on_selection'
         # first, check to see if changed
-        same = True
-        for index, text in enumerate(value_list):
-            if text != grab(self.label_list, index):
-                same = False
-        if same:
-            return
+        self.register_event_type('on_selection')
+        # same = True
+        # for index, text in enumerate(value_list):
+        #     if text != grab(self.label_list, index):
+        #         same = False
+        # if same:
+        #     return
         self.clear_widgets()
         self.label_list = []
         self.selector_list = []
@@ -591,12 +600,12 @@ class FixedRadioButtons(Widget, FixedBase):
 
     def _update_selected(self, index):
         for s in self.selector_list:
-            pass
-            # TODO: restore
-            # if s.selected_number==index:
-            #     s.background_normal = self.background_selected
-            # else:
-            #     s.background_normal = self.background_normal
+            if s.selected_number==index:
+                if self.background_selected:
+                    s.background_normal = self.background_selected
+            else:
+                if self.background_normal:
+                    s.background_normal = self.background_normal
             
     def on_selected(self, instance, index):
         self._update_selected(index)
@@ -607,16 +616,3 @@ class FixedRadioButtons(Widget, FixedBase):
     def on_background_selected(self, instance, value):
         self._update_selected(self.selected)
 
-
-    # def add_widget(self, widget, index=0):
-    #     #widget.size = (1920, 1080)
-    #     widget.bind(
-    #        pos_hint=self.parent._trigger_layout
-    #     )
-    #     return super(FixedSelector, self).add_widget(widget, index)
-
-    # def remove_widget(self, widget):
-    #     widget.unbind(
-    #         pos_hint=self.parent._trigger_layout
-    #     )
-    #     return super(FixedSelector, self).remove_widget(widget)
