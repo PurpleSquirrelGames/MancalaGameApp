@@ -128,6 +128,8 @@ def update_setting(setting_name, value):
     if setting_name == "ai_chosen":
         settings["ai_chosen"] = value
         character = AI_LIST[value]
+        app.root.screens[GAME_SCREEN].ids.ai_picture.source =\
+            "assets/img/ai-pic-{:02d}.png".format(character['index'])
     if setting_name == "who_plays_first":
         if value == 0:
             settings["first_player"] = USER
@@ -340,6 +342,9 @@ class SettingsOpponentScreen(Screen):
     global settings
     global character
     global AI_LIST
+
+    def on_parent(self, instance, value):
+        self.ids.ai_face_image.source = "assets/img/ai-pic-{:02d}.png".format(character['index'])
     
     def _update_details(self, ai_chosen):
         update_setting("ai_chosen", ai_chosen)
@@ -349,7 +354,7 @@ class SettingsOpponentScreen(Screen):
             character['rank'],
             character['name']
         )
-        # self.ids.ai_face_image
+        self.ids.ai_face_image.source = "assets/img/ai-pic-{:02d}.png".format(character['index'])
 
     def previous_ai(self):
         ai_chosen = (settings['ai_chosen'] - 1) % 12
@@ -500,7 +505,7 @@ class Seeds(object):
 
 
 def animate_ai_start(display):
-    a = Animation(pos_fixed=(0, 1080-300))
+    a = Animation(pos_fixed=(380, 400))
     a.start(display.ai_picture)
     pass
 
