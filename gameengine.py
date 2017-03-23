@@ -74,23 +74,7 @@ CAUTION = 2
 
 EMPTY = 0
 FULL = 1
-TACTIC_EMPTY_PIT_VALUE = [
-        (12, 1), # 0 = nearest to STORE, (empty/empty, empty/full)
-        (8, 2), # 1    first value is value for empty; second is multiplier
-        (5, 1),   # 2
-        (4, 1),   # 3
-        (7, 1), # 4
-        (9, 1), # 5
-]
 
-TACTIC_EASY_REPEAT_VALUE = [
-        4, # pit 0 from store
-        5, # 
-        3, # 
-        2, # 
-        1, # 
-        1, # 
-]
 
 class MancalaAI(easyAI.Negamax, object):
 
@@ -107,9 +91,13 @@ class MancalaAI(easyAI.Negamax, object):
 
     def set_character(self):
         if self.testing:
-            self.character = self.testing[self.settings["ai_chosen"]]
+            if self.defender_role:
+                self.character = self.testing[1]
+            else:
+                self.character = self.testing[0]
         else:
             self.character = AI_LIST[self.settings["ai_chosen"]]
+        self.tactics = self.character['tactics']
         self.depth = self.character['lookahead']
 
     def __call__(self, game):
@@ -118,10 +106,6 @@ class MancalaAI(easyAI.Negamax, object):
         if self.character['error_rate'] > 0.0:
             chance = random.random()
             if chance < self.character['error_rate']:
-                return self._random_move(game)
-        if self.defender_role:
-            chance = random.random()
-            if chance < 0.15:
                 return self._random_move(game)
         return super(MancalaAI, self).__call__(game)
 
@@ -133,6 +117,9 @@ class KalahAIPlayer(easyAI.AI_Player):
     
     def set_character(self):
         self.AI_algo.set_character()
+
+    def get_tactics(self):
+        return self.AI_algo.tactics
 
 class KalahGame(easyAI.TwoPlayersGame):
 
@@ -275,9 +262,16 @@ class KalahGame(easyAI.TwoPlayersGame):
                             self._scoop(house)
                     if self.board[HAND]:
                         self._drop_all(STORE_IDX[self.nplayer])
-            # elif self.settings['eog_rule'] == 3:
-            #     # leave seeds alone
-            #     pass
+            elif self.settings['eog_rule'] == 3:
+                # leave seeds alone
+                # just place in hand for proper scoring; don't animate this ever
+                temp = self.want_animation
+                self.want_animation = False
+                for player in PLAYER_LIST:
+                    for house in HOUSE_LIST[player]:
+                        if self.board[house]:
+                            self._scoop(house)
+                self.want_animation = temp # restore
     
     def is_over(self):
         for player in PLAYER_LIST:
@@ -328,35 +322,36 @@ class KalahGame(easyAI.TwoPlayersGame):
             exactly equal the disadvantage fo the other player.
         '''
         # leaving empty pits on own side
+        tactics = self.players[player - 1].get_tactics()
         if True: self.trace = []
         score = 0
         for dist, pit in enumerate(OWN_PITS_FROM_STORE[player]):
             if self.board[pit]==0:
                 opp_count = self.board[P[pit][OPP]]
                 if opp_count:
-                    score += TACTIC_EMPTY_PIT_VALUE[dist][FULL] * opp_count
-                    if True: self.trace.append("+{} OWN EMPTY/FULL PIT {} cnt={}".format(TACTIC_EMPTY_PIT_VALUE[dist][FULL] * opp_count, pit, opp_count))
+                    score += tactics.empty_pit_value[dist][FULL] * opp_count
+                    if True: self.trace.append("+{} OWN EMPTY/FULL PIT {} cnt={}".format(tactics.empty_pit_value[dist][FULL] * opp_count, pit, opp_count))
                 else:
-                    score += TACTIC_EMPTY_PIT_VALUE[dist][EMPTY]
-                    if True: self.trace.append("+{} OWN EMPTY/EMPTY PIT {}".format(TACTIC_EMPTY_PIT_VALUE[dist][EMPTY], pit))
+                    score += tactics.empty_pit_value[dist][EMPTY]
+                    if True: self.trace.append("+{} OWN EMPTY/EMPTY PIT {}".format(tactics.empty_pit_value[dist][EMPTY], pit))
         for dist, pit in enumerate(OWN_PITS_FROM_STORE[opponent]):
             if self.board[pit]==0:
                 opp_count = self.board[P[pit][OPP]]
                 if opp_count:
-                    score -= TACTIC_EMPTY_PIT_VALUE[dist][FULL] * opp_count
-                    if True: self.trace.append("-{} OPP EMPTY/FULL PIT {} cnt={}".format(TACTIC_EMPTY_PIT_VALUE[dist][FULL] * opp_count, pit, opp_count))
+                    score -= tactics.empty_pit_value[dist][FULL] * opp_count
+                    if True: self.trace.append("-{} OPP EMPTY/FULL PIT {} cnt={}".format(tactics.empty_pit_value[dist][FULL] * opp_count, pit, opp_count))
                 else:
-                    score -= TACTIC_EMPTY_PIT_VALUE[dist][EMPTY]
-                    if True: self.trace.append("-{} OPP EMPTY/EMPTY PIT {}".format(TACTIC_EMPTY_PIT_VALUE[dist][EMPTY], pit))
+                    score -= tactics.empty_pit_value[dist][EMPTY]
+                    if True: self.trace.append("-{} OPP EMPTY/EMPTY PIT {}".format(tactics.empty_pit_value[dist][EMPTY], pit))
         # easy repeat patterns seen
         for dist, pit in enumerate(OWN_PITS_FROM_STORE[player]):
             if self.board[pit] == (dist + 1):
-                score += TACTIC_EASY_REPEAT_VALUE[dist]
-                if True: self.trace.append("+{} OWN EASY REPEAT AT {}".format(TACTIC_EASY_REPEAT_VALUE[dist], pit))
+                score += tactics.easy_repeat_value[dist]
+                if True: self.trace.append("+{} OWN EASY REPEAT AT {}".format(tactics.easy_repeat_value[dist], pit))
         for dist, pit in enumerate(OWN_PITS_FROM_STORE[opponent]):
             if self.board[P[pit][OPP]] == (dist + 1):
-                score -= TACTIC_EASY_REPEAT_VALUE[dist]
-                if True: self.trace.append("-{} OPP EASY REPEAT AT {}".format(TACTIC_EASY_REPEAT_VALUE[dist], pit))
+                score -= tactics.easy_repeat_value[dist]
+                if True: self.trace.append("-{} OPP EASY REPEAT AT {}".format(tactics.easy_repeat_value[dist], pit))
         return score
 
 #    def unmake_move(self, move):

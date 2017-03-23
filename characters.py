@@ -1,10 +1,32 @@
 
+class Tactics(object):
+    def __init__(self):
+        self.empty_pit_value = [
+            (12, 1), # 0 = nearest to STORE, (empty/empty, empty/full)
+            (8, 2),  # 1    first value is value for empty; second is multiplier
+            (5, 1),  # 2
+            (4, 1),  # 3
+            (7, 1),  # 4
+            (9, 1),  # 5
+        ]
+        self.easy_repeat_value = [
+            4, # pit 0 from store
+            5, # 
+            3, # 
+            2, # 
+            1, # 
+            1, # 
+        ]
+
+
+
 AI_LIST = [
     {
         "index": 1,
         "name": "Maisy",
         "rank": "1",
         "strategy": "random",  # options: "random", "negamax"
+        "tactics": Tactics(),
         "lookahead": 0,  # 1 to 6
         "error_rate": 1.00,  # 0.0 to 1.0; odds of making mistake
         "fitness": "greed", # options: greed, caution, balance
@@ -16,6 +38,7 @@ AI_LIST = [
         "name": "Billy",
         "rank": "2",
         "strategy": "negamax",  # options: "random", "negamax"
+        "tactics": Tactics(),
         "lookahead": 1,  # 1 to 6
         "error_rate": 0.20,  # 0.0 to 1.0; odds of making mistake
         "fitness": "balance", # options: greed, caution, balance
@@ -27,6 +50,7 @@ AI_LIST = [
         "name": "Emily",
         "rank": "3",
         "strategy": "negamax",  # options: "random", "negamax"
+        "tactics": Tactics(),
         "lookahead": 1,  # 1 to 6
         "error_rate": 0.05,  # 0.0 to 1.0; odds of making mistake
         "fitness": "balance", # options: greed, caution, balance
@@ -38,6 +62,7 @@ AI_LIST = [
         "name": "Jacob",
         "rank": "4",
         "strategy": "negamax",  # options: "random", "negamax"
+        "tactics": Tactics(),
         "lookahead": 2,  # 1 to 6
         "error_rate": 0.02,  # 0.0 to 1.0; odds of making mistake
         "fitness": "balance", # options: greed, caution, balance
@@ -49,6 +74,7 @@ AI_LIST = [
         "name": "Emma",
         "rank": "5",
         "strategy": "negamax",  # options: "random", "negamax"
+        "tactics": Tactics(),
         "lookahead": 3,  # 1 to 6
         "error_rate": 0.00,  # 0.0 to 1.0; odds of making mistake
         "fitness": "greed", # options: greed, caution, balance
@@ -60,6 +86,7 @@ AI_LIST = [
         "name": "Matthew",
         "rank": "6",
         "strategy": "negamax",  # options: "random", "negamax"
+        "tactics": Tactics(),
         "lookahead": 3,  # 1 to 6
         "error_rate": 0.00,  # 0.0 to 1.0; odds of making mistake
         "fitness": "caution", # options: greed, caution, balance
@@ -71,6 +98,7 @@ AI_LIST = [
         "name": "Olivia",
         "rank": "7",
         "strategy": "negamax",  # options: "random", "negamax"
+        "tactics": Tactics(),
         "lookahead": 4,  # 1 to 6
         "error_rate": 0.00,  # 0.0 to 1.0; odds of making mistake
         "fitness": "balance", # options: greed, caution, balance
@@ -82,6 +110,7 @@ AI_LIST = [
         "name": "William",
         "rank": "8",
         "strategy": "negamax",  # options: "random", "negamax"
+        "tactics": Tactics(),
         "lookahead": 4,  # 1 to 6
         "error_rate": 0.03,  # 0.0 to 1.0; odds of making mistake
         "fitness": "greed", # options: greed, caution, balance
@@ -93,6 +122,7 @@ AI_LIST = [
         "name": "Sam",
         "rank": "9",
         "strategy": "negamax",  # options: "random", "negamax"
+        "tactics": Tactics(),
         "lookahead": 5,  # 1 to 6
         "error_rate": 0.03,  # 0.0 to 1.0; odds of making mistake
         "fitness": "caution", # options: greed, caution, balance
@@ -104,6 +134,7 @@ AI_LIST = [
         "name": "Sandra",
         "rank": "10",
         "strategy": "negamax",  # options: "random", "negamax"
+        "tactics": Tactics(),
         "lookahead": 6,  # 1 to 6
         "error_rate": 0.01,  # 0.0 to 1.0; odds of making mistake
         "fitness": "balance", # options: greed, caution, balance
@@ -115,6 +146,7 @@ AI_LIST = [
         "name": "R3 UNIT",
         "rank": "11",
         "strategy": "negamax",  # options: "random", "negamax"
+        "tactics": Tactics(),
         "lookahead": 6,  # 1 to 6
         "error_rate": 0.00,  # 0.0 to 1.0; odds of making mistake
         "fitness": "greed", # options: greed, caution, balance
@@ -126,6 +158,7 @@ AI_LIST = [
         "name": "ThoughtNet",
         "rank": "12",
         "strategy": "negamax",  # options: "random", "negamax"
+        "tactics": Tactics(),
         "lookahead": 7,  # 1 to 6
         "error_rate": 0.00,  # 0.0 to 1.0; odds of making mistake
         "fitness": "greed", # options: greed, caution, balance
