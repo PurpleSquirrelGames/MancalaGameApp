@@ -1,5 +1,14 @@
 # GENETIC TACTICS ALGORITHM
 
+import easyAI
+from copy import copy, deepcopy
+import random
+import gameengine
+from tactics import Tactics, GENE_MAP, build_tactics_from_list
+from operator import itemgetter
+import json
+import os
+
 def build_scenario_tuples(combos):
     current = [None] * len(combos)
     s = []
@@ -10,7 +19,7 @@ def build_scenario_tuples(combos):
                 for d in combos[3]:
                     for e in combos[4]:
                         s.append((a, b, c, d, e))
-                        f.append("tactics/kalah-results-{}-{}-{}-{}-{}.json".format(a, b, c, d, e))
+                        f.append("tactics_work/kalah-results-{}-{}-{}-{}-{}.json".format(a, b, c, d, e))
     return s, f
 
 #
@@ -52,10 +61,10 @@ GENERATION_QTY = 40 # 100
 #  HAVE 50 genomes start each generation
 POPULATION_SIZE = 20 # 50
 #  EACH genome engages each of the other genomes in the "attacker" role
-#     EACH engagement is 10 plays, the final scores are tallied for fitness
+#     EACH engagement is N plays, the final scores are tallied for fitness
 PLAYS_PER_ENGAGEMENT = 1
-#     WHEN a genome is in the defender role; have a 15% chance of wrong move
-#        per round of play to mimic diversity
+#     WHEN a genome is in the defender role; it COULD have a % chance of wrong move
+#        per round of play to mimic diversity, however it currently does not
 #  AFTER ALL engagements are finished, extinct the bottom 60%
 EXTINCTION_RATE = 0.6
 #  BREED replacements:
@@ -75,46 +84,6 @@ EASY_REPEAT_VALUE = 3
 EMPTY_PIT = 0
 FULL_PIT = 1
 
-GENE_MAP = [
-    (EMPTY_AGAINST_EMPTY_PIT_VALUE, 0),
-    (EMPTY_AGAINST_EMPTY_PIT_VALUE, 1),
-    (EMPTY_AGAINST_EMPTY_PIT_VALUE, 2),
-    (EMPTY_AGAINST_EMPTY_PIT_VALUE, 3),
-    (EMPTY_AGAINST_EMPTY_PIT_VALUE, 4),
-    (EMPTY_AGAINST_EMPTY_PIT_VALUE, 5),
-    (EMPTY_AGAINST_FULL_PIT_VALUE, 0),
-    (EMPTY_AGAINST_FULL_PIT_VALUE, 1),
-    (EMPTY_AGAINST_FULL_PIT_VALUE, 2),
-    (EMPTY_AGAINST_FULL_PIT_VALUE, 3),
-    (EMPTY_AGAINST_FULL_PIT_VALUE, 4),
-    (EMPTY_AGAINST_FULL_PIT_VALUE, 5),
-    (EASY_REPEAT_VALUE, 0),
-    (EASY_REPEAT_VALUE, 1),
-    (EASY_REPEAT_VALUE, 2),
-    (EASY_REPEAT_VALUE, 3),
-    (EASY_REPEAT_VALUE, 4),
-    (EASY_REPEAT_VALUE, 5),
-]
-GENE_DESC = [
-    "EMPTY_AGAINST_EMPTY_PIT_VALUE 0",
-    "EMPTY_AGAINST_EMPTY_PIT_VALUE 1",
-    "EMPTY_AGAINST_EMPTY_PIT_VALUE 2",
-    "EMPTY_AGAINST_EMPTY_PIT_VALUE 3",
-    "EMPTY_AGAINST_EMPTY_PIT_VALUE 4",
-    "EMPTY_AGAINST_EMPTY_PIT_VALUE 5",
-    "EMPTY_AGAINST_FULL_PIT_VALUE 0",
-    "EMPTY_AGAINST_FULL_PIT_VALUE 1",
-    "EMPTY_AGAINST_FULL_PIT_VALUE 2",
-    "EMPTY_AGAINST_FULL_PIT_VALUE 3",
-    "EMPTY_AGAINST_FULL_PIT_VALUE 4",
-    "EMPTY_AGAINST_FULL_PIT_VALUE 5",
-    "EASY_REPEAT_VALUE 0",
-    "EASY_REPEAT_VALUE 1",
-    "EASY_REPEAT_VALUE 2",
-    "EASY_REPEAT_VALUE 3",
-    "EASY_REPEAT_VALUE 4",
-    "EASY_REPEAT_VALUE 5",
-]
 GENE_MAP_SIZE = len(GENE_MAP)
 
 PROTO_GENOME = {
@@ -148,14 +117,6 @@ ID_CTR = 1
 ##    ]
 ##}
 
-import easyAI
-from copy import copy, deepcopy
-import random
-import gameengine
-from tactics import Tactics
-from operator import itemgetter
-import json
-import os
 
 settings = {
     "ai_chosen": 0,
@@ -265,7 +226,7 @@ def do_trials(genome_list):
     opp_qty = len(genome_list) - 1
     for me, genome in enumerate(genome_list):
         apply_genome(game.players[0], genome)
-        print me, "GENE", genome['id'], "ANCESTORS", genome["parent_qty"],
+        print me, "GENOME", genome['id'], "ANCESTORS", genome["parent_qty"],
         print "LIFESPAN", genome['life_span'], "OLD_SCORE",
         if genome['score'] == -1000000:
             print "None"
@@ -282,14 +243,7 @@ def do_trials(genome_list):
 
 def apply_genome(character, genome):
     t = character.get_tactics()
-    for index, gene in enumerate(genome['genes']):
-        place, pit = GENE_MAP[index]
-        if place == EMPTY_AGAINST_EMPTY_PIT_VALUE:
-            t.empty_pit_value[pit][EMPTY_PIT] = gene
-        elif place == EMPTY_AGAINST_FULL_PIT_VALUE:
-            t.empty_pit_value[pit][FULL_PIT] = gene
-        elif place == EASY_REPEAT_VALUE:
-            t.easy_repeat_value[pit] = gene
+    build_tactics_from_list(t, genome['genes'])
     return
 
 def do_sort(genome_list):
@@ -303,83 +257,85 @@ def do_sort(genome_list):
 #
 ######################################
 
-for si, scenario in enumerate(SCENARIOS):
-    #----------
-    #
-    #  JUMP PAST WORK DONE
-    #
-    #----------
-    a, b, c, d, e = scenario
-    filename = FILENAMES[si]
-    print "FILE:", filename
-    if os.path.exists(filename):
-        print "    ALREADY EXISTS"
-        continue
-    #-----------
-    #
-    #  SETUP SCENARIO
-    #
-    #-----------
-    short = ""
-    if a==1:
-        settings['who_plays_first'] = 2
-        short += "PLYR FIRST:"
-    else:
-        settings['who_plays_first'] = 1
-        short += "AI FIRST  :"
-    settings['seeds_per_house'] = b
-    short += "SEEDS"+str(b)+":"
-    ALT_AI_LIST[0]['lookahead'] = c
-    ALT_AI_LIST[1]['lookahead'] = c
-    short += "LOOK"+str(c)+":"
-    settings["capture_rule"] = d
-    short += "CAPTURE"+str(d)+":"
-    settings["eog_rule"] = e
-    short += "EOG"+str(e)
-    #---------------------
-    #
-    # islands
-    #
-    #---------------------
-    winner_list = []
-    for island in range(ISLAND_QTY):
-        genome_list = []
+if __name__=="__main__":
+
+    for si, scenario in enumerate(SCENARIOS):
+        #----------
+        #
+        #  JUMP PAST WORK DONE
+        #
+        #----------
+        a, b, c, d, e = scenario
+        filename = FILENAMES[si]
+        print "FILE:", filename
+        if os.path.exists(filename):
+            print "    ALREADY EXISTS"
+            continue
+        #-----------
+        #
+        #  SETUP SCENARIO
+        #
+        #-----------
+        short = ""
+        if a==1:
+            settings['who_plays_first'] = 2
+            short += "PLYR FIRST:"
+        else:
+            settings['who_plays_first'] = 1
+            short += "AI FIRST  :"
+        settings['seeds_per_house'] = b
+        short += "SEEDS"+str(b)+":"
+        ALT_AI_LIST[0]['lookahead'] = c
+        ALT_AI_LIST[1]['lookahead'] = c
+        short += "LOOK"+str(c)+":"
+        settings["capture_rule"] = d
+        short += "CAPTURE"+str(d)+":"
+        settings["eog_rule"] = e
+        short += "EOG"+str(e)
         #---------------------
         #
-        # generations
+        # islands
         #
         #---------------------
-        print "EVOLUTION OF ISLAND", island+1, "OF", ISLAND_QTY
+        winner_list = []
+        for island in range(ISLAND_QTY):
+            genome_list = []
+            #---------------------
+            #
+            # generations
+            #
+            #---------------------
+            print "EVOLUTION OF ISLAND", island+1, "OF", ISLAND_QTY
+            for gen in range(GENERATION_QTY):
+                print "WORKING ON ", short
+                print "GENERATION", gen, "OF", GENERATION_QTY
+                genome_list = do_extinction(genome_list)
+                do_reproduction(genome_list)
+                do_trials(genome_list)
+                genome_list = do_sort(genome_list)
+            # save the TOP10 winners on this island
+            winner_list.extend(genome_list[0:10])
+        #---------------------
+        #
+        # compete across the islands
+        #
+        #---------------------
+        print "CHAMPIONSHIP FOR WORLD"
         for gen in range(GENERATION_QTY):
-            print "WORKING ON ", short
-            print "GENERATION", gen, "OF", GENERATION_QTY
-            genome_list = do_extinction(genome_list)
-            do_reproduction(genome_list)
-            do_trials(genome_list)
-            genome_list = do_sort(genome_list)
-        # save the TOP10 winners on this island
-        winner_list.extend(genome_list[0:10])
-    #---------------------
-    #
-    # compete across the islands
-    #
-    #---------------------
-    print "CHAMPIONSHIP FOR WORLD"
-    for gen in range(GENERATION_QTY):
-        print "CHAMPIONSHIP GEN", gen, "OF", GENERATION_QTY
-        do_trials(winner_list)          # for these rounds, START with trials
+            print "CHAMPIONSHIP GEN", gen, "OF", GENERATION_QTY
+            do_trials(winner_list)          # for these rounds, START with trials
+            winner_list = do_sort(winner_list)
+            winner_list = do_extinction(winner_list)
+            do_reproduction(winner_list)
+        #--------------------
+        #
+        # save the WINNER
+        #
+        #--------------------
         winner_list = do_sort(winner_list)
-        winner_list = do_extinction(winner_list)
-        do_reproduction(winner_list)
-    #--------------------
-    #
-    # save the WINNER
-    #
-    #--------------------
-    winner_list = do_sort(winner_list)
-    winner = winner_list[0]
-    print "WINNER:"
-    print "    ", winner
-    print "WRITING", filename
-    with open(filename, 'w') as outfile:
-        json.dump(winner, outfile)
+        winner = winner_list[0]
+        print "WINNER:"
+        print "    ", winner
+        print "WRITING", filename
+        with open(filename, 'w') as outfile:
+            json.dump(winner, outfile)
