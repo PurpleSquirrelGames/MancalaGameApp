@@ -1,23 +1,4 @@
-
-class Tactics(object):
-    def __init__(self):
-        self.empty_pit_value = [
-            (12, 1), # 0 = nearest to STORE, (empty/empty, empty/full)
-            (8, 2),  # 1    first value is value for empty; second is multiplier
-            (5, 1),  # 2
-            (4, 1),  # 3
-            (7, 1),  # 4
-            (9, 1),  # 5
-        ]
-        self.easy_repeat_value = [
-            4, # pit 0 from store
-            5, # 
-            3, # 
-            2, # 
-            1, # 
-            1, # 
-        ]
-
+from tactics import Tactics
 
 
 AI_LIST = [
