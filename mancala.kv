@@ -247,7 +247,7 @@ AppScreenManager:
                 on_selection: update_setting("capture_rule", self.selected)
             Button:
                 pos_fixed: (1700, 150)
-                size_fixed: (200, 100)
+                active_size_fixed: (200, 100)
                 color: (0, 0, 0, 1)
                 font_size_fixed: 56
                 text: "Done"
@@ -500,7 +500,7 @@ AppScreenManager:
             size_fixed: (2400, 2400)
         Button:
             id: settings_button
-            source: 'assets/img/gear.png'
+            background_normal: 'assets/img/gear.png'
             pos_fixed: (1720, 880)
             size_fixed: (200, 200)
             on_release: app.root.current = "settings_opponent_screen"
@@ -511,21 +511,21 @@ AppScreenManager:
         ProgressSpinner:
             id: wait_on_ai
             size_fixed: (100, 100)
-            pos_fixed: (300, 500)
+            pos_fixed: (1400, 490)
             auto_start: False
         Label:
             id: center_message
             text: 'here'
-            pos_fixed: (800, 600)
+            pos_fixed: (960, 540-50)
             font_size_fixed: 100
-            size_fixed: (100, 100)
+            size_fixed: (10, 100)
             color: (0, 0, 0, 1)
         FixedPopup:
             id: eog_new_game_button
             active_pos_fixed: (800, 500)
             size_fixed: (300, 100)
             Button:
-                active_pos_fixed: (800, 500)
+                active_pos_fixed: (1100, 500)
                 size_fixed: (300, 100)
                 color: (1, 0, 0, 1)
                 font_size_fixed: 56
@@ -669,9 +669,8 @@ AppScreenManager:
             outline_color: (0.97, 0.94, 0.58, 1)
             pos_fixed: (root.PITS[14]['pos'][0]-85, root.UPPER_LABEL)
             color: (0, 0, 0, 1)
-
         Image:
             id: ai_picture
-            source: 'assets/img/ai-pic.png'
+            source: 'assets/img/ai-pic-01.png'
             pos_fixed: (0, 1080)
             size_fixed: (300, 300)
