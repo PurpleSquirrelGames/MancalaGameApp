@@ -1,16 +1,41 @@
 # GENETIC TACTICS ALGORITHM
 
-import easyAI
 from copy import copy, deepcopy
 import random
-import gameengine
-from tactics import Tactics, GENE_MAP, build_tactics_from_list
 from operator import itemgetter
 import json
 import os
+import sys
+
+import easyAI
+import gameengine
+from tactics import Tactics, GENE_MAP, build_tactics_from_list
+
+# you can launch with combo's limited to one value using FIRST, SEEDS, LOOK
+#
+# for example:
+#    python tactics_generator.py FIRST 2 LOOK 5
+#
+# will only generate JSON files for 'AI GOING FIRST' and 'LOOKAHEAD 5'
+
 
 def build_scenario_tuples(combos):
-    current = [None] * len(combos)
+    if len(sys.argv) == 3:
+        try:
+            i = sys.argv.index("FIRST")
+            combos[0] = [int(sys.argv[i + 1])]
+        except ValueError:
+            pass
+        try:
+            i = sys.argv.index("SEEDS")
+            combos[1] = [int(sys.argv[i + 1])]
+        except ValueError:
+            pass
+        try:
+            i = sys.argv.index("LOOK")
+            combos[2] = [int(sys.argv[i + 1])]
+        except ValueError:
+            pass
     s = []
     f = []
     for a in combos[0]:
@@ -19,8 +44,11 @@ def build_scenario_tuples(combos):
                 for d in combos[3]:
                     for e in combos[4]:
                         s.append((a, b, c, d, e))
-                        f.append("tactics_work/kalah-results-{}-{}-{}-{}-{}.json".format(a, b, c, d, e))
+                        f.append("tactics_work/kalah-results-{}-{}-{}-{}-{}.json".format(
+                            a, b, c, d, e
+                        ))
     return s, f
+
 
 #
 # Genetic algorithm used to determine tactical values to be used by the
@@ -33,7 +61,7 @@ COMBOS = []
 COMBOS.append([1, 2])
 #
 #     (4) 3, 4, 5, or 6 SEEDS PER PIT
-COMBOS.append([4, 3, 5, 6]) # doing 4 first to help with early analysis
+COMBOS.append([4, 3, 5, 6])  # doing 4 first to help with early analysis
 #
 #     (6) LOOKING 1, 2, 3, 4, 5, or 6 TURNS AHEAD
 COMBOS.append([1, 2, 3, 4, 5, 6])
@@ -54,19 +82,19 @@ SCENARIOS, FILENAMES = build_scenario_tuples(COMBOS)
 #
 #  DO 10 "islands" of independent evolution;
 #     then later run all of them together for 20 more generations
-ISLAND_QTY = 3 # 10
+ISLAND_QTY = 3  # 10
 #
 #  RUN 100 generations for each island
-GENERATION_QTY = 40 # 100
+GENERATION_QTY = 40  # 100
 #  HAVE 50 genomes start each generation
-POPULATION_SIZE = 20 # 50
+POPULATION_SIZE = 8  # 50
 #  EACH genome engages each of the other genomes in the "attacker" role
 #     EACH engagement is N plays, the final scores are tallied for fitness
 PLAYS_PER_ENGAGEMENT = 1
 #     WHEN a genome is in the defender role; it COULD have a % chance of wrong move
 #        per round of play to mimic diversity, however it currently does not
 #  AFTER ALL engagements are finished, extinct the bottom 60%
-EXTINCTION_RATE = 0.6
+EXTINCTION_RATE = 0.7
 #  BREED replacements:
 #        1/3rd get a +1 or -1 change to a random gene
 #        1/3rd get a big change to a random gene
@@ -89,7 +117,7 @@ GENE_MAP_SIZE = len(GENE_MAP)
 PROTO_GENOME = {
     'id': 0,
     'score': -1000000,  # negative 1 million is below all possible scores
-    'genes': [1]*len(GENE_MAP),
+    'genes': [1] * len(GENE_MAP),
     'life_span': 0,
     'parent_qty': 0
 }
@@ -121,7 +149,7 @@ ID_CTR = 1
 settings = {
     "ai_chosen": 0,
     "who_plays_first": 1,
-    "first_player": 2, #  use inverse because we are from AI point of view
+    "first_player": 2,  # use inverse because we are from AI point of view
     "seeds_per_house_selection": 1,
     "seeds_per_house": 4,
     "capture_rule": 0,
@@ -138,7 +166,7 @@ ALT_AI_LIST = [
         "strategy": "negamax",  # options: "random", "negamax"
         "lookahead": 1,  # 1 to 6
         "error_rate": 0.0,  # 0.0 to 1.0; odds of making mistake
-        "fitness": "balance", # options: greed, caution, balance
+        "fitness": "balance",  # options: greed, caution, balance
         "desc": "test genome",
         "tagline": "",
         "tactics": Tactics()
@@ -150,28 +178,24 @@ ALT_AI_LIST = [
         "strategy": "negamax",  # options: "random", "negamax"
         "lookahead": 3,  # 1 to 6
         "error_rate": 0.00,  # 0.0 to 1.0; odds of making mistake
-        "fitness": "balance", # options: greed, caution, balance
+        "fitness": "balance",  # options: greed, caution, balance
         "desc": "test genome defender",
         "tagline": "",
         "tactics": Tactics()
     },
 ]
 
+game = gameengine.KalahGame(settings, testing=ALT_AI_LIST, verbose=False)
 
-game = gameengine.KalahGame(settings, testing=ALT_AI_LIST)
 
 def play_engagement():
     score = 0
     for round in range(PLAYS_PER_ENGAGEMENT):
-        #print "    round {:02d}".format(round),
         game.reset_board()
-        while not game.is_over():
-            move = game.get_move()
-            game.play_move(move)
-        #print "RESULT:", game.get_winner(), game.strategic_scoring(1, 2)
-        score += game.strategic_scoring(1, 2)
+        game.play(verbose=False)
+        result = game.strategic_scoring(1, 2)
+        score += result
     final_score = score / PLAYS_PER_ENGAGEMENT
-    # print "    FINAL SCORE:", final_score
     return final_score
 
 def do_extinction(genome_list):
