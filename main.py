@@ -130,6 +130,9 @@ def update_setting(setting_name, value):
         character = AI_LIST[value]
         app.root.screens[GAME_SCREEN].ids.ai_picture.source =\
             "assets/img/ai-pic-{:02d}.png".format(character['index'])
+        seeds.change_ai_hand_picture(
+            "assets/img/ai-hand-{:02d}.png".format(character['index'])
+        )
     if setting_name == "who_plays_first":
         if value == 0:
             settings["first_player"] = USER
@@ -423,18 +426,6 @@ class Seeds(object):
             display.game_screen_root.add_widget(seed)
             self.board[HAND].append(seed)
             self.seed_ref.append(seed)
-        # FixedImage:
-        #     id: user_hand
-        #     source: 'assets/img/user-hand-01.png'
-        #     pos_hint: root.HANDS[1]['pos']
-        #     true_spot: (300, 300)
-        #     size_hint: (600, 600)
-        # FixedImage:
-        #     id: ai_hand
-        #     source: 'assets/img/ai-hand-01.png'
-        #     pos_hint: root.HANDS[2]['pos']
-        #     true_spot: (300, 300)
-        #     size_hint: (600, 600)
         hand = Image()
         hand.id = "user_hand"
         hand.source = "assets/img/user-hand-01.png"
@@ -447,11 +438,14 @@ class Seeds(object):
         hand.id = "ai_hand"
         hand.source = "assets/img/ai-hand-01.png"
         hand.pos_fixed = GameScreen.HANDS[AI]['pos']
-        hand.spot_fixed = (300, 300)
-        hand.size_fixed = (600, 600)
+        hand.spot_fixed = (300, 128)
+        hand.size_fixed = (600, 1000)
         display.game_screen_root.add_widget(hand)
         self.ai_hand = hand
         self.display = display
+
+    def change_ai_hand_picture(self, filename):
+        self.ai_hand.source = filename
 
     def change_picture(self):
         for s in self.seed_ref:
@@ -505,9 +499,12 @@ class Seeds(object):
 
 
 def animate_ai_start(display):
-    a = Animation(pos_fixed=(380, 400))
+    a = Animation(pos_fixed = (380, 400)) + Animation(pos_fixed=(384, 400), duration=2.0)
+    a.bind(on_complete = animate_ai_start_finished)
     a.start(display.ai_picture)
-    pass
+
+def animate_ai_start_finished(*args, **kwargs):
+    machine.input("animation_done")
 
 def animate_ai_end(display):
     a = Animation(pos_fixed=(0, 1080))
@@ -737,19 +734,25 @@ class AIThinkingState(State):
     def on_entry(self):
         self.ref['kivy'].center_message.text = "AI is thinking"
         self.ref['kivy'].wait_on_ai.start_spinning()
+        self.animation_finished = False
+        self.thinking_finished = False
         animate_ai_start(self.ref["kivy"])
         thread.start_new_thread(get_ai_move, ())
 
     def input(self, input_name, *args, **kwargs):
         if input_name == "ai_move":
+            self.thinking_finished = True
             self.ref["ai_choices"] = args[0]
-            self.ref["kivy"].wait_on_ai.stop_spinning()
-            self.change_state("animate_ai")
         if input_name == "request_new_game":
             self.change_state("init_game")
+        if input_name == "animation_done":
+            self.animation_finished = True
+        if self.animation_finished and self.thinking_finished:
+            self.change_state("animate_ai")            
 
     def on_exit(self):
         animate_ai_end(self.ref["kivy"])
+        self.ref["kivy"].wait_on_ai.stop_spinning()
 
 class AnimateAIChoicesState(State):
 
@@ -759,7 +762,7 @@ class AnimateAIChoicesState(State):
         self.animation = HandSeedAnimation(AI, board_prior, self.ref['kivy'])
 
     def input(self, input_name, *args, **kwargs):
-        if input_name=="animation_done":
+        if input_name == "animation_done":
             self.change_state('start_turn')
         if input_name == "request_new_game":
             self.change_state("init_game")
