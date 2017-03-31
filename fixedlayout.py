@@ -25,6 +25,8 @@ HEIGHT = 1
 
 PIXEL_SCALE = 0.7
 
+MONKEY = 1.01
+
 def grab(alist, index):
     try:
         return alist[index]
@@ -116,9 +118,11 @@ class FixedLayout(FloatLayout, FixedProperties):
         if screen_ratio < window_ratio:
             overall_width = (sw / (sh / wh)) / ww
             overall_height = 1.0
+            self.scaling = overall_width
         else:
             overall_width = 1.0
             overall_height = (sh / (sw / ww)) / wh
+            self.scaling = overall_height
         overall_margin_width = (1.0 - overall_width) / 2.0
         overall_margin_height = (1.0 - overall_height) / 2.0
         self.pcnt_per_pixel[WIDTH] = overall_width / sw
@@ -126,6 +130,10 @@ class FixedLayout(FloatLayout, FixedProperties):
         self.pcnt_margin[WIDTH] = overall_margin_width
         self.pcnt_margin[HEIGHT] = overall_margin_height
         self.pixels_per_fixed_pixel = wh / sh
+
+    MONKEY = 1.05
+    def monkey(self, value):
+        return value
 
     def fixed_scaler(self, value):
         if not value:
@@ -137,8 +145,8 @@ class FixedLayout(FloatLayout, FixedProperties):
             xy_tuple=(0, 0)
         x, y = xy_tuple
         pcnt = [1, 1]
-        pcnt[X] = x * self.pcnt_per_pixel[WIDTH]
-        pcnt[Y] = y * self.pcnt_per_pixel[HEIGHT]
+        pcnt[X] = self.monkey(x * self.pcnt_per_pixel[WIDTH])
+        pcnt[Y] = self.monkey(y * self.pcnt_per_pixel[HEIGHT])
         return pcnt
 
     def scale_pos(self, xy_tuple, xy_offset):
