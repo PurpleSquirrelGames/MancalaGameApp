@@ -55,13 +55,23 @@ settings = {
     "board_choice": 0,
     "seed_choice": 0,
     "notification_volume": 2,
-    "seed_volume": 2
+    "seed_volume": 2,
+    "best_level": 0
+}
+
+current = {
+    'ai_viewed': 0,
+    'first_time_flag': False,
+    'allow_resume': False
 }
 
 if storage.exists('settings'):
     settings = storage.get('settings')
 else:
     storage.put('settings', **settings)
+    current['first_time_flag'] = True
+
+current['ai_viewed'] = settings['ai_chosen']
 
 character = AI_LIST[settings['ai_chosen']]
 
@@ -128,10 +138,7 @@ def update_setting(setting_name, value):
     if setting_name == "ai_chosen":
         settings["ai_chosen"] = value
         character = AI_LIST[value]
-        app.root.screens[GAME_SCREEN].ids.ai_picture.source =\
-            "assets/img/ai-pic-{:02d}.png".format(character['index'])
-        seeds.change_ai_hand_picture(
-            "assets/img/ai-hand-{:02d}.png".format(character['index'])
+        seeds.change_ai_pictures("{:02d}".format(character['index'])
         )
     if setting_name == "who_plays_first":
         if value == 0:
@@ -208,6 +215,24 @@ def restore_game():
     game.board = game_state['board']
     game.nplayer = game_state['turn']
     game.restoration = True
+
+def enable_resume_game():
+    global current
+    p = "assets/img/resume-button.png"
+    app.root.screens[SETTINGS_OPPONENT_SCREEN].ids.resume_game.background_normal = p
+    app.root.screens[SETTINGS_RULES_SCREEN].ids.resume_game.background_normal = p
+    app.root.screens[SETTINGS_SCREEN_SCREEN].ids.resume_game.background_normal = p
+    app.root.screens[SETTINGS_SOUND_SCREEN].ids.resume_game.background_normal = p
+    current['allow_resume'] = True
+
+def disable_resume_game():
+    global current
+    p = "assets/img/invisible.png"
+    app.root.screens[SETTINGS_OPPONENT_SCREEN].ids.resume_game.background_normal = p
+    app.root.screens[SETTINGS_RULES_SCREEN].ids.resume_game.background_normal = p
+    app.root.screens[SETTINGS_SCREEN_SCREEN].ids.resume_game.background_normal = p
+    app.root.screens[SETTINGS_SOUND_SCREEN].ids.resume_game.background_normal = p
+    current['allow_resume'] = False
 
 ##############################
 #
@@ -318,20 +343,20 @@ class GameScreen(Screen):
 
     PITS = [
         {"pos": PARKED     }, #  0, hand
-        {"pos": (420,  300)}, #  1
-        {"pos": (636,  300)}, #  2
-        {"pos": (852,  300)}, #  3
-        {"pos": (1068, 300)}, #  4
-        {"pos": (1284, 300)}, #  5
-        {"pos": (1500, 300)}, #  6
-        {"pos": (1716, 480)}, #  7 user store
-        {"pos": (1500, 700)}, #  8
-        {"pos": (1284, 760)}, #  9
-        {"pos": (1068, 760)}, # 10
-        {"pos": (852,  760)}, # 11
-        {"pos": (636,  760)}, # 12
-        {"pos": (420,  760)}, # 13
-        {"pos": (220,  600)}  # 14 ai store
+        {"pos": (420,  300), "out-pos": (420,  250)}, #  1
+        {"pos": (636,  300), "out-pos": (636,  250)}, #  2
+        {"pos": (852,  300), "out-pos": (852,  250)}, #  3
+        {"pos": (1068, 300), "out-pos": (1068, 250)}, #  4
+        {"pos": (1284, 300), "out-pos": (1284, 250)}, #  5
+        {"pos": (1500, 300), "out-pos": (1500, 250)}, #  6
+        {"pos": (1716, 480), "out-pos": (1716, 480)}, #  7 user store
+        {"pos": (1500, 760), "out-pos": (1500, 810)}, #  8
+        {"pos": (1284, 760), "out-pos": (1284, 810)}, #  9
+        {"pos": (1068, 760), "out-pos": (1068, 810)}, # 10
+        {"pos": (852,  760), "out-pos": (852,  810)}, # 11
+        {"pos": (636,  760), "out-pos": (636,  810)}, # 12
+        {"pos": (420,  760), "out-pos": (420,  810)}, # 13
+        {"pos": (220,  600), "out-pos": (220,  600)}  # 14 ai store
     ]
 
     LOWER_LABEL = 30
@@ -345,29 +370,41 @@ class SettingsOpponentScreen(Screen):
     global settings
     global character
     global AI_LIST
+    global current
 
     def on_parent(self, instance, value):
-        self.ids.ai_face_image.source = "assets/img/ai-pic-{:02d}.png".format(character['index'])
+        self._update_details(settings['ai_chosen'])
     
     def _update_details(self, ai_chosen):
-        update_setting("ai_chosen", ai_chosen)
-        self.ids.ai_description.text = character['desc']
-        self.ids.ai_play_style.text = character['tagline']
+        c = AI_LIST[ai_chosen]
+        self.ids.ai_description.text = c['desc']
+        self.ids.ai_play_style.text = c['tagline']
         self.ids.ai_name.text = format("{} of 12: [size=80]{}[/size]").format(
-            character['rank'],
-            character['name']
+            c['rank'],
+            c['name']
         )
-        self.ids.ai_face_image.source = "assets/img/ai-pic-{:02d}.png".format(character['index'])
+        self.ids.ai_face_image.source = "assets/img/ai-pic-{:02d}.png".format(c['index'])
+        if ai_chosen > settings['best_level']:
+            self.ids.choose_ai.background_normal = 'assets/img/invisible.png'
+            n = AI_LIST[settings['best_level']]
+            msg = "You must win against {} ({}) ".format(n['name'], settings['best_level'] + 1)
+            msg += "before you can play {}".format(c['name'])
+            self.ids.choose_msg.text = msg
+        else:
+            self.ids.choose_msg.text = ""
+            self.ids.choose_ai.background_normal = 'assets/img/choose-button.png'
 
     def previous_ai(self):
-        ai_chosen = (settings['ai_chosen'] - 1) % 12
-        settings['ai_chosen'] = ai_chosen
-        self._update_details(ai_chosen)
+        current['ai_viewed'] = (current['ai_viewed'] - 1) % 12
+        self._update_details(current['ai_viewed'])
+
+    def choose_ai(self):
+        update_setting("ai_chosen", current['ai_viewed'])
+        disable_resume_game()
 
     def next_ai(self):
-        ai_chosen = (settings['ai_chosen'] + 1) % 12
-        settings['ai_chosen'] = ai_chosen
-        self._update_details(ai_chosen)
+        current['ai_viewed'] = (current['ai_viewed'] + 1) % 12
+        self._update_details(current['ai_viewed'])
 
 class SettingsRulesScreen(Screen):
     pass
@@ -386,6 +423,8 @@ class AppScreenManager(ScreenManager):
 
 class MancalaApp(App):
 
+    global current
+
     def build(self):
         presentation = Builder.load_file('mancala.kv')
         return presentation
@@ -395,10 +434,16 @@ class MancalaApp(App):
         machine.change_state("init_game")
         generically_apply_settings()
 
+    def resume_game(self):
+        if not current['allow_resume']:
+            return
+        self.root.current = "game_screen"
+
     def start_new_game(self):
         self.root.current = "game_screen"
         self.root.screens[GAME_SCREEN].ids.eog_new_game_button.active = False
         save_game(force_new_game=True)
+        enable_resume_game()
         machine.input("request_new_game")
 
 
@@ -442,10 +487,19 @@ class Seeds(object):
         hand.size_fixed = (600, 1000)
         display.game_screen_root.add_widget(hand)
         self.ai_hand = hand
+        face = Image()
+        face.id = "ai_picture"
+        face.source = "assets/img/ai-pic-01.png"
+        face.pos_fixed = (0, 1080)
+        face.size_fixed = (300, 300)
+        self.ai_face = face
+        display.game_screen_root.add_widget(face)
         self.display = display
 
-    def change_ai_hand_picture(self, filename):
-        self.ai_hand.source = filename
+    def change_ai_pictures(self, rank):
+        self.ai_hand.source = "assets/img/ai-hand-{}.png".format(rank)
+        self.ai_face.source = "assets/img/ai-pic-{}.png".format(rank)
+
 
     def change_picture(self):
         for s in self.seed_ref:
@@ -499,16 +553,17 @@ class Seeds(object):
 
 
 def animate_ai_start(display):
-    a = Animation(pos_fixed = (380, 400)) + Animation(pos_fixed=(384, 400), duration=2.0)
+    global seeds
+    a = Animation(pos_fixed = (230, 400)) + Animation(pos_fixed=(234, 400), duration=2.0)
     a.bind(on_complete = animate_ai_start_finished)
-    a.start(display.ai_picture)
+    a.start(seeds.ai_face)
 
 def animate_ai_start_finished(*args, **kwargs):
     machine.input("animation_done")
 
 def animate_ai_end(display):
     a = Animation(pos_fixed=(0, 1080))
-    a.start(display.ai_picture)
+    a.start(seeds.ai_face)
 
 class HandSeedAnimation(object):
 
@@ -589,6 +644,11 @@ class HandSeedAnimation(object):
                     self.display.center_message.text = "Setting Up Board"
             elif step['action']=="normal_move":
                 self.display.center_message.text = ""
+                hand_animation = Animation(
+                    pos_fixed=GameScreen.PITS[pit]["out-pos"],
+                    duration=settings['seed_drop_rate'],
+                    t='in_out_sine'
+                )
             elif step['action']=="home":
                 self.display.center_message.text = ""
                 hand_animation = Animation(
@@ -599,7 +659,7 @@ class HandSeedAnimation(object):
             # update_numbers
             display_board(self.board, self.display)
             if not hand_animation:
-                if step['action'] in ['normal_move', 'setting_up']:
+                if step['action'] in ['setting_up']:
                     duration = 0.1
                 else:
                     duration = 1.0
@@ -669,7 +729,7 @@ class StartTurn(State):
         if self.ref["game"].is_over():
             return self.change_state("eog")
         if self.ref["game"].nplayer==1:
-            self.ref["kivy"].center_message.text = "Player, choose a house."
+            self.ref["kivy"].center_message.text = "Choose a house."
             self.ref["game"].usermove_start_simulation()
             self.ref["possible_user_moves"] = self.ref["game"].possible_moves()
             return self.change_state("wait_for_pit")
@@ -732,7 +792,8 @@ def get_ai_move():
 class AIThinkingState(State):
     
     def on_entry(self):
-        self.ref['kivy'].center_message.text = "AI is thinking"
+        global character
+        self.ref['kivy'].center_message.text = "{} is thinking.".format(character["name"])
         self.ref['kivy'].wait_on_ai.start_spinning()
         self.animation_finished = False
         self.thinking_finished = False

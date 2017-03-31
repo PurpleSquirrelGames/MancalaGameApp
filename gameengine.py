@@ -211,7 +211,7 @@ class KalahGame(easyAI.TwoPlayersGame):
 
     def make_move_choice(self, house):
         if self.want_animation:
-            self.animate.append({ACTION: "normal_move"})
+            self.animate.append({ACTION: "normal_move", LOC: house})
         # scoop up the house chosen
         self._scoop(house)
         current_house = house
@@ -230,8 +230,8 @@ class KalahGame(easyAI.TwoPlayersGame):
                         if self.board[P[current_house][OPP]]:
                             if self.want_animation:
                                 self.animate.append({ACTION: "steal"})
-                            self._scoop(current_house)
                             self._scoop(P[current_house][OPP])
+                            self._scoop(current_house)
                             self._drop_all(STORE_IDX[self.nplayer])
         elif self.settings['capture_rule'] == 1:  # capture even if opposite is empty
             if self.board[current_house] == 1:
@@ -239,9 +239,9 @@ class KalahGame(easyAI.TwoPlayersGame):
                     if P[current_house][ROLE] == HOUSE:
                         if self.want_animation:
                             self.animate.append({ACTION: "steal"})
-                        self._scoop(current_house)
                         if self.board[P[current_house][OPP]]:
                             self._scoop(P[current_house][OPP])
+                        self._scoop(current_house)
                         self._drop_all(STORE_IDX[self.nplayer])
         # elif settings['capture_rule'] == 2: # no capture
         #     pass
