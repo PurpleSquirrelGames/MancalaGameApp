@@ -78,7 +78,7 @@ EMPTY = 0
 FULL = 1
 
 
-class MancalaAI(easyAI.Negamax, object):
+class MancalaAI(easyAI.NonRecursiveNegamax, object):
 
     def __init__(self, settings, testing=False, tt=None, defender_role=False):
         self.settings = settings
@@ -167,6 +167,10 @@ class KalahGame(easyAI.TwoPlayersGame):
 
     def ttentry(self):
         return tuple(self.board)
+
+    def ttrestore(self, entry_tuple):
+        for index in range(len(self.board)):
+            self.board[index] = entry_tuple[index]
 
     def possible_moves(self):
         move_list = [[pit] for pit in self.possible_moves_choices()]
@@ -467,7 +471,7 @@ class KalahGame(easyAI.TwoPlayersGame):
 
 if __name__=="__main__":
     settings = {
-        "ai_chosen": 4,
+        "ai_chosen": 11,
         "who_plays_first": 0,
         "first_player": USER,
         "seeds_per_house_selection": 1,

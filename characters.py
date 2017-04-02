@@ -33,7 +33,7 @@ AI_LIST = [
         "strategy": "negamax",  # options: "random", "negamax"
         "tactics": Tactics(),
         "lookahead": 1,  # 1 to 6
-        "error_rate": 0.05,  # 0.0 to 1.0; odds of making mistake
+        "error_rate": 0.00,  # 0.0 to 1.0; odds of making mistake
         "fitness": "balance", # options: greed, caution, balance
         "desc": "Emily is still a novice, but has played multiple times.",
         "tagline": "Blunt errors are rare, but still easy to win against."
