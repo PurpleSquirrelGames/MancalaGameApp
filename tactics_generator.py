@@ -20,7 +20,7 @@ from tactics import Tactics, GENE_MAP, build_tactics_from_list
 
 
 def build_scenario_tuples(combos):
-    if len(sys.argv) == 3:
+    if len(sys.argv) >= 3:
         try:
             i = sys.argv.index("FIRST")
             combos[0] = [int(sys.argv[i + 1])]
@@ -87,7 +87,7 @@ ISLAND_QTY = 3  # 10
 #  RUN 100 generations for each island
 GENERATION_QTY = 40  # 100
 #  HAVE 50 genomes start each generation
-POPULATION_SIZE = 8  # 50
+POPULATION_SIZE = 12  # 50
 #  EACH genome engages each of the other genomes in the "attacker" role
 #     EACH engagement is N plays, the final scores are tallied for fitness
 PLAYS_PER_ENGAGEMENT = 1
@@ -221,6 +221,7 @@ def do_reproduction(genome_list):
         for _ in range(qty_changes):
             action = random.randint(1, 3)
             gene_select = random.randint(1, GENE_MAP_SIZE) - 1
+            gene_type = GENE_MAP[gene_select][0]
             if action==1:
                 # minor adjustment
                 if new_genome['genes'][gene_select] == 0:
@@ -230,7 +231,10 @@ def do_reproduction(genome_list):
                 new_genome['genes'][gene_select] += degree
             elif action==2:
                 # major adjustment
-                degree = random.randint(-1000, 1000)
+                if gene_type==EMPTY_AGAINST_FULL_PIT_VALUE:
+                    degree = random.randint(-4, 4)
+                else:
+                    degree = random.randint(-2000, 2000)
                 new_genome['genes'][gene_select] += degree
                 if new_genome['genes'][gene_select] < 0:
                     new_genome['genes'][gene_select] = 0
