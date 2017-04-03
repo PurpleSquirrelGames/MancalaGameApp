@@ -288,11 +288,6 @@ AppScreenManager:
             pos_hint: {'x': -0.5*(2400-1920)/1920.0, 'y': -0.5*(2400-1080)/1080.0}
             size_hint: (2400/1920.0, 2400/1080.0)
         FixedLayout:
-            Image:
-                id: board_image
-                source: 'assets/img/settings-background.png'
-                pos_fixed: (-240, -660)
-                size_fixed: (2400, 2400)
             Button:
                 background_normal: 'assets/img/not-opponent.png'
                 pos_fixed: (-194, 698)
@@ -322,6 +317,17 @@ AppScreenManager:
                 font_size_fixed: 50
                 color: (0, 0, 0, 1)
                 background_color: (0.1, 1, 0.1, 1)
+            Image:
+                pos_fixed: (400, 780)
+                size_fixed: (1400, 300)
+                source: 'assets/img/link-background.png'
+            Label:
+                pos_fixed: (400, 780+50)
+                size_fixed: (1400, 250)
+                text: "Like the look of the Mancala board?\nThe author of this game also makes physical boards:\n\n         [b][u][ref=url]Amazon Store Reference[/ref][/u][/b]"
+                markup: True
+                color: (0, 0, 0, 1)
+                on_ref_press: root.launch_url(args[1])
             FixedSimpleMenu:
                 id: screen_screen_menu
                 pos_fixed: (400, 150)
@@ -332,6 +338,11 @@ AppScreenManager:
                     heading: "Board chosen"
                     text: "Walnut"
                     on_press: root.ids.board_choice_popup.active = True
+                FixedSimpleMenuItem:
+                    name: "background"
+                    heading: "Background chosen"
+                    text: "Green Felt"
+                    on_press: root.ids.background_popup.active = True
                 FixedSimpleMenuItem:
                     name: "seed_choice"
                     heading: "Seed chosen"
@@ -362,6 +373,26 @@ AppScreenManager:
                     font_size_fixed: 56
                     text: "Done"
                     on_press: root.ids.board_choice_popup.active = False
+            FixedPopup:
+                id: background_popup
+                active_pos_fixed: (300, 100)
+                size_fixed: (1600, 900)
+                FixedRadioButtons:
+                    selected: settings['background']
+                    active_pos_fixed: (400, 200)
+                    size_fixed: (1400, 192*2)
+                    selections: visual_settings['background']
+                    color: (0, 0, 0, 1)
+                    background_selected: "assets/img/selected.png"
+                    background_normal: "assets/img/not-selected.png"
+                    on_selection: update_setting("background", self.selected)
+                Button:
+                    active_pos_fixed: (1700, 150)
+                    size_fixed: (200, 100)
+                    color: (0, 0, 0, 1)
+                    font_size_fixed: 56
+                    text: "Done"
+                    on_press: root.ids.background_popup.active = False
             FixedPopup:
                 id: seed_choice_popup
                 active_pos_fixed: (300, 100)

@@ -1,5 +1,6 @@
 import thread
 import random
+import webbrowser
 from copy import copy
 from kivy.app import App
 from kivy.animation import Animation
@@ -21,6 +22,7 @@ from fixedlayout import FixedLayout, FixedPopup, FixedRadioButtons, \
 from simplestate import StateMachine, State
 from gameengine import KalahGame
 from characters import AI_LIST
+from coordinates import PIT_ARRANGEMENT, SEED_DICT
 
 __version__ = '0.0.14'
 
@@ -35,6 +37,9 @@ AI = 2
 
 PARKED = (2000, 2000)
 HAND = 0
+
+X = 0
+Y = 1
 
 #############################
 #
@@ -53,6 +58,7 @@ settings = {
     "animation_speed_choice": 1,
     "seed_drop_rate": 0.4,
     "board_choice": 0,
+    "background": 0,
     "seed_choice": 0,
     "notification_volume": 2,
     "seed_volume": 2,
@@ -100,6 +106,10 @@ visual_settings = {
     "board_choice": [
         "Walnut",
         "Birch"
+    ],
+    "background": [
+        "Green Linen",
+        "White Table"
     ],
     "seed_choice": [
         "Teal Green Glass Gems",
@@ -162,13 +172,16 @@ def update_setting(setting_name, value):
         app.root.screens[SETTINGS_SCREEN_SCREEN].ids.screen_screen_menu.\
             set_text(setting_name, visual_settings[setting_name][value])
     if setting_name == "board_choice":
-        filename = [
-            'assets/img/walnut-board-green.png',
-            'assets/img/birch-board-white.png',
-        ][value]
-        app.root.screens[GAME_SCREEN].ids.board_image.source = filename
         app.root.screens[SETTINGS_SCREEN_SCREEN].ids.screen_screen_menu.\
             set_text(setting_name, visual_settings[setting_name][value])
+    if setting_name == "background":
+        app.root.screens[SETTINGS_SCREEN_SCREEN].ids.screen_screen_menu.\
+            set_text(setting_name, visual_settings[setting_name][value])
+    if setting_name in ["board_choice", "background"]:
+        wood = ["walnut", "birch"][settings["board_choice"]]
+        color = ["green", "white"][settings["background"]]
+        filename = 'assets/img/{}-board-{}.png'.format(wood, color)
+        app.root.screens[GAME_SCREEN].ids.board_image.source = filename
     if setting_name == "animation_speed_choice":
         settings["seed_drop_rate"] = 0.1 + value*0.3
         app.root.screens[SETTINGS_SCREEN_SCREEN].ids.screen_screen_menu.\
@@ -296,30 +309,6 @@ for qty_num, qty_str in enumerate(["1", "2", "many"]):
         SCOOP_SOUND[qty].append(SoundLoader.load(file_name))
     SCOOP_SOUND[qty].append(0)                            
 
-
-SEED_DICT = {}
-for seed_num, seed_str in enumerate(["teal", "pebble", "black"]):
-    SEED_DICT[seed_num] = {}
-    SEED_DICT[seed_num]['images'] = []
-    for index in range(1, 4):
-        file_name = [
-            'assets/img/seed-teal-0{}.png',
-            'assets/img/seed-pebble-0{}.png',
-            'assets/img/seed-black-0{}.png',
-        ][seed_num]
-        file_name = file_name.format(index)
-        size = [
-            (90, 90),
-            (75, 71),
-            (75, 62)
-        ][seed_num]
-        true_spot = (size[0]/2.0, size[1]/2.0)
-        SEED_DICT[seed_num]['images'].append({
-            'file': file_name,
-            'size_fixed': size,
-            'true_spot': true_spot
-        })
-
 ##############################
 #
 #  KIVY CLASSES
@@ -356,7 +345,7 @@ class GameScreen(Screen):
         {"pos": (852,  760), "out-pos": (852,  810)}, # 11
         {"pos": (636,  760), "out-pos": (636,  810)}, # 12
         {"pos": (420,  760), "out-pos": (420,  810)}, # 13
-        {"pos": (220,  600), "out-pos": (220,  600)}  # 14 ai store
+        {"pos": (204,  600), "out-pos": (220,  600)}  # 14 ai store
     ]
 
     LOWER_LABEL = 30
@@ -387,8 +376,11 @@ class SettingsOpponentScreen(Screen):
         if ai_chosen > settings['best_level']:
             self.ids.choose_ai.background_normal = 'assets/img/invisible.png'
             n = AI_LIST[settings['best_level']]
-            msg = "You must win against {} ({}) ".format(n['name'], settings['best_level'] + 1)
-            msg += "before you can play {}".format(c['name'])
+            msg = "You must first defeat {} ({}) ".format(n['name'], settings['best_level'] + 1)
+            if ai_chosen > settings['best_level'] + 1:
+                m = AI_LIST[ai_chosen - 1]
+                msg += "through {} ({}) ".format(m['name'], ai_chosen)
+            msg += "to play {}.".format(c['name'])
             self.ids.choose_msg.text = msg
         else:
             self.ids.choose_msg.text = ""
@@ -411,7 +403,10 @@ class SettingsRulesScreen(Screen):
 
 
 class SettingsScreenScreen(Screen):
-    pass
+
+    def launch_url(self, value):
+        # TODO: look at settings and send the right lookup
+        webbrowser.open('https://www.amazon.com/Mancala-Walnut-Stones-Purple-Squirrel/dp/B01CKHQ4GO')
 
 
 class SettingsSoundScreen(Screen):
@@ -544,12 +539,13 @@ class Seeds(object):
 
     def _move(self, seed, pit):
         pos_fixed = GameScreen.PITS[pit]['pos']
-        x = pos_fixed[0] + random.randint(-50, 50)
+        index = len(self.board[pit]) - 1
+        x = pos_fixed[X] + PIT_ARRANGEMENT[pit-1][index][X]
         if pit in [7, 14]:
-            y = pos_fixed[1] + random.randint(-150, 150)
+            y = pos_fixed[Y] + PIT_ARRANGEMENT[pit-1][index][Y] * 3
         else:
-            y = pos_fixed[1] + random.randint(-50, 50)
-        seed.pos_fixed = (x, y)
+            y = pos_fixed[Y] + PIT_ARRANGEMENT[pit-1][index][Y]
+        seed.pos_fixed = (int(x), int(y))
 
 
 def animate_ai_start(display):

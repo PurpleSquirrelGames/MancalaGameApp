@@ -559,9 +559,9 @@ class FixedRadioButtons(Widget, FixedBase):
         index = instance.selected_number
         if index==self.selected:
             return
-        self.selector_list[self.selected].text = "O"
+        # self.selector_list[self.selected].text = "O"
         self.selected = index
-        self.selector_list[self.selected].text = "X"
+        # self.selector_list[self.selected].text = "X"
         if self.on_selection:
             self.dispatch('on_selection')
 
