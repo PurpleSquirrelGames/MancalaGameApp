@@ -142,14 +142,19 @@ def update_setting(setting_name, value):
     global app
     global seeds
 
-    # print setting_name
+    # yes, this routine IS called even without a real change
+    if value == settings[setting_name]:
+        change_seen = False
+    else:
+        change_seen = True
+        settings[setting_name] = value
 
-    settings[setting_name] = value
     if setting_name == "ai_chosen":
         settings["ai_chosen"] = value
         character = AI_LIST[value]
-        seeds.change_ai_pictures("{:02d}".format(character['index'])
-        )
+        seeds.change_ai_pictures("{:02d}".format(character['index']))
+        if change_seen:
+            disable_resume_game()
     if setting_name == "who_plays_first":
         if value == 0:
             settings["first_player"] = USER
@@ -157,16 +162,24 @@ def update_setting(setting_name, value):
             settings["first_player"] = AI
         app.root.screens[SETTINGS_RULES_SCREEN].ids.rules_screen_menu.\
             set_text(setting_name, visual_settings[setting_name][value])
+        if change_seen:
+            disable_resume_game()
     if setting_name == "seeds_per_house_selection":
         settings["seeds_per_house"] = value + 3
         app.root.screens[SETTINGS_RULES_SCREEN].ids.rules_screen_menu.\
             set_text(setting_name, visual_settings[setting_name][value])
+        if change_seen:
+            disable_resume_game()
     if setting_name == "capture_rule":
         app.root.screens[SETTINGS_RULES_SCREEN].ids.rules_screen_menu.\
             set_text(setting_name, visual_settings[setting_name][value])
+        if change_seen:
+            disable_resume_game()
     if setting_name == "eog_rule":
         app.root.screens[SETTINGS_RULES_SCREEN].ids.rules_screen_menu.\
             set_text(setting_name, visual_settings[setting_name][value])
+        if change_seen:
+            disable_resume_game()
     if setting_name == "seed_choice":
         seeds.change_picture()
         app.root.screens[SETTINGS_SCREEN_SCREEN].ids.screen_screen_menu.\
@@ -194,11 +207,6 @@ def update_setting(setting_name, value):
             set_text(setting_name, visual_settings[setting_name][value])
     storage.put('settings', **settings)
 
-def generically_apply_settings():
-    global settings
-
-    for key in settings:
-        update_setting(key, settings[key])
 
 def save_game(force_new_game=False):
     global machine
@@ -231,11 +239,16 @@ def restore_game():
 
 def enable_resume_game():
     global current
-    p = "assets/img/resume-button.png"
+    p = "assets/img/blank-wood-button.png"
+    t = "Resume"
     app.root.screens[SETTINGS_OPPONENT_SCREEN].ids.resume_game.background_normal = p
     app.root.screens[SETTINGS_RULES_SCREEN].ids.resume_game.background_normal = p
     app.root.screens[SETTINGS_SCREEN_SCREEN].ids.resume_game.background_normal = p
     app.root.screens[SETTINGS_SOUND_SCREEN].ids.resume_game.background_normal = p
+    app.root.screens[SETTINGS_OPPONENT_SCREEN].ids.resume_game.text = t
+    app.root.screens[SETTINGS_RULES_SCREEN].ids.resume_game.text = t
+    app.root.screens[SETTINGS_SCREEN_SCREEN].ids.resume_game.text = t
+    app.root.screens[SETTINGS_SOUND_SCREEN].ids.resume_game.text = t
     current['allow_resume'] = True
 
 def disable_resume_game():
@@ -245,7 +258,22 @@ def disable_resume_game():
     app.root.screens[SETTINGS_RULES_SCREEN].ids.resume_game.background_normal = p
     app.root.screens[SETTINGS_SCREEN_SCREEN].ids.resume_game.background_normal = p
     app.root.screens[SETTINGS_SOUND_SCREEN].ids.resume_game.background_normal = p
+    app.root.screens[SETTINGS_OPPONENT_SCREEN].ids.resume_game.text = ""
+    app.root.screens[SETTINGS_RULES_SCREEN].ids.resume_game.text = ""
+    app.root.screens[SETTINGS_SCREEN_SCREEN].ids.resume_game.text = ""
+    app.root.screens[SETTINGS_SOUND_SCREEN].ids.resume_game.text = ""
     current['allow_resume'] = False
+
+def generically_apply_settings():
+    global settings
+
+    for key in settings:
+        update_setting(key, settings[key])
+    if current['allow_resume']:
+        enable_resume_game()
+    else:
+        disable_resume_game()
+
 
 ##############################
 #
@@ -375,6 +403,7 @@ class SettingsOpponentScreen(Screen):
         self.ids.ai_face_image.source = "assets/img/ai-pic-{:02d}.png".format(c['index'])
         if ai_chosen > settings['best_level']:
             self.ids.choose_ai.background_normal = 'assets/img/invisible.png'
+            self.ids.choose_ai.text = ""
             n = AI_LIST[settings['best_level']]
             msg = "You must first defeat {} ({}) ".format(n['name'], settings['best_level'] + 1)
             if ai_chosen > settings['best_level'] + 1:
@@ -382,9 +411,14 @@ class SettingsOpponentScreen(Screen):
                 msg += "through {} ({}) ".format(m['name'], ai_chosen)
             msg += "to play {}.".format(c['name'])
             self.ids.choose_msg.text = msg
+        elif ai_chosen==settings['ai_chosen']:
+            self.ids.choose_msg.text = "You are currently playing this opponent."
+            self.ids.choose_ai.background_normal = 'assets/img/blank-wood-button.png'
+            self.ids.choose_ai.text = ""
         else:
             self.ids.choose_msg.text = ""
-            self.ids.choose_ai.background_normal = 'assets/img/choose-button.png'
+            self.ids.choose_ai.background_normal = 'assets/img/blank-wood-button.png'
+            self.ids.choose_ai.text = "Choose"
 
     def previous_ai(self):
         current['ai_viewed'] = (current['ai_viewed'] - 1) % 12
@@ -392,7 +426,6 @@ class SettingsOpponentScreen(Screen):
 
     def choose_ai(self):
         update_setting("ai_chosen", current['ai_viewed'])
-        disable_resume_game()
 
     def next_ai(self):
         current['ai_viewed'] = (current['ai_viewed'] + 1) % 12
@@ -426,6 +459,8 @@ class MancalaApp(App):
 
     def on_start(self):
         machine.bind_reference("kivy", self.root.screens[GAME_SCREEN].ids)
+        if current['first_time_flag']:
+            self.root.current = "settings_opponent_screen"
         machine.change_state("init_game")
         generically_apply_settings()
 
@@ -436,8 +471,9 @@ class MancalaApp(App):
 
     def start_new_game(self):
         self.root.current = "game_screen"
-        self.root.screens[GAME_SCREEN].ids.eog_new_game_button.active = False
+        self.root.screens[GAME_SCREEN].ids.eog_new_game_button.active = False # ?
         save_game(force_new_game=True)
+        current['first_time_flag'] = False
         enable_resume_game()
         machine.input("request_new_game")
 
@@ -685,16 +721,22 @@ class PendingStartState(State):
 class InitGameState(State):
 
     def on_entry(self):
+        global current
+
         self.ref['kivy'].wait_on_ai.stop_spinning()
         board_prior = copy(self.ref["game"].board)
-        restore_game()
-        if self.ref["game"].restoration:
-            self.ref["game"].reset_board(restoration=True)
-            self.ref["game"].restoration = False
-            self.animation = HandSeedAnimation(AI, board_prior, self.ref['kivy'], restoration=True)
+        if current['first_time_flag']:
+            print "FIRST TIME"
         else:
-            self.ref["game"].reset_board()
-            self.animation = HandSeedAnimation(AI, board_prior, self.ref['kivy'])
+            restore_game()
+            if self.ref["game"].restoration:
+                self.ref["game"].reset_board(restoration=True)
+                self.ref["game"].restoration = False
+                self.animation = HandSeedAnimation(AI, board_prior, self.ref['kivy'], restoration=True)
+            else:
+                self.ref["game"].reset_board()
+                self.animation = HandSeedAnimation(AI, board_prior, self.ref['kivy'])
+            enable_resume_game()
         return self.same_state
 
     def input(self, input_name, *args, **kwargs):
