@@ -64,7 +64,8 @@ COMBOS.append([1, 2])
 COMBOS.append([4, 3, 5, 6])  # doing 4 first to help with early analysis
 #
 #     (6) LOOKING 1, 2, 3, 4, 5, or 6 TURNS AHEAD
-COMBOS.append([1, 2, 3, 4, 5, 6])
+# COMBOS.append([1, 2, 3, 4, 5, 6])
+COMBOS.append([1, 2, 3, 4])
 #
 #     (3) CAPTURE RULE VARIATIONS
 COMBOS.append([0, 1, 2])
@@ -336,7 +337,7 @@ if __name__=="__main__":
             print "EVOLUTION OF ISLAND", island+1, "OF", ISLAND_QTY
             for gen in range(GENERATION_QTY):
                 print "WORKING ON ", short
-                print "GENERATION", gen, "OF", GENERATION_QTY
+                print "ISLAND", island, "GENERATION", gen, "OF", GENERATION_QTY
                 genome_list = do_extinction(genome_list)
                 do_reproduction(genome_list)
                 do_trials(genome_list)
