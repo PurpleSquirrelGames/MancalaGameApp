@@ -395,11 +395,9 @@ class SettingsOpponentScreen(Screen):
     def _update_details(self, ai_chosen):
         c = AI_LIST[ai_chosen]
         self.ids.ai_description.text = c['desc']
-        self.ids.ai_play_style.text = c['tagline']
-        self.ids.ai_name.text = format("{} of 12: [size=80]{}[/size]").format(
-            c['rank'],
-            c['name']
-        )
+        self.ids.ai_play_style.text = "[i]" + c['tagline'] + "[/i]"
+        self.ids.ai_name.text = c['name']
+        self.ids.ai_rank.text = format("{} of 12").format(c['rank'])
         self.ids.ai_face_image.source = "assets/img/ai-pic-{:02d}.png".format(c['index'])
         if ai_chosen > settings['best_level']:
             self.ids.choose_ai.background_normal = 'assets/img/invisible.png'
@@ -409,7 +407,7 @@ class SettingsOpponentScreen(Screen):
             if ai_chosen > settings['best_level'] + 1:
                 m = AI_LIST[ai_chosen - 1]
                 msg += "through {} ({}) ".format(m['name'], ai_chosen)
-            msg += "to play {}.".format(c['name'])
+            # msg += "to play {}.".format(c['name'])
             self.ids.choose_msg.text = msg
         elif ai_chosen==settings['ai_chosen']:
             self.ids.choose_msg.text = "You are currently playing this opponent."
@@ -430,6 +428,10 @@ class SettingsOpponentScreen(Screen):
     def next_ai(self):
         current['ai_viewed'] = (current['ai_viewed'] + 1) % 12
         self._update_details(current['ai_viewed'])
+
+    def launch_url(self):
+        webbrowser.open('https://www.youtube.com/watch?v=iSJk6CYsf6c')
+
 
 class SettingsRulesScreen(Screen):
     pass

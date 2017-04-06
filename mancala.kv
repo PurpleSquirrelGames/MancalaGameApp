@@ -39,7 +39,7 @@ AppScreenManager:
                 on_release: app.root.current = "settings_sound_screen"
             Button:
                 id: resume_game
-                pos_fixed: (1350, 0)
+                pos_fixed: (1300, 0)
                 size_fixed: (250, 100)
                 background_normal: 'assets/img/blank-wood-button.png'
                 font_size_fixed: 56
@@ -56,24 +56,45 @@ AppScreenManager:
                 background_color: (0.1, 1, 0.1, 1)
             Image:
                 id: ai_face_image
-                pos_fixed: (1620, 780)
+                pos_fixed: (1920-410+55, 1080-417+58)
                 size_fixed: (300, 300)
                 source: 'assets/img/blue3.png'
+            Image:
+                pos_fixed: (1920-410, 1080-417)
+                size_fixed: (410, 417)
+                source: 'assets/img/picture-frame.png'
+            Button:
+                text: "Learn How to Play\n(YouTube)"
+                pos_fixed: (1920 - 410, 1080 - 417 - 300)
+                size_fixed: (410, 150)
+                color: (0, 0, 0, 1)
+                background_normal: 'assets/img/youtube-url.png'
+                font_size_fixed: 56
+                on_release: root.launch_url()
+            Label:
+                id: ai_rank
+                pos_fixed: (1920 - 410/2, 1080 - 417 - 100)
+                size_fixed: (200, 100)
+                text_size: self.size
+                font_size_fixed: 56
+                color: (0, 0, 0, 1)
+                markup: True
+                text: 'n of 12'
             Label:
                 id: ai_name
                 pos_fixed: (400, 800)
                 size_fixed: (1200, 200)
                 text_size: self.size
-                font_size_fixed: 56
+                font_size_fixed: 96
                 color: (0, 0, 0, 1)
                 markup: True
-                text: character['rank']+" of 12: [size=80]"+character['name']+"[/size]"
+                text: character['name']
             Label:
                 id: ai_description
                 pos_fixed: (400, 400)
                 size_fixed: (1100, 350)
                 text_size: self.size
-                font_size_fixed: 56
+                font_size_fixed: 64
                 color: (0, 0, 0, 1)
                 valign: "top"
                 markup: True
@@ -83,7 +104,7 @@ AppScreenManager:
                 pos_fixed: (400, 300)
                 size_fixed: (1100, 250)
                 text_size: self.size
-                font_size_fixed: 56
+                font_size_fixed: 64
                 color: (0, 0, 0, 1)
                 markup: True
                 valign: "top"
@@ -144,7 +165,7 @@ AppScreenManager:
                 on_release: app.root.current = "settings_sound_screen"
             Button:
                 id: resume_game
-                pos_fixed: (1350, 0)
+                pos_fixed: (1300, 0)
                 size_fixed: (250, 100)
                 background_normal: 'assets/img/blank-wood-button.png'
                 font_size_fixed: 56
@@ -314,7 +335,7 @@ AppScreenManager:
                 on_release: app.root.current = "settings_sound_screen"
             Button:
                 id: resume_game
-                pos_fixed: (1350, 0)
+                pos_fixed: (1300, 0)
                 size_fixed: (250, 100)
                 background_normal: 'assets/img/blank-wood-button.png'
                 font_size_fixed: 56
@@ -336,7 +357,7 @@ AppScreenManager:
             Label:
                 pos_fixed: (400, 780+50)
                 size_fixed: (1400, 250)
-                text: "Like the look of the Mancala board?\nThe author of this game also makes physical boards:\n\n         [b][u][ref=url]Amazon Store Reference[/ref][/u][/b]"
+                text: "Like the look of the Mancala board?\nThe author of this game also makes physical boards:\n\n         [b][ref=url]Amazon Store Reference[/ref][/b]"
                 markup: True
                 color: (0, 0, 0, 1)
                 on_ref_press: root.launch_url(args[1])
@@ -472,7 +493,7 @@ AppScreenManager:
                 on_release: app.root.current = "settings_screen_screen"
             Button:
                 id: resume_game
-                pos_fixed: (1350, 0)
+                pos_fixed: (1300, 0)
                 size_fixed: (250, 100)
                 background_normal: 'assets/img/blank-wood-button.png'
                 font_size_fixed: 56

@@ -25,8 +25,6 @@ HEIGHT = 1
 
 PIXEL_SCALE = 0.7
 
-MONKEY = 1.01
-
 def grab(alist, index):
     try:
         return alist[index]
@@ -119,19 +117,25 @@ class FixedLayout(FloatLayout, FixedProperties):
             overall_width = (sw / (sh / wh)) / ww
             overall_height = 1.0
             self.scaling = overall_width
+            self.pixels_per_fixed_pixel = ww / sw
         else:
             overall_width = 1.0
             overall_height = (sh / (sw / ww)) / wh
             self.scaling = overall_height
+            self.pixels_per_fixed_pixel = wh / sh
         overall_margin_width = (1.0 - overall_width) / 2.0
         overall_margin_height = (1.0 - overall_height) / 2.0
         self.pcnt_per_pixel[WIDTH] = overall_width / sw
         self.pcnt_per_pixel[HEIGHT] = overall_height / sh
         self.pcnt_margin[WIDTH] = overall_margin_width
         self.pcnt_margin[HEIGHT] = overall_margin_height
-        self.pixels_per_fixed_pixel = wh / sh
+        # the following is used for fonts and other non-relative items
+        # fonts are always based on height
+        if screen_ratio < window_ratio:
+            self.pixels_per_fixed_pixel = wh / sh
+        else:
+            self.pixels_per_fixed_pixel = (overall_height * wh) / sh            
 
-    MONKEY = 1.05
     def monkey(self, value):
         return value
 
