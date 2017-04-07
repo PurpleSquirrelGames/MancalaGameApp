@@ -77,6 +77,7 @@ CAUTION = 2
 EMPTY = 0
 FULL = 1
 
+INF = float("inf")
 
 class MancalaAI(easyAI.NonRecursiveNegamax, object):
 
@@ -86,10 +87,6 @@ class MancalaAI(easyAI.NonRecursiveNegamax, object):
         self.defender_role = defender_role
         self.set_character()
         super(MancalaAI, self).__init__(self.character['lookahead'], tt=self.tt)
-
-    def _random_move(self, game):
-        possible_moves = game.possible_moves()
-        return random.choice(possible_moves)
 
     def set_character(self):
         if self.testing:
@@ -105,11 +102,16 @@ class MancalaAI(easyAI.NonRecursiveNegamax, object):
 
     def __call__(self, game):
         if self.character['strategy'] == "random":
-            return self._random_move(game)
+            # this is only used by Maisy
+            possible_moves = game.possible_moves()
+            shortest_length = min([len(m) for m in possible_moves])
+            shortest_moves = [m for m in possible_moves if len(m)==shortest_length]
+            return random.choice(shortest_moves)
         if self.character['error_rate'] > 0.0:
             chance = random.random()
             if chance < self.character['error_rate']:
-                return self._random_move(game)
+                possible_moves = game.possible_moves()
+                return random.choice(possible_moves)
         return super(MancalaAI, self).__call__(game)
 
 

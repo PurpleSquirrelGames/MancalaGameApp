@@ -23,7 +23,7 @@ HEIGHT = 1
 # know what Kivy uses; can't find any documentation for that information.
 # So I'm using the PIXEL_SCALE below as the ratio.
 
-PIXEL_SCALE = 0.7
+PIXEL_SCALE = 0.75 # 0.7
 
 def grab(alist, index):
     try:

@@ -516,8 +516,8 @@ class Seeds(object):
         hand.id = "ai_hand"
         hand.source = "assets/img/ai-hand-01.png"
         hand.pos_fixed = GameScreen.HANDS[AI]['pos']
-        hand.spot_fixed = (300, 128)
-        hand.size_fixed = (600, 1000)
+        hand.spot_fixed = (340, 128)
+        hand.size_fixed = (600, 1500)
         display.game_screen_root.add_widget(hand)
         self.ai_hand = hand
         face = Image()
@@ -835,6 +835,7 @@ class AIThinkingState(State):
         global character
         self.ref['kivy'].center_message.text = "{} is thinking.".format(character["name"])
         self.ref['kivy'].wait_on_ai.start_spinning()
+        self.ref['kivy'].spinner_background.active = True
         self.animation_finished = False
         self.thinking_finished = False
         animate_ai_start(self.ref["kivy"])
@@ -854,6 +855,7 @@ class AIThinkingState(State):
     def on_exit(self):
         animate_ai_end(self.ref["kivy"])
         self.ref["kivy"].wait_on_ai.stop_spinning()
+        self.ref['kivy'].spinner_background.active = False
 
 class AnimateAIChoicesState(State):
 

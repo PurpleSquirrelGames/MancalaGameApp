@@ -42,7 +42,7 @@ AppScreenManager:
                 pos_fixed: (1300, 0)
                 size_fixed: (250, 100)
                 background_normal: 'assets/img/blank-wood-button.png'
-                font_size_fixed: 56
+                font_size_fixed: 64
                 text: "Resume"
                 color: (101/255.0, 244/255.0, 66/255.0, 1)
                 on_release: app.resume_game()
@@ -51,9 +51,9 @@ AppScreenManager:
                 size_fixed: (300, 100)
                 text: "New Game"
                 on_release: app.start_new_game()
-                font_size_fixed: 50
-                color: (0, 0, 0, 1)
-                background_color: (0.1, 1, 0.1, 1)
+                font_size_fixed: 64
+                color: (101/255.0, 244/255.0, 66/255.0, 1)
+                background_normal: 'assets/img/blank-wood-button.png'
             Image:
                 id: ai_face_image
                 pos_fixed: (1920-410+55, 1080-417+58)
@@ -150,7 +150,7 @@ AppScreenManager:
         FixedLayout:
             Button:
                 background_normal: 'assets/img/not-opponent.png'
-                pos_fixed: (-194, 698)
+                pos_fixed: (-184, 698)
                 size_fixed: (498, 226)
                 on_release: app.root.current = "settings_opponent_screen"
             Button:
@@ -168,7 +168,7 @@ AppScreenManager:
                 pos_fixed: (1300, 0)
                 size_fixed: (250, 100)
                 background_normal: 'assets/img/blank-wood-button.png'
-                font_size_fixed: 56
+                font_size_fixed: 64
                 text: "Resume"
                 color: (101/255.0, 244/255.0, 66/255.0, 1)
                 on_release: app.resume_game()
@@ -177,9 +177,9 @@ AppScreenManager:
                 size_fixed: (300, 100)
                 text: "New Game"
                 on_release: app.start_new_game()
-                font_size_fixed: 50
-                color: (0, 0, 0, 1)
-                background_color: (0.1, 1, 0.1, 1)
+                font_size_fixed: 64
+                color: (101/255.0, 244/255.0, 66/255.0, 1)
+                background_normal: 'assets/img/blank-wood-button.png'
             FixedSimpleMenu:
                 id: rules_screen_menu
                 pos_fixed: (400, 150)
@@ -320,7 +320,7 @@ AppScreenManager:
         FixedLayout:
             Button:
                 background_normal: 'assets/img/not-opponent.png'
-                pos_fixed: (-194, 698)
+                pos_fixed: (-184, 698)
                 size_fixed: (498, 226)
                 on_release: app.root.current = "settings_opponent_screen"
             Button:
@@ -338,7 +338,7 @@ AppScreenManager:
                 pos_fixed: (1300, 0)
                 size_fixed: (250, 100)
                 background_normal: 'assets/img/blank-wood-button.png'
-                font_size_fixed: 56
+                font_size_fixed: 64
                 text: "Resume"
                 color: (101/255.0, 244/255.0, 66/255.0, 1)
                 on_release: app.resume_game()
@@ -347,9 +347,9 @@ AppScreenManager:
                 size_fixed: (300, 100)
                 text: "New Game"
                 on_release: app.start_new_game()
-                font_size_fixed: 50
-                color: (0, 0, 0, 1)
-                background_color: (0.1, 1, 0.1, 1)
+                font_size_fixed: 64
+                background_normal: 'assets/img/blank-wood-button.png'
+                color: (101/255.0, 244/255.0, 66/255.0, 1)
             Image:
                 pos_fixed: (400, 780)
                 size_fixed: (1400, 300)
@@ -357,6 +357,7 @@ AppScreenManager:
             Label:
                 pos_fixed: (400, 780+50)
                 size_fixed: (1400, 250)
+                font_size_fixed: 64
                 text: "Like the look of the Mancala board?\nThe author of this game also makes physical boards:\n\n         [b][ref=url]Amazon Store Reference[/ref][/b]"
                 markup: True
                 color: (0, 0, 0, 1)
@@ -478,7 +479,7 @@ AppScreenManager:
         FixedLayout:
             Button:
                 background_normal: 'assets/img/not-opponent.png'
-                pos_fixed: (-194, 698)
+                pos_fixed: (-184, 698)
                 size_fixed: (498, 226)
                 on_release: app.root.current = "settings_opponent_screen"
             Button:
@@ -496,18 +497,18 @@ AppScreenManager:
                 pos_fixed: (1300, 0)
                 size_fixed: (250, 100)
                 background_normal: 'assets/img/blank-wood-button.png'
-                font_size_fixed: 56
+                font_size_fixed: 64
                 text: "Resume"
                 color: (101/255.0, 244/255.0, 66/255.0, 1)
                 on_release: app.resume_game()
             Button:
                 pos_fixed: (1600, 0)
                 size_fixed: (300, 100)
+                background_normal: 'assets/img/blank-wood-button.png'
                 text: "New Game"
                 on_release: app.start_new_game()
-                font_size_fixed: 50
-                color: (0, 0, 0, 1)
-                background_color: (0.1, 1, 0.1, 1)
+                font_size_fixed: 64
+                color: (101/255.0, 244/255.0, 66/255.0, 1)
             FixedSimpleMenu:
                 id: sound_screen_menu
                 pos_fixed: (400, 150)
@@ -585,6 +586,14 @@ AppScreenManager:
                 source: 'assets/img/message-background.png'
                 pos_fixed: (330, 540-80)
                 size_fixed: (1260, 160)
+            FixedPopup:
+                id: spinner_background
+                active_pos_fixed: (1400-25, 490-25)
+                size_fixed: (150, 150)
+                Image:
+                    source: 'assets/img/spinner-background.png'
+                    active_pos_fixed: (1400-25, 490-25)
+                    size_fixed: (150, 150)
             ProgressSpinner:
                 id: wait_on_ai
                 size_fixed: (100, 100)
@@ -594,18 +603,19 @@ AppScreenManager:
                 id: center_message
                 text: 'here'
                 pos_fixed: (960, 540-50)
-                font_size_fixed: 100
+                font_size_fixed: 96
                 size_fixed: (10, 100)
                 color: (0, 0, 0, 1)
             FixedPopup:
                 id: eog_new_game_button
-                active_pos_fixed: (800, 500)
+                active_pos_fixed: (1200, 500)
                 size_fixed: (300, 100)
                 Button:
-                    active_pos_fixed: (1100, 500)
+                    active_pos_fixed: (1200, 500)
                     size_fixed: (300, 100)
-                    color: (1, 0, 0, 1)
-                    font_size_fixed: 56
+                    color: (101/255.0, 244/255.0, 66/255.0, 1)
+                    background_normal: 'assets/img/blank-wood-button.png'
+                    font_size_fixed: 64
                     text: "New Game"
                     on_release: app.start_new_game()
             Button:
