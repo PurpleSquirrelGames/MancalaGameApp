@@ -50,7 +50,7 @@ for i in range(12 * 6 + 1):
     x, y = SEED_SPOTS_TEMPLATE[i % SEED_SPOTS_TEMPLATE_LEN]
     scaler = (75.0 / 7.0) * (1.0 + 0.1 * float(int(i / SEED_SPOTS_TEMPLATE_LEN) - 1))
     SEED_SPOTS_SCALED.append( (x * scaler, y * scaler) )
-    print (x * scaler, y * scaler)
+    # print (x * scaler, y * scaler)
 
 PIT_ARRANGEMENT = []
 for pit in range(14):

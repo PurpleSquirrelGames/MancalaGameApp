@@ -8,7 +8,7 @@ AI_LIST = [
         "rank": "1",
         "strategy": "random",  # options: "random", "negamax"
         "tactics": Tactics(),
-        "lookahead": 0,  # 1 to 6
+        "lookahead": 1,  # 1 to 6
         "error_rate": 1.00,  # 0.0 to 1.0; odds of making mistake
         "fitness": "greed", # options: greed, caution, balance
         "desc": "This 4 year old likes to move seeds.",
@@ -83,7 +83,7 @@ AI_LIST = [
         "lookahead": 4,  # 1 to 6
         "error_rate": 0.00,  # 0.0 to 1.0; odds of making mistake
         "fitness": "balance", # options: greed, caution, balance
-        "desc": "Olivia plays regularly but doesn't consider hergreed a gamer.",
+        "desc": "Olivia plays regularly but doesn't consider herself a gamer.",
         "tagline": "A well-rounded player. Moderate/High difficulty."
     },
     {
@@ -120,7 +120,7 @@ AI_LIST = [
         "error_rate": 0.01,  # 0.0 to 1.0; odds of making mistake
         "fitness": "balance", # options: greed, caution, balance
         "desc": "Sandra is very good. Plays regularly.",
-        "tagline": "High difficulty. error_rate very rare."
+        "tagline": "High difficulty. Errors are very rare."
     },
     {
         "index": 11,
@@ -143,7 +143,7 @@ AI_LIST = [
         "lookahead": 7,  # 1 to 6
         "error_rate": 0.00,  # 0.0 to 1.0; odds of making mistake
         "fitness": "greed", # options: greed, caution, balance
-        "desc": "A deep artificial intelligence. ThoughtNet finds interacting with humans pleasing.",
+        "desc": "A deep artificial intelligence. ThoughtNet finds interacting with humans pleasing.\nNOTE: on some devices, ThoughtNet is very slow.",
         "tagline": "Very high difficulty. Still possible to win if you go first."
     },
 ]

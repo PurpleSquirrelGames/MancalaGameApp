@@ -6,6 +6,7 @@ from kivy.app import App
 from kivy.animation import Animation
 from kivy.clock import Clock
 from kivy.core.audio import SoundLoader
+from kivy.core.window import Window
 from kivy.factory import Factory 
 from kivy.garden.progressspinner import ProgressSpinner
 from kivy.lang import Builder
@@ -29,6 +30,7 @@ __version__ = '0.0.14'
 machine = StateMachine(debug=True)
 
 seeds = None
+status_bar = None
 
 storage = JsonStore('mancala.json')
 
@@ -153,6 +155,7 @@ def update_setting(setting_name, value):
         settings["ai_chosen"] = value
         character = AI_LIST[value]
         seeds.change_ai_pictures("{:02d}".format(character['index']))
+        app.root.screens[SETTINGS_OPPONENT_SCREEN].ids.start_game_wrapper.text = "play\n{}".format(character['name'])
         if change_seen:
             disable_resume_game()
     if setting_name == "who_plays_first":
@@ -301,6 +304,9 @@ VOL_SOFT = 1
 VOL_MEDIUM = 2
 VOL_LOUD = 3
 
+VOLS = [0.0, 0.25, 0.5, 1.0]
+
+
 PLAY_IDX = 4
 
 COMBO_LIST = {}
@@ -337,6 +343,23 @@ for qty_num, qty_str in enumerate(["1", "2", "many"]):
         SCOOP_SOUND[qty].append(SoundLoader.load(file_name))
     SCOOP_SOUND[qty].append(0)                            
 
+
+done_sound = SoundLoader.load("assets/audio/ding-ai-done.wav")
+waiting_for_player_sound = SoundLoader.load("assets/audio/tin-wait-for-player.wav")
+reward_sound = SoundLoader.load("assets/audio/tada-level-up.wav")
+
+def play_ai_done_sound():
+    done_sound.volume = VOLS[settings['notification_volume']]
+    done_sound.play()
+
+def play_waiting_for_player():
+    waiting_for_player_sound.volume = VOLS[settings['notification_volume']]
+    waiting_for_player_sound.play()
+
+def play_reward_sound():
+    reward_sound.volume = VOLS[settings['notification_volume']]
+    reward_sound.play()
+
 ##############################
 #
 #  KIVY CLASSES
@@ -354,8 +377,8 @@ class GameScreen(Screen):
 
     HANDS = [
         {}, # 0, nobody
-        {"pos": (500, -300)},       # 1 user
-        {"pos": (500, 1080+300)}     # 2 ai
+        {"pos": (500, -500)},       # 1 user
+        {"pos": (500, 1080+500)}     # 2 ai
     ]
 
     PITS = [
@@ -381,6 +404,10 @@ class GameScreen(Screen):
 
     def pushed_pit(self, pit):
         machine.input("pushed_pit", pit)
+
+    def toggle_message_bar(self):
+        global status_bar
+        status_bar.toggle_hide()
 
 class SettingsOpponentScreen(Screen):
 
@@ -465,6 +492,40 @@ class MancalaApp(App):
             self.root.current = "settings_opponent_screen"
         machine.change_state("init_game")
         generically_apply_settings()
+        Window.bind(on_keyboard=self.on_key)
+        self.MENU_POPUPS = [
+            self.root.screens[SETTINGS_RULES_SCREEN].ids.game_choice_popup,
+            self.root.screens[SETTINGS_RULES_SCREEN].ids.who_first_popup,
+            self.root.screens[SETTINGS_RULES_SCREEN].ids.seeds_per_house_selection_popup,
+            self.root.screens[SETTINGS_RULES_SCREEN].ids.capture_rule_popup,
+            self.root.screens[SETTINGS_RULES_SCREEN].ids.eog_rule_popup,
+            self.root.screens[SETTINGS_SCREEN_SCREEN].ids.board_choice_popup,
+            self.root.screens[SETTINGS_SCREEN_SCREEN].ids.background_popup,
+            self.root.screens[SETTINGS_SCREEN_SCREEN].ids.seed_choice_popup,
+            self.root.screens[SETTINGS_SCREEN_SCREEN].ids.animation_speed_popup,
+            self.root.screens[SETTINGS_SOUND_SCREEN].ids.notification_volume_popup,
+            self.root.screens[SETTINGS_SOUND_SCREEN].ids.seed_volume_popup
+        ]
+
+    def need_to_escape_menu(self):
+        ''' if any menu screen is open; then close it. '''
+        open_popup_found = False
+        for popup in self.MENU_POPUPS:
+            if popup.active:
+                popup.active = False
+                open_popup_found = True
+        return open_popup_found
+
+    def on_key(self, window, key, *args):
+        if key == 27:  # Esc on PC, Back on Android
+            if self.need_to_escape_menu():
+                return True
+            if current['allow_resume']:
+                self.resume_game()
+            else:
+                self.start_new_game()
+            return True
+        return False
 
     def resume_game(self):
         if not current['allow_resume']:
@@ -485,6 +546,59 @@ class MancalaApp(App):
 #  ANIMATION
 #
 ##############################
+
+STATUS_FULL_LOCATION = (330, 460)
+STATUS_MIN_LOCATION = (0, 0)
+STATUS_OFFSCREEN_LOCATION = (4000, 4000)
+
+class StatusBar(object):
+
+    def __init__(self, display):
+        self.display = display
+        self.text = ""
+        self.want_visible = True
+        self.is_done = False
+        self._move_board(self.want_visible)
+
+    def _move_board(self, force_show=False):
+        if force_show:
+            self.display.message_background.pos_fixed = STATUS_FULL_LOCATION
+            self.display.center_message.text = self.text
+        elif self.is_done:
+            self.display.message_background.pos_fixed = STATUS_OFFSCREEN_LOCATION
+            if self.want_visible:
+                self.display.message_down_button.pos_fixed = STATUS_OFFSCREEN_LOCATION
+            self.display.center_message.text = ""
+            self.display.message_down_button.text = ""
+        elif self.want_visible:
+            self.display.message_background.pos_fixed = STATUS_FULL_LOCATION
+            self.display.message_down_button.pos_fixed = STATUS_FULL_LOCATION
+            self.display.center_message.text = self.text
+            self.display.message_down_button.text = "V"
+        else:
+            self.display.message_background.pos_fixed = STATUS_OFFSCREEN_LOCATION
+            self.display.message_down_button.pos_fixed = STATUS_MIN_LOCATION
+            self.display.center_message.text = ""
+            self.display.message_down_button.text = "*" if self.wait_on_player else ""
+
+    def toggle_hide(self):
+        if self.want_visible:
+            self.want_visible = False
+        else:
+            self.want_visible = True
+        self._move_board()
+
+    def say(self, text, wait_on_player=False, force_show=False):
+        self.wait_on_player = wait_on_player
+        self.text = text
+        self.is_done = False
+        self._move_board(force_show=force_show)
+
+    def done(self):
+        self.wait_on_player = True
+        self.text = ""
+        self.is_done = True
+        self._move_board()
 
 class Seeds(object):
 
@@ -555,7 +669,7 @@ class Seeds(object):
         sf = SCOOP_SOUND[scoop_size]
         sf[PLAY_IDX] = (sf[PLAY_IDX] + 1) % PLAY_IDX
         current = sf[PLAY_IDX]
-        sf[current].volume = settings['seed_volume']*0.3
+        sf[current].volume = VOLS[settings['seed_volume']]
         sf[current].play()
 
     def drop(self, pit, count):
@@ -572,7 +686,7 @@ class Seeds(object):
         sf = sf[pit_type]
         sf[PLAY_IDX] = (sf[PLAY_IDX] + 1) % PLAY_IDX
         current = sf[PLAY_IDX]
-        sf[current].volume = settings['seed_volume']*0.3
+        sf[current].volume = VOLS[settings['seed_volume']]
         sf[current].play()
 
     def _move(self, seed, pit):
@@ -668,23 +782,23 @@ class HandSeedAnimation(object):
                     t='in_out_sine'
                 )
             elif step['action']=="steal":
-                self.display.center_message.text = "Capture!"
+                status_bar.say("Capture!")
             elif step['action']=="game_over":
-                self.display.center_message.text = "Handling End of Game"
+                status_bar.say("Handling End of Game")
             elif step['action']=="setting_up":
                 if self.restoration:
-                    self.display.center_message.text = "Restoring Game"
+                    status_bar.say("Restoring Game")
                 else:
-                    self.display.center_message.text = "Setting Up Board"
+                    status_bar.say("Setting Up Board")
             elif step['action']=="normal_move":
-                self.display.center_message.text = ""
+                status_bar.done()
                 hand_animation = Animation(
                     pos_fixed=GameScreen.PITS[pit]["out-pos"],
                     duration=settings['seed_drop_rate'],
                     t='in_out_sine'
                 )
             elif step['action']=="home":
-                self.display.center_message.text = ""
+                status_bar.done()
                 hand_animation = Animation(
                     pos_fixed = GameScreen.HANDS[self.nplayer]['pos'],
                     duration=settings['seed_drop_rate'],
@@ -718,7 +832,9 @@ class PendingStartState(State):
 
     def on_exit(self):
         global seeds
+        global status_bar
         seeds = Seeds(self.ref["kivy"])
+        status_bar = StatusBar(self.ref["kivy"])
 
 class InitGameState(State):
 
@@ -769,7 +885,7 @@ class StartTurn(State):
         if self.ref["game"].is_over():
             return self.change_state("eog")
         if self.ref["game"].nplayer==1:
-            self.ref["kivy"].center_message.text = "Choose a house."
+            status_bar.say("Choose a house.", wait_on_player=True)
             self.ref["game"].usermove_start_simulation()
             self.ref["possible_user_moves"] = self.ref["game"].possible_moves()
             return self.change_state("wait_for_pit")
@@ -782,6 +898,7 @@ class StartTurn(State):
 class WaitForPitButtons(State):
 
     def on_entry(self):
+        play_waiting_for_player()
         display_board(self.ref['game'].board, self.ref['kivy'])
 
     def input(self, input_name, *args, **kwargs):
@@ -790,11 +907,11 @@ class WaitForPitButtons(State):
             index = len(self.ref['choices_so_far'])
             valid_move = any(grab(chlist, index)==pit for chlist in self.ref["possible_user_moves"])
             if valid_move:
-                self.ref['kivy'].center_message.text = "playing house {}".format(pit)
+                status_bar.say("Playing house {}".format(pit))
                 self.ref['choices_so_far'].append(pit)
                 self.change_state("animate_user")
             else:
-                self.ref['kivy'].center_message.text = "cannot play empty house. try again."
+                status_bar.say("Cannot play empty house. Try again.")
         if input_name == "request_new_game":
             self.change_state("init_game")
 
@@ -813,7 +930,7 @@ class AnitmateUserChoiceState(State):
                 self.ref["game"].usermove_finish_simulation()
                 self.ref["game"].animated_play_move(self.ref['choices_so_far'])
                 return self.change_state("start_turn")
-            self.ref['kivy'].center_message.text ="landed in store. play again."
+            status_bar.say("Landed in store. Play again.", wait_on_player=True)
             return self.change_state("wait_for_pit")
         if input_name == "request_new_game":
             self.change_state("init_game")
@@ -833,7 +950,7 @@ class AIThinkingState(State):
     
     def on_entry(self):
         global character
-        self.ref['kivy'].center_message.text = "{} is thinking.".format(character["name"])
+        status_bar.say("{} is thinking.".format(character["name"]))
         self.ref['kivy'].wait_on_ai.start_spinning()
         self.ref['kivy'].spinner_background.active = True
         self.animation_finished = False
@@ -854,6 +971,7 @@ class AIThinkingState(State):
 
     def on_exit(self):
         animate_ai_end(self.ref["kivy"])
+        play_ai_done_sound()
         self.ref["kivy"].wait_on_ai.stop_spinning()
         self.ref['kivy'].spinner_background.active = False
 
@@ -878,9 +996,10 @@ class EndOfGameDisplayState(State):
     def on_entry(self):
         save_game()
         winner = self.ref['game'].get_winner()    
-        self.ref["kivy"].center_message.text = \
-            ["Tie Game.", "You won!", "AI won."][game.get_winner()]
+        msg = ["Tie Game.", "You won!", "{} won.".format(character["name"])][game.get_winner()]
+        status_bar.say(msg, force_show=True)
         self.ref["kivy"].eog_new_game_button.active = True
+        play_reward_sound()
 
     def input(self, input_name, *args, **kwargs):
         if input_name == "request_new_game":

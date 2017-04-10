@@ -47,9 +47,17 @@ AppScreenManager:
                 color: (101/255.0, 244/255.0, 66/255.0, 1)
                 on_release: app.resume_game()
             Button:
+                id: start_game_wrapper
+                pos_fixed: (1580, -20)
+                size_fixed: (340, 340)
+                text: "play\nMaisy"
+                on_release: app.start_new_game()
+                font_size_fixed: 56
+                color: (0, 0, 0, 1)
+                background_normal: 'assets/img/start-button.png'
+            Button:
                 pos_fixed: (1600, 0)
                 size_fixed: (300, 100)
-                text: "New Game"
                 on_release: app.start_new_game()
                 font_size_fixed: 64
                 color: (101/255.0, 244/255.0, 66/255.0, 1)
@@ -221,13 +229,8 @@ AppScreenManager:
                     color: (0, 0, 0, 1)
                     background_selected: "assets/img/selected.png"
                     background_normal: "assets/img/not-selected.png"
-                Button:
-                    active_pos_fixed: (1700, 150)
-                    size_fixed: (200, 100)
-                    color: (0, 0, 0, 1)
-                    font_size_fixed: 56
-                    text: "Done"
-                    on_press: root.ids.game_choice_popup.active = False
+                    on_selection:
+                        root.ids.game_choice_popup.active = False
             FixedPopup:
                 id: who_first_popup
                 active_pos_fixed: (300, 100)
@@ -240,14 +243,9 @@ AppScreenManager:
                     color: (0, 0, 0, 1)
                     background_selected: "assets/img/selected.png"
                     background_normal: "assets/img/not-selected.png"
-                    on_selection: update_setting("who_plays_first", self.selected)
-                Button:
-                    active_pos_fixed: (1700, 150)
-                    size_fixed: (200, 100)
-                    color: (0, 0, 0, 1)
-                    font_size_fixed: 56
-                    text: "Done"
-                    on_press: root.ids.who_first_popup.active = False
+                    on_selection:
+                        update_setting("who_plays_first", self.selected)
+                        root.ids.who_first_popup.active = False
             FixedPopup:
                 id: seeds_per_house_selection_popup
                 active_pos_fixed: (300, 100)
@@ -260,14 +258,9 @@ AppScreenManager:
                     color: (0, 0, 0, 1)
                     background_selected: "assets/img/selected.png"
                     background_normal: "assets/img/not-selected.png"
-                    on_selection: update_setting("seeds_per_house_selection", self.selected)
-                Button:
-                    active_pos_fixed: (1700, 150)
-                    size_fixed: (200, 100)
-                    color: (0, 0, 0, 1)
-                    font_size_fixed: 56
-                    text: "Done"
-                    on_press: root.ids.seeds_per_house_selection_popup.active = False
+                    on_selection:
+                        update_setting("seeds_per_house_selection", self.selected)
+                        root.ids.seeds_per_house_selection_popup.active = False
             FixedPopup:
                 id: capture_rule_popup
                 active_pos_fixed: (300, 100)
@@ -280,14 +273,9 @@ AppScreenManager:
                     color: (0, 0, 0, 1)
                     background_selected: "assets/img/selected.png"
                     background_normal: "assets/img/not-selected.png"
-                    on_selection: update_setting("capture_rule", self.selected)
-                Button:
-                    pos_fixed: (1700, 150)
-                    active_size_fixed: (200, 100)
-                    color: (0, 0, 0, 1)
-                    font_size_fixed: 56
-                    text: "Done"
-                    on_press: root.ids.capture_rule_popup.active = False
+                    on_selection:
+                        update_setting("capture_rule", self.selected)
+                        root.ids.capture_rule_popup.active = False
             FixedPopup:
                 id: eog_rule_popup
                 active_pos_fixed: (300, 100)
@@ -300,14 +288,9 @@ AppScreenManager:
                     color: (0, 0, 0, 1)
                     background_selected: "assets/img/selected.png"
                     background_normal: "assets/img/not-selected.png"
-                    on_selection: update_setting("eog_rule", self.selected)
-                Button:
-                    active_pos_fixed: (1700, 150)
-                    size_fixed: (200, 100)
-                    color: (0, 0, 0, 1)
-                    font_size_fixed: 56
-                    text: "Done"
-                    on_press: root.ids.eog_rule_popup.active = False
+                    on_selection:
+                        update_setting("eog_rule", self.selected)
+                        root.ids.eog_rule_popup.active = False
 
 <SettingsScreenScreen>
     name: "settings_screen_screen"
@@ -399,14 +382,9 @@ AppScreenManager:
                     color: (0, 0, 0, 1)
                     background_selected: "assets/img/selected.png"
                     background_normal: "assets/img/not-selected.png"
-                    on_selection: update_setting("board_choice", self.selected)
-                Button:
-                    active_pos_fixed: (1700, 150)
-                    size_fixed: (200, 100)
-                    color: (0, 0, 0, 1)
-                    font_size_fixed: 56
-                    text: "Done"
-                    on_press: root.ids.board_choice_popup.active = False
+                    on_selection:
+                        update_setting("board_choice", self.selected)
+                        root.ids.board_choice_popup.active = False
             FixedPopup:
                 id: background_popup
                 active_pos_fixed: (300, 100)
@@ -419,14 +397,9 @@ AppScreenManager:
                     color: (0, 0, 0, 1)
                     background_selected: "assets/img/selected.png"
                     background_normal: "assets/img/not-selected.png"
-                    on_selection: update_setting("background", self.selected)
-                Button:
-                    active_pos_fixed: (1700, 150)
-                    size_fixed: (200, 100)
-                    color: (0, 0, 0, 1)
-                    font_size_fixed: 56
-                    text: "Done"
-                    on_press: root.ids.background_popup.active = False
+                    on_selection:
+                        update_setting("background", self.selected)
+                        root.ids.background_popup.active = False
             FixedPopup:
                 id: seed_choice_popup
                 active_pos_fixed: (300, 100)
@@ -439,14 +412,9 @@ AppScreenManager:
                     color: (0, 0, 0, 1)
                     background_selected: "assets/img/selected.png"
                     background_normal: "assets/img/not-selected.png"
-                    on_selection: update_setting("seed_choice", self.selected)
-                Button:
-                    active_pos_fixed: (1700, 150)
-                    size_fixed: (200, 100)
-                    color: (0, 0, 0, 1)
-                    font_size_fixed: 56
-                    text: "Done"
-                    on_press: root.ids.seed_choice_popup.active = False
+                    on_selection:
+                        update_setting("seed_choice", self.selected)
+                        root.ids.seed_choice_popup.active = False
             FixedPopup:
                 id: animation_speed_popup
                 active_pos_fixed: (300, 100)
@@ -459,14 +427,9 @@ AppScreenManager:
                     color: (0, 0, 0, 1)
                     background_selected: "assets/img/selected.png"
                     background_normal: "assets/img/not-selected.png"
-                    on_selection: update_setting("animation_speed_choice", self.selected)
-                Button:
-                    active_pos_fixed: (1700, 150)
-                    size_fixed: (200, 100)
-                    color: (0, 0, 0, 1)
-                    font_size_fixed: 56
-                    text: "Done"
-                    on_press: root.ids.animation_speed_popup.active = False
+                    on_selection:
+                        update_setting("animation_speed_choice", self.selected)
+                        root.ids.animation_speed_popup.active = False
 
 <SettingsSoundScreen>
     name: "settings_sound_screen"
@@ -536,14 +499,9 @@ AppScreenManager:
                     color: (0, 0, 0, 1)
                     background_selected: "assets/img/selected.png"
                     background_normal: "assets/img/not-selected.png"
-                    on_selection: update_setting("notification_volume", self.selected)
-                Button:
-                    active_pos_fixed: (1700, 150)
-                    size_fixed: (200, 100)
-                    color: (0, 0, 0, 1)
-                    font_size_fixed: 56
-                    text: "Done"
-                    on_press: root.ids.notification_volume_popup.active = False
+                    on_selection:
+                        update_setting("notification_volume", self.selected)
+                        root.ids.notification_volume_popup.active = False
             FixedPopup:
                 id: seed_volume_popup
                 active_pos_fixed: (300, 100)
@@ -556,15 +514,9 @@ AppScreenManager:
                     color: (0, 0, 0, 1)
                     background_selected: "assets/img/selected.png"
                     background_normal: "assets/img/not-selected.png"
-                    on_selection: update_setting("seed_volume", self.selected)
-                Button:
-                    active_pos_fixed: (1700, 150)
-                    size_fixed: (200, 100)
-                    color: (0, 0, 0, 1)
-                    font_size_fixed: 56
-                    text: "Done"
-                    on_press: root.ids.seed_volume_popup.active = False
-
+                    on_selection:
+                        update_setting("seed_volume", self.selected)
+                        root.ids.seed_volume_popup.active = False
 
 <GameScreen>
     name: "game_screen"
@@ -583,9 +535,17 @@ AppScreenManager:
                 size_fixed: (200, 200)
                 on_release: app.root.current = "settings_opponent_screen"
             Image:
+                id: message_background
                 source: 'assets/img/message-background.png'
                 pos_fixed: (330, 540-80)
                 size_fixed: (1260, 160)
+            Button:
+                id: message_down_button
+                text: "V"
+                font_size_fixed: 80
+                pos_fixed: (330, 540-80)
+                size_fixed: (160, 160)
+                on_release: root.toggle_message_bar()
             FixedPopup:
                 id: spinner_background
                 active_pos_fixed: (1400-25, 490-25)

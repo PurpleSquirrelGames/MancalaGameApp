@@ -561,8 +561,8 @@ class FixedRadioButtons(Widget, FixedBase):
 
     def selection_made(self, instance):
         index = instance.selected_number
-        if index==self.selected:
-            return
+        #if index==self.selected:
+        #    return
         # self.selector_list[self.selected].text = "O"
         self.selected = index
         # self.selector_list[self.selected].text = "X"

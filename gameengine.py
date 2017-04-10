@@ -4,6 +4,7 @@ from easyAI import TT
 from copy import copy
 import random
 from characters import AI_LIST
+from tactics import Tactics
 
 USER = 1
 AI = 2
@@ -85,6 +86,7 @@ class MancalaAI(easyAI.NonRecursiveNegamax, object):
         self.settings = settings
         self.testing = testing
         self.defender_role = defender_role
+        self.tactics = Tactics()
         self.set_character()
         super(MancalaAI, self).__init__(self.character['lookahead'], tt=self.tt)
 
@@ -96,9 +98,10 @@ class MancalaAI(easyAI.NonRecursiveNegamax, object):
                 self.character = self.testing[0]
         else:
             self.character = AI_LIST[self.settings["ai_chosen"]]
-        self.tactics = self.character['tactics']
         self.depth = self.character['lookahead']
         self.tt = None
+        self.tactics.remap(self.character, self.settings)
+        #
 
     def __call__(self, game):
         if self.character['strategy'] == "random":
@@ -328,7 +331,13 @@ class KalahGame(easyAI.TwoPlayersGame):
 
     def scoring(self, player=None):
         s = self.strategic_scoring(self.nplayer, self.nopponent)
-        t = self.tactical_scoring(self.nplayer, self.nopponent)
+        if self.is_over():
+            if s > 0:
+                t = 9000
+            else:
+                t = -9000
+        else:
+            t = self.tactical_scoring(self.nplayer, self.nopponent)
         return s + t
 
     def strategic_scoring(self, player, opponent):
