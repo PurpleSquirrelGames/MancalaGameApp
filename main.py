@@ -508,8 +508,8 @@ class Seeds(object):
         hand.id = "user_hand"
         hand.source = "assets/img/user-hand-01.png"
         hand.pos_fixed = GameScreen.HANDS[USER]['pos']
-        hand.spot_fixed = (300, 300)
-        hand.size_fixed = (600, 600)
+        hand.spot_fixed = (300, 1500-128)
+        hand.size_fixed = (600, 1500)
         display.game_screen_root.add_widget(hand)
         self.user_hand = hand
         hand = Image()
