@@ -21,7 +21,7 @@ from fixedlayout import FixedLayout, FixedPopup, FixedRadioButtons, \
 from simplestate import StateMachine, State
 from gameengine import KalahGame
 from characters import AI_LIST
-from coordinates import PIT_ARRANGEMENT, SEED_DICT
+from coordinates import PIT_ARRANGEMENT, SEED_DICT, HAND_FOCUS
 
 __version__ = '0.0.14'
 
@@ -716,8 +716,13 @@ class Seeds(object):
         self.display = display
 
     def change_ai_pictures(self, rank):
+        global HAND_FOCUS
         self.ai_hand.source = "assets/img/ai-hand-{}.png".format(rank)
         self.ai_face.source = "assets/img/ai-pic-{}.png".format(rank)
+        i = int(rank) - 1
+        self.ai_hand.spot_fixed = HAND_FOCUS[i]
+        # self.ai_hand.size_fixed = (100, 100)  # toggle to force recalc
+        # self.ai_hand.size_fixed = (600, 1500)
 
     def change_picture(self):
         for s in self.seed_ref:

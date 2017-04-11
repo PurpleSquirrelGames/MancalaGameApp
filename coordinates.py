@@ -91,3 +91,19 @@ for seed_num, seed_str in enumerate(["teal", "pebble", "black"]):
             'size_fixed': size,
             'true_spot': true_spot
         })
+
+
+HAND_FOCUS = [
+    (300,   0),  # AI 1
+    (150, 200),  # AI 2
+    (500, 100),  # AI 3
+    (300, 150),  # AI 4
+    (250, 150),  # AI 5
+    (400, 150),  # AI 6
+    (450, 100),  # AI 7
+    (300, 150),  # AI 8
+    (150, 100),  # AI 9
+    (360, 250),  # AI 10
+    (310,  15),  # AI 11
+    (100,  75),  # AI 12
+]
