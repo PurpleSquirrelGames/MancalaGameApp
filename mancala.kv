@@ -716,3 +716,27 @@ AppScreenManager:
                 outline_color: (0.97, 0.94, 0.58, 1)
                 pos_fixed: (root.PITS[14]['pos'][0]-85, root.UPPER_LABEL)
                 color: (0, 0, 0, 1)
+
+            FixedPopup:
+                id: progress_message_popup
+                active_pos_fixed: (330, 40)
+                size_fixed: (1260, 400)
+                Button:
+                    id: progress_message
+                    text: "xyz"
+                    font_size_fixed: 64
+                    active_pos_fixed: (330, 40)
+                    size_fixed: (1260, 400)
+            FixedPopup:
+                id: next_opponent_popup
+                active_pos_fixed: (1200, 400 + 40 - 100 - 50)
+                size_fixed: (300, 100)
+                Button:
+                    id: next_opponent_button
+                    active_pos_fixed: (1200, 400 + 40 - 100 - 50)
+                    size_fixed: (300, 100)
+                    color: (101/255.0, 244/255.0, 66/255.0, 1)
+                    background_normal: 'assets/img/blank-wood-button.png'
+                    font_size_fixed: 56
+                    text: "Play ?"
+                    on_release: app.upgrade_opponent()

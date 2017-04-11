@@ -1,6 +1,7 @@
 import thread
 import random
 import webbrowser
+import pprint
 from copy import copy
 from kivy.app import App
 from kivy.animation import Animation
@@ -26,6 +27,8 @@ from characters import AI_LIST
 from coordinates import PIT_ARRANGEMENT, SEED_DICT
 
 __version__ = '0.0.14'
+
+pp = pprint.PrettyPrinter(indent=4)
 
 machine = StateMachine(debug=True)
 
@@ -64,13 +67,14 @@ settings = {
     "seed_choice": 0,
     "notification_volume": 2,
     "seed_volume": 2,
-    "best_level": 0
+    "best_level": -1
 }
 
 current = {
     'ai_viewed': 0,
     'first_time_flag': False,
-    'allow_resume': False
+    'allow_resume': False,
+    'seed_sounds': {}
 }
 
 if storage.exists('settings'):
@@ -198,6 +202,7 @@ def update_setting(setting_name, value):
         color = ["green", "white"][settings["background"]]
         filename = 'assets/img/{}-board-{}.png'.format(wood, color)
         app.root.screens[GAME_SCREEN].ids.board_image.source = filename
+        set_current_sound_combo()
     if setting_name == "animation_speed_choice":
         settings["seed_drop_rate"] = 0.1 + value*0.3
         app.root.screens[SETTINGS_SCREEN_SCREEN].ids.screen_screen_menu.\
@@ -309,18 +314,18 @@ VOLS = [0.0, 0.25, 0.5, 1.0]
 
 PLAY_IDX = 4
 
-COMBO_LIST = {}
+SEED_SOUNDS = {}
 for board_num, board_str in enumerate(["walnut", "birch"]):
-    COMBO_LIST[board_num] = {}
+    SEED_SOUNDS[board_num] = {}
     for seed_num, seed_str in enumerate(["teal", "pebble", "black"]):
-        COMBO_LIST[board_num][seed_num] = {}
+        SEED_SOUNDS[board_num][seed_num] = {}
         #
         #  add sounds to COMBO LIST
         #
-        COMBO_LIST[board_num][seed_num][SOUND_FILE] = {}
+        SEED_SOUNDS[board_num][seed_num] = {}
         for qty_num, qty_str in enumerate(["1", "2", "many"]):
             qty = (qty_num+1) if qty_num<2 else MANY
-            COMBO_LIST[board_num][seed_num][SOUND_FILE][qty] = {}
+            SEED_SOUNDS[board_num][seed_num][qty] = {}
             for pit_type, pit_str in enumerate(["empty", "filled"]):
                 file_name = "assets/audio/{}-{}-{}-{}.wav".format(
                     board_str,
@@ -328,11 +333,7 @@ for board_num, board_str in enumerate(["walnut", "birch"]):
                     qty_str,
                     pit_str
                 )
-                COMBO_LIST[board_num][seed_num][SOUND_FILE][qty][pit_type] = []
-                for _ in range(PLAY_IDX):
-                    COMBO_LIST[board_num][seed_num][SOUND_FILE][qty][pit_type].\
-                        append(SoundLoader.load(file_name))
-                COMBO_LIST[board_num][seed_num][SOUND_FILE][qty][pit_type].append(0)
+                SEED_SOUNDS[board_num][seed_num][qty][pit_type] = file_name
 
 SCOOP_SOUND = {}
 for qty_num, qty_str in enumerate(["1", "2", "many"]):
@@ -343,14 +344,34 @@ for qty_num, qty_str in enumerate(["1", "2", "many"]):
         SCOOP_SOUND[qty].append(SoundLoader.load(file_name))
     SCOOP_SOUND[qty].append(0)                            
 
+def set_current_sound_combo():
+    global settings
+    global SEED_SOUNDS
+    global current
 
-done_sound = SoundLoader.load("assets/audio/ding-ai-done.wav")
+    sounds = current['seed_sounds']
+    ref = SEED_SOUNDS[settings['board_choice']][settings['seed_choice']]
+
+    for qty in [1, 2, MANY]:
+        sounds[qty] = {}
+        for pit_type in [0, 1]:
+            file_name = ref[qty][pit_type]
+            sounds[qty][pit_type] = []
+            for _ in range(PLAY_IDX):
+                sounds[qty][pit_type].append(SoundLoader.load(file_name))
+            sounds[qty][pit_type].append(0)
+
+
+set_current_sound_combo()
+
+# done_sound = SoundLoader.load("assets/audio/ding-ai-done.wav")
 waiting_for_player_sound = SoundLoader.load("assets/audio/tin-wait-for-player.wav")
 reward_sound = SoundLoader.load("assets/audio/tada-level-up.wav")
 
-def play_ai_done_sound():
-    done_sound.volume = VOLS[settings['notification_volume']]
-    done_sound.play()
+#   playing the ai_done_sound() causes a crash after a difficult AI level, I do not know why.
+# def play_ai_done_sound():
+#     done_sound.volume = VOLS[settings['notification_volume']]
+#     done_sound.play()
 
 def play_waiting_for_player():
     waiting_for_player_sound.volume = VOLS[settings['notification_volume']]
@@ -426,7 +447,7 @@ class SettingsOpponentScreen(Screen):
         self.ids.ai_name.text = c['name']
         self.ids.ai_rank.text = format("{} of 12").format(c['rank'])
         self.ids.ai_face_image.source = "assets/img/ai-pic-{:02d}.png".format(c['index'])
-        if ai_chosen > settings['best_level']:
+        if ai_chosen > (settings['best_level'] + 1):
             self.ids.choose_ai.background_normal = 'assets/img/invisible.png'
             self.ids.choose_ai.text = ""
             n = AI_LIST[settings['best_level']]
@@ -439,7 +460,7 @@ class SettingsOpponentScreen(Screen):
         elif ai_chosen==settings['ai_chosen']:
             self.ids.choose_msg.text = "You are currently playing this opponent."
             self.ids.choose_ai.background_normal = 'assets/img/blank-wood-button.png'
-            self.ids.choose_ai.text = ""
+            self.ids.choose_ai.text = "(current)"
         else:
             self.ids.choose_msg.text = ""
             self.ids.choose_ai.background_normal = 'assets/img/blank-wood-button.png'
@@ -450,7 +471,8 @@ class SettingsOpponentScreen(Screen):
         self._update_details(current['ai_viewed'])
 
     def choose_ai(self):
-        update_setting("ai_chosen", current['ai_viewed'])
+        if current['ai_viewed'] <= (settings['best_level'] + 1):
+            update_setting("ai_chosen", current['ai_viewed'])
 
     def next_ai(self):
         current['ai_viewed'] = (current['ai_viewed'] + 1) % 12
@@ -540,6 +562,10 @@ class MancalaApp(App):
         enable_resume_game()
         machine.input("request_new_game")
 
+    def upgrade_opponent(self):
+        global settings
+        update_setting("ai_chosen", settings['best_level'] + 1)
+        self.start_new_game()
 
 ##############################
 #
@@ -673,7 +699,7 @@ class Seeds(object):
         sf[current].play()
 
     def drop(self, pit, count):
-        global COMBO_LIST
+        global current
         global settings
         pit_type = FILLED_PIT if self.board[pit] else EMPTY_PIT
         for _ in range(count):
@@ -681,13 +707,11 @@ class Seeds(object):
             self.board[pit].append(seed)
             self._move(seed, pit)
         drop_size = count if count<3 else MANY
-        sf = COMBO_LIST[settings['board_choice']][settings['seed_choice']]
-        sf = sf[SOUND_FILE][drop_size]
-        sf = sf[pit_type]
+        sf = current['seed_sounds'][drop_size][pit_type]
         sf[PLAY_IDX] = (sf[PLAY_IDX] + 1) % PLAY_IDX
-        current = sf[PLAY_IDX]
-        sf[current].volume = VOLS[settings['seed_volume']]
-        sf[current].play()
+        i = sf[PLAY_IDX]
+        sf[i].volume = VOLS[settings['seed_volume']]
+        sf[i].play()
 
     def _move(self, seed, pit):
         pos_fixed = GameScreen.PITS[pit]['pos']
@@ -971,7 +995,7 @@ class AIThinkingState(State):
 
     def on_exit(self):
         animate_ai_end(self.ref["kivy"])
-        play_ai_done_sound()
+        # play_ai_done_sound()
         self.ref["kivy"].wait_on_ai.stop_spinning()
         self.ref['kivy'].spinner_background.active = False
 
@@ -994,17 +1018,40 @@ class AnimateAIChoicesState(State):
 class EndOfGameDisplayState(State):
 
     def on_entry(self):
+        global settings
+        global AI_LIST
+
         save_game()
         winner = self.ref['game'].get_winner()    
-        msg = ["Tie Game.", "You won!", "{} won.".format(character["name"])][game.get_winner()]
+        msg = ["Tie Game.", "You won!", "{} won.".format(character["name"])][winner]
         status_bar.say(msg, force_show=True)
         self.ref["kivy"].eog_new_game_button.active = True
-        play_reward_sound()
+        if winner==USER:
+            if settings['ai_chosen'] > settings['best_level']:
+                best_level = settings['ai_chosen']
+                update_setting('best_level', best_level)
+                n = AI_LIST[best_level]
+                m = AI_LIST[best_level + 1]
+                progress_message = "Congratulations!\n\n"
+                progress_message += "You have successfully defeated {}.\n".format(n['name'])
+                if best_level < 11:
+                    progress_message += "You can now play {}, a smarter opponent.".format(m['name'])
+                    self.ref["kivy"].next_opponent_popup.active = True
+                    self.ref["kivy"].next_opponent_button.text = "Play {}".format(m['name'])
+                else:
+                    progress_message += "You have won the game!\n"
+                    progress_message += "For more challenge, let the opponent go first."
+                self.ref["kivy"].progress_message_popup.active = True
+                self.ref["kivy"].progress_message.text = progress_message
+                play_reward_sound()
 
     def input(self, input_name, *args, **kwargs):
         if input_name == "request_new_game":
             self.change_state("init_game")
 
+    def on_exit(self):
+        self.ref["kivy"].next_opponent_popup.active = False
+        self.ref["kivy"].progress_message_popup.active = False
 
 if __name__=='__main__':
     game = KalahGame(settings)
