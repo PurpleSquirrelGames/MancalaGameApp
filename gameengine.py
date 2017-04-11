@@ -330,18 +330,36 @@ class KalahGame(easyAI.TwoPlayersGame):
         print "          01   02   03   04   05   06      USER"
 
     def scoring(self, player=None):
-        s = self.strategic_scoring(self.nplayer, self.nopponent)
         if self.is_over():
+            s = self.strategic_scoring(self.nplayer, self.nopponent)
             if s > 0:
                 t = 9000
             else:
                 t = -9000
         else:
+            if self.character['fitness'] == "caution":
+                s = self.caution_scoring(player)
+            elif self.character['fitness'] == "greed":
+                s = self.greed_scoring(player)
+            else:
+                s = self.strategic_scoring(self.nplayer, self.nopponent)
             t = self.tactical_scoring(self.nplayer, self.nopponent)
         return s + t
 
     def strategic_scoring(self, player, opponent):
         raw_score = self.board[STORE_IDX[player]] - self.board[STORE_IDX[opponent]]
+        return raw_score * 1000
+
+    def caution_scoring(self, player):
+        raw_score = self.board[STORE_IDX[USER]]
+        if self.player==AI:
+            raw_score *= -1
+        return raw_score * 1000
+
+    def greed_scoring(self, player):
+        raw_score = self.board[STORE_IDX[AI]]
+        if self.player==USER:
+            raw_score *= -1
         return raw_score * 1000
 
     def tactical_scoring(self, player, opponent):
@@ -355,6 +373,9 @@ class KalahGame(easyAI.TwoPlayersGame):
         '''
         # leaving empty pits on own side
         if True: self.trace = []
+        if self.character['tactics'] == "blind":
+            if True: self.trace.append("+0 BLIND TACTICS")
+            return 0
         tactics = self.players[player - 1].get_tactics()
         if not tactics:
             return 0
@@ -482,7 +503,7 @@ class KalahGame(easyAI.TwoPlayersGame):
 
 if __name__=="__main__":
     settings = {
-        "ai_chosen": 11,
+        "ai_chosen": 4,
         "who_plays_first": 0,
         "first_player": USER,
         "seeds_per_house_selection": 1,

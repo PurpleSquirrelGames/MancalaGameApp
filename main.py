@@ -74,7 +74,8 @@ current = {
     'ai_viewed': 0,
     'first_time_flag': False,
     'allow_resume': False,
-    'seed_sounds': {}
+    'seed_sounds': {},
+    'cheat': False
 }
 
 if storage.exists('settings'):
@@ -430,6 +431,8 @@ class GameScreen(Screen):
         global status_bar
         status_bar.toggle_hide()
 
+cheat_spin = []
+
 class SettingsOpponentScreen(Screen):
 
     global settings
@@ -450,9 +453,9 @@ class SettingsOpponentScreen(Screen):
         if ai_chosen > (settings['best_level'] + 1):
             self.ids.choose_ai.background_normal = 'assets/img/invisible.png'
             self.ids.choose_ai.text = ""
-            n = AI_LIST[settings['best_level']]
-            msg = "You must first defeat {} ({}) ".format(n['name'], settings['best_level'] + 1)
-            if ai_chosen > settings['best_level'] + 1:
+            n = AI_LIST[settings['best_level'] + 1]
+            msg = "You must first defeat {} ({}) ".format(n['name'], settings['best_level'] + 2)
+            if ai_chosen > settings['best_level'] + 2:
                 m = AI_LIST[ai_chosen - 1]
                 msg += "through {} ({}) ".format(m['name'], ai_chosen)
             # msg += "to play {}.".format(c['name'])
@@ -467,16 +470,31 @@ class SettingsOpponentScreen(Screen):
             self.ids.choose_ai.text = "Choose"
 
     def previous_ai(self):
+        global cheat_spin
         current['ai_viewed'] = (current['ai_viewed'] - 1) % 12
         self._update_details(current['ai_viewed'])
+        if cheat_spin and cheat_spin[-1]==">":
+            cheat_spin.append("<")
+        else:
+            cheat_spin = []
 
     def choose_ai(self):
-        if current['ai_viewed'] <= (settings['best_level'] + 1):
+        global settings
+        global current
+        global cheat_spin
+        if cheat_spin==[">", ">", ">", "<", ">", ">", ">", "<"]:
+            current['cheat'] = True
+            self.ids.choose_ai.text = "cheat"
+        cheat_spin = []
+        if (current['ai_viewed'] <= (settings['best_level'] + 1)) or current['cheat']:
             update_setting("ai_chosen", current['ai_viewed'])
 
     def next_ai(self):
+        global cheat_spin
         current['ai_viewed'] = (current['ai_viewed'] + 1) % 12
         self._update_details(current['ai_viewed'])
+        cheat_spin.append(">")
+
 
     def launch_url(self):
         webbrowser.open('https://www.youtube.com/watch?v=iSJk6CYsf6c')
@@ -1026,15 +1044,17 @@ class EndOfGameDisplayState(State):
         msg = ["Tie Game.", "You won!", "{} won.".format(character["name"])][winner]
         status_bar.say(msg, force_show=True)
         self.ref["kivy"].eog_new_game_button.active = True
-        if winner==USER:
+        if (winner==USER) or current['cheat']:
             if settings['ai_chosen'] > settings['best_level']:
                 best_level = settings['ai_chosen']
                 update_setting('best_level', best_level)
                 n = AI_LIST[best_level]
-                m = AI_LIST[best_level + 1]
                 progress_message = "Congratulations!\n\n"
+                if winner==AI:
+                    progress_message = "Congratulations cheater!\n\n"
                 progress_message += "You have successfully defeated {}.\n".format(n['name'])
                 if best_level < 11:
+                    m = AI_LIST[best_level + 1]
                     progress_message += "You can now play {}, a smarter opponent.".format(m['name'])
                     self.ref["kivy"].next_opponent_popup.active = True
                     self.ref["kivy"].next_opponent_button.text = "Play {}".format(m['name'])

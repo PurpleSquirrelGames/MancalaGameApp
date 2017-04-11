@@ -101,12 +101,17 @@ class FixedLayout(FloatLayout, FixedProperties):
         update = self._trigger_layout
         fbind('size', update)
         fbind('pos', update)
+        Window.fullscreen = 'auto'
         self.calc_scale_to_window()
+
 
     def calc_scale_to_window(self, *args, **kwargs):
         # the goal here, is to figure out the percentage per-pixel to map
         #    pos_fixed or size_fixed into pos_hint and size_hint
-        self.window_width, self.window_height = self.size
+        # self.window_width, self.window_height = self.size
+        self.window_width = Window.width
+        self.window_height = Window.height
+        print "SIZE", self.window_width, self.window_height
         wh = float(self.window_height)
         ww = float(self.window_width)
         sh = float(self.fixed_screen_size[HEIGHT])

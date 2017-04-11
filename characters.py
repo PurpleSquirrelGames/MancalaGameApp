@@ -1,13 +1,10 @@
-from tactics import Tactics
-
-
 AI_LIST = [
     {
         "index": 1,
         "name": "Maisy",
         "rank": "1",
         "strategy": "random",  # options: "random", "negamax"
-        "tactics": Tactics(),
+        "tactics": "blind", # options: "blind", "standard"
         "lookahead": 1,  # 1 to 6
         "error_rate": 1.00,  # 0.0 to 1.0; odds of making mistake
         "fitness": "greed", # options: greed, caution, balance
@@ -19,7 +16,7 @@ AI_LIST = [
         "name": "Billy",
         "rank": "2",
         "strategy": "negamax",  # options: "random", "negamax"
-        "tactics": Tactics(),
+        "tactics": "blind",
         "lookahead": 1,  # 1 to 6
         "error_rate": 0.20,  # 0.0 to 1.0; odds of making mistake
         "fitness": "balance", # options: greed, caution, balance
@@ -31,9 +28,9 @@ AI_LIST = [
         "name": "Emily",
         "rank": "3",
         "strategy": "negamax",  # options: "random", "negamax"
-        "tactics": Tactics(),
+        "tactics": "standard",
         "lookahead": 1,  # 1 to 6
-        "error_rate": 0.00,  # 0.0 to 1.0; odds of making mistake
+        "error_rate": 0.10,  # 0.0 to 1.0; odds of making mistake
         "fitness": "balance", # options: greed, caution, balance
         "desc": "Emily is still a novice, but has played multiple times.",
         "tagline": "Blunt errors are rare, but still easy to win against."
@@ -43,9 +40,9 @@ AI_LIST = [
         "name": "Jacob",
         "rank": "4",
         "strategy": "negamax",  # options: "random", "negamax"
-        "tactics": Tactics(),
+        "tactics": "standard",
         "lookahead": 2,  # 1 to 6
-        "error_rate": 0.02,  # 0.0 to 1.0; odds of making mistake
+        "error_rate": 0.05,  # 0.0 to 1.0; odds of making mistake
         "fitness": "balance", # options: greed, caution, balance
         "desc": "Jacob plays on occasion with friends.",
         "tagline": "Jacob plays okay. Moderate difficulty."
@@ -55,8 +52,8 @@ AI_LIST = [
         "name": "Emma",
         "rank": "5",
         "strategy": "negamax",  # options: "random", "negamax"
-        "tactics": Tactics(),
-        "lookahead": 3,  # 1 to 6
+        "tactics": "standard",
+        "lookahead": 2,  # 1 to 6
         "error_rate": 0.00,  # 0.0 to 1.0; odds of making mistake
         "fitness": "greed", # options: greed, caution, balance
         "desc": "Emma is determined to win, even if she does not play much.",
@@ -67,7 +64,7 @@ AI_LIST = [
         "name": "Matthew",
         "rank": "6",
         "strategy": "negamax",  # options: "random", "negamax"
-        "tactics": Tactics(),
+        "tactics": "standard",
         "lookahead": 3,  # 1 to 6
         "error_rate": 0.00,  # 0.0 to 1.0; odds of making mistake
         "fitness": "caution", # options: greed, caution, balance
@@ -79,33 +76,33 @@ AI_LIST = [
         "name": "Olivia",
         "rank": "7",
         "strategy": "negamax",  # options: "random", "negamax"
-        "tactics": Tactics(),
-        "lookahead": 4,  # 1 to 6
-        "error_rate": 0.00,  # 0.0 to 1.0; odds of making mistake
+        "tactics": "standard",
+        "lookahead": 3,  # 1 to 6
+        "error_rate": 0.05,  # 0.0 to 1.0; odds of making mistake
         "fitness": "balance", # options: greed, caution, balance
         "desc": "Olivia plays regularly but doesn't consider herself a gamer.",
-        "tagline": "A well-rounded player. Moderate/High difficulty."
+        "tagline": "A well-rounded player. Moderate difficulty."
     },
     {
         "index": 8,
         "name": "William",
         "rank": "8",
         "strategy": "negamax",  # options: "random", "negamax"
-        "tactics": Tactics(),
+        "tactics": "standard",
         "lookahead": 4,  # 1 to 6
         "error_rate": 0.03,  # 0.0 to 1.0; odds of making mistake
         "fitness": "greed", # options: greed, caution, balance
         "desc": "William loves to gamble and win big.",
-        "tagline": "Smart but concentrates on his own store too much. Moderate/High difficulty."
+        "tagline": "Smart but concentrates on his own store too much. Moderate difficulty."
     },
     {
         "index": 9,
         "name": "Sam",
         "rank": "9",
         "strategy": "negamax",  # options: "random", "negamax"
-        "tactics": Tactics(),
-        "lookahead": 5,  # 1 to 6
-        "error_rate": 0.03,  # 0.0 to 1.0; odds of making mistake
+        "tactics": "standard",
+        "lookahead": 4,  # 1 to 6
+        "error_rate": 0.00,  # 0.0 to 1.0; odds of making mistake
         "fitness": "caution", # options: greed, caution, balance
         "desc": "Sam plays a good game.",
         "tagline": "Too cautious, but a solid player. High difficulty."
@@ -115,8 +112,8 @@ AI_LIST = [
         "name": "Sandra",
         "rank": "10",
         "strategy": "negamax",  # options: "random", "negamax"
-        "tactics": Tactics(),
-        "lookahead": 6,  # 1 to 6
+        "tactics": "standard",
+        "lookahead": 5,  # 1 to 6
         "error_rate": 0.01,  # 0.0 to 1.0; odds of making mistake
         "fitness": "balance", # options: greed, caution, balance
         "desc": "Sandra is very good. Plays regularly.",
@@ -127,10 +124,10 @@ AI_LIST = [
         "name": "R3 UNIT",
         "rank": "11",
         "strategy": "negamax",  # options: "random", "negamax"
-        "tactics": Tactics(),
+        "tactics": "standard",
         "lookahead": 6,  # 1 to 6
         "error_rate": 0.00,  # 0.0 to 1.0; odds of making mistake
-        "fitness": "greed", # options: greed, caution, balance
+        "fitness": "balance", # options: greed, caution, balance
         "desc": "An arrogant artificial intelligence.",
         "tagline": "Looks ahead 6 moves, but basically good. High difficulty."
     },
@@ -139,10 +136,10 @@ AI_LIST = [
         "name": "ThoughtNet",
         "rank": "12",
         "strategy": "negamax",  # options: "random", "negamax"
-        "tactics": Tactics(),
+        "tactics": "standard",
         "lookahead": 7,  # 1 to 6
         "error_rate": 0.00,  # 0.0 to 1.0; odds of making mistake
-        "fitness": "greed", # options: greed, caution, balance
+        "fitness": "balance", # options: greed, caution, balance
         "desc": "A deep artificial intelligence. ThoughtNet finds interacting with humans pleasing.\nNOTE: on some devices, ThoughtNet is very slow.",
         "tagline": "Very high difficulty. Still possible to win if you go first."
     },
