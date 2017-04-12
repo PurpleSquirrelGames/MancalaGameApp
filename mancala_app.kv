@@ -4,6 +4,7 @@
 #:import character __main__.character
 #:import update_setting __main__.update_setting
 #:import visual_settings __main__.visual_settings
+#:import OUA fixedlayout.OUA
 
 AppScreenManager:
     transition: NoTransition()
@@ -524,8 +525,8 @@ AppScreenManager:
         Image:
             id: board_image
             source: 'assets/img/walnut-board-green.png'
-            pos_hint: {'x': -0.5*(2400-1920)/1920.0, 'y': -0.5*(2400-1080)/1080.0}
-            size_hint: (2400/1920.0, 2400/1080.0)
+            pos: (-(2400-1920)/2, -(2400-1080)/2)
+            size: (2400, 2400)
         FixedLayout:
             id: game_screen_root
             Button:
