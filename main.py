@@ -12,8 +12,8 @@ from kivy.lang import Builder
 from kivy.storage.jsonstore import JsonStore
 from kivy.uix.image import Image
 from kivy.uix.screenmanager import ScreenManager, Screen, NoTransition
-
 from kivy.uix.floatlayout import FloatLayout
+from kivy.utils import platform
 
 from fixedlayout import FixedLayout, FixedPopup, FixedRadioButtons, \
     FixedSimpleMenu, FixedSimpleMenuItem
@@ -23,7 +23,13 @@ from gameengine import KalahGame
 from characters import AI_LIST
 from coordinates import PIT_ARRANGEMENT, SEED_DICT, HAND_FOCUS
 
-__version__ = '0.0.14'
+if platform=="android":
+    import runnable
+    BGSIZE = 2400
+else:
+    BGSIZE = 2400
+
+__version__ = '0.0.16'
 
 pp = pprint.PrettyPrinter(indent=4)
 
@@ -548,7 +554,7 @@ class MancalaApp(App):
     global current
 
     def build(self):
-        presentation = Builder.load_file('mancala.kv')
+        presentation = Builder.load_file('mancala_app.kv')
         return presentation
 
     def on_start(self):
@@ -1134,4 +1140,7 @@ if __name__ == '__main__':
     machine.register_state(EndOfGameDisplayState("eog"))
     machine.start("pending_start")
     app = MancalaApp()
+    Window.fullscreen = 'auto'
+    if platform=="android":
+        runnable.set_fullscreen()
     app.run()

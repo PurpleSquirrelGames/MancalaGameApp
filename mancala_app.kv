@@ -4,7 +4,7 @@
 #:import character __main__.character
 #:import update_setting __main__.update_setting
 #:import visual_settings __main__.visual_settings
-#:import OUA fixedlayout.OUA
+#:import BGSIZE __main__.BGSIZE
 
 AppScreenManager:
     transition: NoTransition()
@@ -522,13 +522,14 @@ AppScreenManager:
 <GameScreen>
     name: "game_screen"
     FloatLayout:
-        Image:
-            id: board_image
-            source: 'assets/img/walnut-board-green.png'
-            pos: (-(2400-1920)/2, -(2400-1080)/2)
-            size: (2400, 2400)
         FixedLayout:
             id: game_screen_root
+            Image:
+                id: board_image
+                source: 'assets/img/walnut-board-green.png'
+                pos_fixed: (0, 0)
+                spot_fixed: ((BGSIZE - 1920)/2, (BGSIZE - 1080)/2)
+                size_fixed: (BGSIZE, BGSIZE)
             Button:
                 id: settings_button
                 background_normal: 'assets/img/gear.png'

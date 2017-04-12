@@ -101,7 +101,6 @@ class FixedLayout(FloatLayout, FixedProperties):
         update = self._trigger_layout
         fbind('size', update)
         fbind('pos', update)
-        Window.fullscreen = 'auto'
         self.calc_scale_to_window()
 
 
@@ -111,7 +110,7 @@ class FixedLayout(FloatLayout, FixedProperties):
         # self.window_width, self.window_height = self.size
         self.window_width = Window.width
         self.window_height = Window.height
-        print "SIZE", self.window_width, self.window_height
+        # print "SIZE", self.window_width, self.window_height
         wh = float(self.window_height)
         ww = float(self.window_width)
         sh = float(self.fixed_screen_size[HEIGHT])
