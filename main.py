@@ -205,9 +205,11 @@ def update_setting(setting_name, value):
             set_text(setting_name, visual_settings[setting_name][value])
     if setting_name in ["board_choice", "background"]:
         wood = ["walnut", "birch"][settings["board_choice"]]
-        color = ["green", "white"][settings["background"]]
-        filename = 'assets/img/{}-board-{}.png'.format(wood, color)
+        filename = 'assets/img/{}-board.png'.format(wood)
         app.root.screens[GAME_SCREEN].ids.board_image.source = filename
+        color = ["green", "white"][settings["background"]]
+        filename = 'assets/img/{}-background.png'.format(color)
+        app.root.screens[GAME_SCREEN].ids.game_background.source = filename
         set_current_sound_combo()
     if setting_name == "animation_speed_choice":
         settings["seed_drop_rate"] = 0.1 + value * 0.3

@@ -525,11 +525,16 @@ AppScreenManager:
         FixedLayout:
             id: game_screen_root
             Image:
-                id: board_image
-                source: 'assets/img/walnut-board-green.png'
+                id: game_background
+                source: 'assets/img/green-background.png'
                 pos_fixed: (0, 0)
                 spot_fixed: ((BGSIZE - 1920)/2, (BGSIZE - 1080)/2)
                 size_fixed: (BGSIZE, BGSIZE)
+            Image:
+                id: board_image
+                source: 'assets/img/walnut-board.png'
+                pos_fixed: (1, 1080 - 800 - 160)
+                size_fixed: (1918, 798)
             Button:
                 id: settings_button
                 background_normal: 'assets/img/gear.png'
