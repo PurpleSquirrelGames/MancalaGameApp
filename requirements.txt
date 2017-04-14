@@ -2,15 +2,15 @@ appdirs==1.4.0
 buildozer==0.32
 Cython==0.23
 docutils==0.13.1
-#easyAI==0.0.0.5
-Kivy==1.9.2.dev0
+jnius==1.1.0
+# pip install git+https://github.com/kivy/kivy.git@master
+# Kivy==1.9.2.dev0
 Kivy-Garden==0.1.4
 packaging==16.8
 pexpect==4.2.1
 ptyprocess==0.5.1
 Pygments==2.2.0
-pyparsing==2.1.10
+pyparsing==2.2.0
 requests==2.13.0
 six==1.10.0
 virtualenv==15.1.0
-jnius==1.1.0

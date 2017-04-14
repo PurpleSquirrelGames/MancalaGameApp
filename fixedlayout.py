@@ -68,7 +68,8 @@ class FixedProperties(object):
         #
         if not hasattr(widget, "active_pos_fixed"):
             widget.apply_property(active_pos_fixed=ObjectProperty((0, 0)))
-
+        # we force stretching to True
+        widget.allow_stretch = True
 
 class FixedBase(FixedProperties):
 

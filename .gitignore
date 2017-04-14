@@ -95,3 +95,11 @@ mancala.json
 # assembly files
 .buildozer
 bin/
+
+# proprietary files
+_source_work/marketing
+assets/img/icon.png
+assets/img/pre-splash.png
+
+# temp library changes
+easyAI/

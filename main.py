@@ -1,7 +1,6 @@
 import thread
 import random
 import webbrowser
-import pprint
 from copy import copy
 from kivy.app import App
 from kivy.animation import Animation
@@ -23,15 +22,7 @@ from gameengine import KalahGame
 from characters import AI_LIST
 from coordinates import PIT_ARRANGEMENT, SEED_DICT, HAND_FOCUS
 
-if platform=="android":
-    import runnable
-    BGSIZE = 2400
-else:
-    BGSIZE = 2400
-
-__version__ = '0.0.16'
-
-pp = pprint.PrettyPrinter(indent=4)
+__version__ = u"0.0.17"
 
 machine = StateMachine(debug=True)
 
