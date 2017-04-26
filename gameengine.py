@@ -3,6 +3,7 @@ from easyAI.AI.DictTT import DictTT
 from easyAI import TT
 from copy import copy
 import random
+from operator import itemgetter
 from characters import AI_LIST
 from tactics import Tactics
 
@@ -177,10 +178,16 @@ class KalahGame(easyAI.TwoPlayersGame):
         for index in range(len(self.board)):
             self.board[index] = entry_tuple[index]
 
-    def possible_moves(self):
+    def possible_moves(self, sorting=False):
         move_list = [[pit] for pit in self.possible_moves_choices()]
         completed_list = []
-        self.recurse_moves(move_list, completed_list)
+        if sorting:
+            self.recurse_moves_sorting(move_list, completed_list)
+            # completed_list is now a list of tuples; sort and remove scoring
+            sorted_list = sorted(completed_list, key=itemgetter(0), reverse=True)
+            completed_list = [move for (score, move) in sorted_list]
+        else:
+            self.recurse_moves(move_list, completed_list)
         return completed_list
 
     def recurse_moves(self, move_list, completed_list):
@@ -200,6 +207,27 @@ class KalahGame(easyAI.TwoPlayersGame):
                 self.board = board_copy
             else:
                 completed_list.append(move)
+
+    def recurse_moves_sorting(self, move_list, completed_list):
+        for move in move_list:
+            board_copy = copy(self.board)
+            last_pit = move[-1]
+            last_pit_flag = self.is_stopping_in_own_store(last_pit)
+            self.make_move_choice(last_pit)
+            if last_pit_flag:
+                more_choices = self.possible_moves_choices()
+                if more_choices:
+                    next_todo = []
+                    for pit in more_choices:
+                        next_todo.append(move + [pit])
+                    self.recurse_moves_sorting(next_todo, completed_list)
+                else:
+                    score = self.tactical_scoring(self.nplayer, self.nopponent)
+                    completed_list.append((score, move))
+            else:
+                score = self.tactical_scoring(self.nplayer, self.nopponent)
+                completed_list.append((score, move))
+            self.board = board_copy
 
     def possible_moves_choices(self):
         possible = []
@@ -503,9 +531,9 @@ class KalahGame(easyAI.TwoPlayersGame):
 
 if __name__=="__main__":
     settings = {
-        "ai_chosen": 4,
-        "who_plays_first": 0,
-        "first_player": USER,
+        "ai_chosen": 11,
+        "who_plays_first": 1,
+        "first_player": AI,
         "seeds_per_house_selection": 1,
         "seeds_per_house": 4,
         "capture_rule": 0,
@@ -517,23 +545,41 @@ if __name__=="__main__":
     game = KalahGame(settings)
     game.reset_board()
 
-    while not game.is_over():
-        # print game.animate
-        game.show(full=True)
-        if game.nplayer==USER:
-            poss = game.possible_moves()
-            for index, move in enumerate(poss):
-                print index, move
-            index = int(input("enter move:"))
-            move = poss[index]
-        else:
-            move = game.get_move()
-            print "AI plays", move
-        game.play_move(move)
-    print
-    print "GAME OVER!"
-    print
-    print game.show()
-    print
-    print "RESULT:", ["TIE", "USER WON", "AI WON"][game.get_winner()]
+    one_play_test = True
+
+    if one_play_test:
+        # reference:
+        #
+        # time python gameengine.py
+        # One move test
+        # POSS MOVES [[8], [9], [10, 8], [10, 9], [10, 11], [10, 12], [10, 13], [11], [12], [13]]
+        # AI plays [10, 13]
+
+        # real    0m1.990s
+        # user    0m1.980s
+        # sys 0m0.008s
+        print "One move test"
+        print "POSS MOVES", game.possible_moves()
+        move = game.get_move()
+        print "AI plays", move
+    else:
+        while not game.is_over():
+            # print game.animate
+            game.show(full=True)
+            if game.nplayer==USER:
+                poss = game.possible_moves()
+                for index, move in enumerate(poss):
+                    print index, move
+                index = int(input("enter move:"))
+                move = poss[index]
+            else:
+                move = game.get_move()
+                print "AI plays", move
+            game.play_move(move)
+        print
+        print "GAME OVER!"
+        print
+        print game.show()
+        print
+        print "RESULT:", ["TIE", "USER WON", "AI WON"][game.get_winner()]
 
