@@ -65,7 +65,7 @@ COMBOS.append([4, 3, 5, 6])  # doing 4 first to help with early analysis
 #
 #     (6) LOOKING 1, 2, 3, 4, 5, or 6 TURNS AHEAD
 # COMBOS.append([1, 2, 3, 4, 5, 6])
-COMBOS.append([1, 2, 3, 4])
+COMBOS.append([2, 3, 4])
 #
 #     (3) CAPTURE RULE VARIATIONS
 COMBOS.append([0, 1, 2])
@@ -83,15 +83,15 @@ SCENARIOS, FILENAMES = build_scenario_tuples(COMBOS)
 #
 #  DO 10 "islands" of independent evolution;
 #     then later run all of them together for 20 more generations
-ISLAND_QTY = 3  # 10
+ISLAND_QTY = 10  # 10
 #
 #  RUN 100 generations for each island
 GENERATION_QTY = 40  # 100
 #  HAVE 50 genomes start each generation
-POPULATION_SIZE = 12  # 50
+POPULATION_SIZE = 10  # 50
 #  EACH genome engages each of the other genomes in the "attacker" role
 #     EACH engagement is N plays, the final scores are tallied for fitness
-PLAYS_PER_ENGAGEMENT = 1
+PLAYS_PER_ENGAGEMENT = 5
 #     WHEN a genome is in the defender role; it COULD have a % chance of wrong move
 #        per round of play to mimic diversity, however it currently does not
 #  AFTER ALL engagements are finished, extinct the bottom 60%
@@ -118,7 +118,7 @@ GENE_MAP_SIZE = len(GENE_MAP)
 PROTO_GENOME = {
     'id': 0,
     'score': -1000000,  # negative 1 million is below all possible scores
-    'genes': [1] * len(GENE_MAP),
+    'genes': [0] * len(GENE_MAP),
     'life_span': 0,
     'parent_qty': 0
 }
@@ -148,7 +148,7 @@ ID_CTR = 1
 
 
 settings = {
-    "ai_chosen": 0,
+    "ai_chosen": 1,
     "who_plays_first": 1,
     "first_player": 2,  # use inverse because we are from AI point of view
     "seeds_per_house_selection": 1,
@@ -162,39 +162,39 @@ settings = {
 ALT_AI_LIST = [
     {
         "index": 1,
-        "name": "Attacker",
+        "name": "USER ROLE",
         "rank": "1",
         "strategy": "negamax",  # options: "random", "negamax"
-        "lookahead": 1,  # 1 to 6
-        "error_rate": 0.0,  # 0.0 to 1.0; odds of making mistake
+        "lookahead": 4,  # 1 to 6
+        "error_rate": 0.05,  # 0.0 to 1.0; odds of making mistake
         "fitness": "balance",  # options: greed, caution, balance
         "desc": "test genome",
         "tagline": "",
-        "tactics": Tactics()
+        "tactics": "standard"
     },
     {
         "index": 2,
-        "name": "Defender",
+        "name": "AI ROLE",
         "rank": "1",
         "strategy": "negamax",  # options: "random", "negamax"
-        "lookahead": 3,  # 1 to 6
+        "lookahead": 4,  # 1 to 6
         "error_rate": 0.00,  # 0.0 to 1.0; odds of making mistake
         "fitness": "balance",  # options: greed, caution, balance
         "desc": "test genome defender",
         "tagline": "",
-        "tactics": Tactics()
+        "tactics": "standard"
     },
 ]
 
-game = gameengine.KalahGame(settings, testing=ALT_AI_LIST, verbose=False)
 
+game = None
 
 def play_engagement():
     score = 0
     for round in range(PLAYS_PER_ENGAGEMENT):
         game.reset_board()
         game.play(verbose=False)
-        result = game.strategic_scoring(1, 2)
+        result = game.strategic_scoring(2, 1) # we are scoring from AI perspective
         score += result
     final_score = score / PLAYS_PER_ENGAGEMENT
     return final_score
@@ -218,17 +218,14 @@ def do_reproduction(genome_list):
     for _ in range(missing):
         parent = random.choice(genome_list)
         new_genome = deepcopy(parent)
-        qty_changes = random.randint(1, 5)
+        qty_changes = random.randint(1, 10)
         for _ in range(qty_changes):
             action = random.randint(1, 3)
             gene_select = random.randint(1, GENE_MAP_SIZE) - 1
             gene_type = GENE_MAP[gene_select][0]
             if action==1:
                 # minor adjustment
-                if new_genome['genes'][gene_select] == 0:
-                    degree = random.choice([1, 2])
-                else:
-                    degree = random.choice([-1, 1])
+                degree = random.choice([-1, 1])
                 new_genome['genes'][gene_select] += degree
             elif action==2:
                 # major adjustment
@@ -237,8 +234,6 @@ def do_reproduction(genome_list):
                 else:
                     degree = random.randint(-2000, 2000)
                 new_genome['genes'][gene_select] += degree
-                if new_genome['genes'][gene_select] < 0:
-                    new_genome['genes'][gene_select] = 0
             elif action==3:
                 # swap genes
                 life_partner = random.choice(genome_list)
@@ -252,31 +247,29 @@ def do_reproduction(genome_list):
     return
 
 def do_trials(genome_list):
-    opp_qty = len(genome_list) - 1
+    # opp_qty = len(genome_list) - 1
+    opp_qty = 4
     for me, genome in enumerate(genome_list):
-        apply_genome(game.players[0], genome)
+        apply_genome(game.players[1], genome) # always apply to AI 
         print me, "GENOME", genome['id'], "ANCESTORS", genome["parent_qty"],
         print "LIFESPAN", genome['life_span'], "OLD_SCORE",
         if genome['score'] == -1000000:
             print "None"
         else:
             print genome['score']
-        total = 0
-        for other, opponent in enumerate(genome_list):
-            if me!=other:
-                apply_genome(game.players[1], opponent)
-                total += play_engagement()
-        genome['score'] = int(total / opp_qty)
+        print "    CURRENT:", genome['genes']
+        genome['score'] = play_engagement()
         print "    SCORE", genome['score']
     return
 
 def apply_genome(character, genome):
     t = character.get_tactics()
     build_tactics_from_list(t, genome['genes'])
+    character.set_character()
     return
 
 def do_sort(genome_list):
-    new_list = sorted(genome_list, key=itemgetter('score'), reverse=True)    
+    new_list = sorted(genome_list, key=itemgetter('score'), reverse=True)
     return new_list
 
 
@@ -298,8 +291,13 @@ if __name__=="__main__":
         filename = FILENAMES[si]
         print "FILE:", filename
         if os.path.exists(filename):
-            print "    ALREADY EXISTS"
+            print "    FILE ALREADY BUILT"
             continue
+        if os.path.exists(filename+".lock"):
+            print "    FILE ALREADY BEING WORKED ON"
+            continue
+        with open(filename+".lock", 'w') as outfile:
+            outfile.write("lock")
         #-----------
         #
         #  SETUP SCENARIO
@@ -314,13 +312,13 @@ if __name__=="__main__":
             short += "AI FIRST  :"
         settings['seeds_per_house'] = b
         short += "SEEDS"+str(b)+":"
-        ALT_AI_LIST[0]['lookahead'] = c
         ALT_AI_LIST[1]['lookahead'] = c
         short += "LOOK"+str(c)+":"
         settings["capture_rule"] = d
         short += "CAPTURE"+str(d)+":"
         settings["eog_rule"] = e
         short += "EOG"+str(e)
+        game = gameengine.KalahGame(settings, testing=ALT_AI_LIST, verbose=False)
         #---------------------
         #
         # islands
@@ -368,3 +366,4 @@ if __name__=="__main__":
         print "WRITING", filename
         with open(filename, 'w') as outfile:
             json.dump(winner, outfile)
+        os.remove(filename+".lock")

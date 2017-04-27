@@ -51,14 +51,14 @@ P = {
      4: {OWNER: USER, NEXT: {USER:  5, AI:  5}, ROLE: HOUSE, OPP: 10, DISTPIT: {USER:  3, AI:  9}},
      5: {OWNER: USER, NEXT: {USER:  6, AI:  6}, ROLE: HOUSE, OPP:  9, DISTPIT: {USER:  2, AI:  8}},
      6: {OWNER: USER, NEXT: {USER:  7, AI:  8}, ROLE: HOUSE, OPP:  8, DISTPIT: {USER:  1, AI:  7}},
-     7: {OWNER: USER, NEXT: {USER:  8, AI:  8}, ROLE: STORE, OPP: -1, DISTPIT: None},
+     7: {OWNER: USER, NEXT: {USER:  8, AI:  8}, ROLE: STORE, OPP:  0, DISTPIT: None},
      8: {OWNER: AI  , NEXT: {USER:  9, AI:  9}, ROLE: HOUSE, OPP:  6, DISTPIT: {USER: 12, AI:  6}},
      9: {OWNER: AI  , NEXT: {USER: 10, AI: 10}, ROLE: HOUSE, OPP:  5, DISTPIT: {USER: 11, AI:  5}},
     10: {OWNER: AI  , NEXT: {USER: 11, AI: 11}, ROLE: HOUSE, OPP:  4, DISTPIT: {USER: 10, AI:  4}},
     11: {OWNER: AI  , NEXT: {USER: 12, AI: 12}, ROLE: HOUSE, OPP:  3, DISTPIT: {USER:  9, AI:  3}},
     12: {OWNER: AI  , NEXT: {USER: 13, AI: 13}, ROLE: HOUSE, OPP:  2, DISTPIT: {USER:  8, AI:  2}},
     13: {OWNER: AI  , NEXT: {USER:  1, AI: 14}, ROLE: HOUSE, OPP:  1, DISTPIT: {USER:  7, AI:  1}},
-    14: {OWNER: AI  , NEXT: {USER:  1, AI:  1}, ROLE: STORE, OPP: -1, DISTPIT: None},
+    14: {OWNER: AI  , NEXT: {USER:  1, AI:  1}, ROLE: STORE, OPP:  0, DISTPIT: None},
 }
 ALL_PITS = range(1, 15)
 
@@ -82,6 +82,7 @@ FULL = 1
 INF = float("inf")
 
 class MancalaAI(easyAI.NonRecursiveNegamax, object):
+# class MancalaAI(easyAI.Negamax, object):
 
     def __init__(self, settings, testing=False, tt=None, defender_role=False):
         self.settings = settings
@@ -99,9 +100,9 @@ class MancalaAI(easyAI.NonRecursiveNegamax, object):
                 self.character = self.testing[0]
         else:
             self.character = AI_LIST[self.settings["ai_chosen"]]
-        self.depth = self.character['lookahead']
+            self.depth = self.character['lookahead']
+            self.tactics.remap(self.character, self.settings)
         self.tt = None
-        self.tactics.remap(self.character, self.settings)
         #
 
     def __call__(self, game):
@@ -164,8 +165,13 @@ class KalahGame(easyAI.TwoPlayersGame):
         self.reset_board(empty=True)
 
     def set_character(self):
-        self.character = AI_LIST[self.settings["ai_chosen"]]
-        self.players[1].set_character()
+        if self.testing:
+            self.players[0].set_character()
+            self.players[1].set_character()
+            self.character = self.testing[0]
+        else:
+            self.character = AI_LIST[self.settings["ai_chosen"]]
+            self.players[1].set_character()
 
     def is_stopping_in_own_store(self, pit):
         count = self.board[pit] % 13  # if seeds > 12 then they wrap around board; so modulo 13
@@ -249,27 +255,39 @@ class KalahGame(easyAI.TwoPlayersGame):
     def make_move_choice(self, house):
         if self.want_animation:
             self.animate.append({ACTION: "normal_move", LOC: house})
+            self.animate.append({ACTION: "scoop", LOC: house})
+        #
         # scoop up the house chosen
-        self._scoop(house)
+        #
+        # self._scoop(house)
+        self.board[HAND] = self.board[house]
+        self.board[house] = 0
         current_house = house
+        #
         # drop the seeds into the pits
+        #
         for ctr in range(self.board[HAND]):
             next_house = P[current_house][NEXT][self.nplayer]
-            self._drop(next_house)
+            # self._drop(next_house)
+            self.board[HAND] -= 1
+            self.board[next_house] += 1
+            if self.want_animation:
+                 self.animate.append({ACTION: "drop", LOC: next_house, COUNT: 1})
             current_house = next_house
         #
         # capture if possible
         #
         if self.settings['capture_rule'] == 0:  # capture if opposite is full
             if self.board[current_house] == 1:
-                if P[current_house][OWNER] == self.nplayer:
-                    if P[current_house][ROLE] == HOUSE:
-                        if self.board[P[current_house][OPP]]:
-                            if self.want_animation:
-                                self.animate.append({ACTION: "steal"})
-                            self._scoop(P[current_house][OPP])
-                            self._scoop(current_house)
-                            self._drop_all(STORE_IDX[self.nplayer])
+                # note: A 'store' OPP is always the empty hand, so it always fails
+                if self.board[P[current_house][OPP]]:
+                    if P[current_house][OWNER] == self.nplayer:
+                        # see note above; if P[current_house][ROLE] == HOUSE:
+                        if self.want_animation:
+                            self.animate.append({ACTION: "steal"})
+                        self._scoop(P[current_house][OPP])
+                        self._scoop(current_house)
+                        self._drop_all(STORE_IDX[self.nplayer])
         elif self.settings['capture_rule'] == 1:  # capture even if opposite is empty
             if self.board[current_house] == 1:
                 if P[current_house][OWNER] == self.nplayer:
@@ -327,14 +345,21 @@ class KalahGame(easyAI.TwoPlayersGame):
                             self._scoop(house)
                 self.want_animation = temp  # restore
 
+    # def is_over(self):
+    #     for player in PLAYER_LIST:
+    #         has_seed = False
+    #         for house in HOUSE_LIST[player]:
+    #             if self.board[house]:
+    #                 has_seed = True
+    #         if has_seed is False:
+    #             return True
+    #     return False
+
     def is_over(self):
-        for player in PLAYER_LIST:
-            has_seed = False
-            for house in HOUSE_LIST[player]:
-                if self.board[house]:
-                    has_seed = True
-            if has_seed is False:
-                return True
+        if not any(self.board[1:7]):  # check for seeds in player side
+            return True
+        if not any(self.board[8:14]):  # check for seeds on AI side
+            return True
         return False
 
     def show(self, full=False):

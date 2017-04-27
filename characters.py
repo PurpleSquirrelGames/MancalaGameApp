@@ -30,7 +30,7 @@ AI_LIST = [
         "strategy": "negamax",  # options: "random", "negamax"
         "tactics": "standard",
         "lookahead": 1,  # 1 to 6
-        "error_rate": 0.10,  # 0.0 to 1.0; odds of making mistake
+        "error_rate": 0.00,  # 0.0 to 1.0; odds of making mistake
         "fitness": "balance", # options: greed, caution, balance
         "desc": "Emily is still a novice, but has played multiple times.",
         "tagline": "Blunt errors are rare, but still easy to win against."
@@ -137,7 +137,7 @@ AI_LIST = [
         "rank": "12",
         "strategy": "negamax",  # options: "random", "negamax"
         "tactics": "standard",
-        "lookahead": 7,  # 1 to 6
+        "lookahead": 6,  # 1 to 6
         "error_rate": 0.00,  # 0.0 to 1.0; odds of making mistake
         "fitness": "balance", # options: greed, caution, balance
         "desc": "A deep artificial intelligence. ThoughtNet finds interacting with humans pleasing.\nNOTE: on some devices, ThoughtNet is very slow.",
