@@ -65,7 +65,7 @@ COMBOS.append([4, 3, 5, 6])  # doing 4 first to help with early analysis
 #
 #     (6) LOOKING 1, 2, 3, 4, 5, or 6 TURNS AHEAD
 # COMBOS.append([1, 2, 3, 4, 5, 6])
-COMBOS.append([2, 3, 4])
+COMBOS.append([3])
 #
 #     (3) CAPTURE RULE VARIATIONS
 COMBOS.append([0, 1, 2])
@@ -86,16 +86,16 @@ SCENARIOS, FILENAMES = build_scenario_tuples(COMBOS)
 ISLAND_QTY = 10  # 10
 #
 #  RUN 100 generations for each island
-GENERATION_QTY = 40  # 100
+GENERATION_QTY = 20  # 100
 #  HAVE 50 genomes start each generation
 POPULATION_SIZE = 10  # 50
 #  EACH genome engages each of the other genomes in the "attacker" role
 #     EACH engagement is N plays, the final scores are tallied for fitness
-PLAYS_PER_ENGAGEMENT = 5
+PLAYS_PER_ENGAGEMENT = 6
 #     WHEN a genome is in the defender role; it COULD have a % chance of wrong move
 #        per round of play to mimic diversity, however it currently does not
 #  AFTER ALL engagements are finished, extinct the bottom 60%
-EXTINCTION_RATE = 0.7
+EXTINCTION_RATE = 0.5
 #  BREED replacements:
 #        1/3rd get a +1 or -1 change to a random gene
 #        1/3rd get a big change to a random gene

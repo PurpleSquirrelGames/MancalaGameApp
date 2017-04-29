@@ -89,9 +89,6 @@ kivyinstall/
 # Rope project settings
 .ropeproject
 
-# game settings
-mancala.json
-
 # assembly files
 .buildozer
 bin/

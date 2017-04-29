@@ -4,6 +4,7 @@
 #:import character __main__.character
 #:import update_setting __main__.update_setting
 #:import visual_settings __main__.visual_settings
+#:import _ __main__._
 
 AppScreenManager:
     transition: NoTransition()
@@ -175,21 +176,19 @@ AppScreenManager:
             size_fixed: (250, 100)
             background_normal: 'assets/img/blank-wood-button.png'
             font_size_fixed: 64
-            text: "Resume"
+            text: _("Resume")
             color: (101/255.0, 244/255.0, 66/255.0, 1)
             on_release: app.resume_game()
         Button:
             pos_fixed: (1600, 0)
             size_fixed: (300, 100)
-            text: "New Game"
+            text: _("New Game")
             on_release: app.start_new_game()
             font_size_fixed: 64
-            color: (101/255.0, 244/255.0, 66/255.0, 1)
-            background_normal: 'assets/img/blank-wood-button.png'
         FixedSimpleMenu:
             id: rules_screen_menu
             pos_fixed: (400, 150)
-            size_fixed: (1500, 768)
+            size_fixed: (1500, 192*5)
             color: (0, 0, 0, 1)
             FixedSimpleMenuItem:
                 name: "game_chosen"
@@ -198,22 +197,22 @@ AppScreenManager:
                 on_press: root.ids.game_choice_popup.active = True
             FixedSimpleMenuItem:
                 name: "who_plays_first"
-                heading: "Who plays first"
+                heading: _("Who plays first")
                 text: visual_settings["who_plays_first"][settings["who_plays_first"]]
                 on_press: root.ids.who_first_popup.active = True
             FixedSimpleMenuItem:
                 name: "seeds_per_house_selection"
-                heading: "Seeds per house"
+                heading: _("Seeds per house")
                 text: "4"
                 on_press: root.ids.seeds_per_house_selection_popup.active = True
             FixedSimpleMenuItem:
                 name: "capture_rule"
-                heading: "Capturing if last seed drops into own empty house"
+                heading: _("Capturing if last seed drops into own empty house")
                 text: "Capture if oppposite house has seeds"
                 on_press: root.ids.capture_rule_popup.active = True
             FixedSimpleMenuItem:
                 name: "eog_rule"
-                heading: "At end of game, how to handle remaining seeds"
+                heading: _("At end of game, how to handle remaining seeds")
                 text: "Move seeds to the store/Kalaha on that side"
                 on_press: root.ids.eog_rule_popup.active = True
         FixedPopup:
@@ -345,28 +344,33 @@ AppScreenManager:
         FixedSimpleMenu:
             id: screen_screen_menu
             pos_fixed: (400, 150)
-            size_fixed: (1500, 576)
+            size_fixed: (1500, 192*5)
             color: (0, 0, 0, 1)
             FixedSimpleMenuItem:
                 name: "board_choice"
-                heading: "Board chosen"
+                heading: _("Board chosen")
                 text: "Walnut"
                 on_press: root.ids.board_choice_popup.active = True
             FixedSimpleMenuItem:
                 name: "background"
-                heading: "Background chosen"
+                heading: _("Background chosen")
                 text: "Green Felt"
                 on_press: root.ids.background_popup.active = True
             FixedSimpleMenuItem:
                 name: "seed_choice"
-                heading: "Seed chosen"
+                heading: _("Seed chosen")
                 text: "Teal glass gems"
                 on_press: root.ids.seed_choice_popup.active = True
             FixedSimpleMenuItem:
                 name: "animation_speed_choice"
-                heading: "Animated hand speed"
+                heading: _("Animated hand speed")
                 text: "Medium"
                 on_press: root.ids.animation_speed_popup.active = True
+            FixedSimpleMenuItem:
+                name: "show_center_message_choice"
+                heading: _("Display of center message on the board")
+                text: "Yes"
+                on_press: root.ids.show_center_message_popup.active = True
         FixedPopup:
             id: board_choice_popup
             active_pos_fixed: (300, 100)
@@ -427,6 +431,21 @@ AppScreenManager:
                 on_selection:
                     update_setting("animation_speed_choice", self.selected)
                     root.ids.animation_speed_popup.active = False
+        FixedPopup:
+            id: show_center_message_popup
+            active_pos_fixed: (300, 100)
+            size_fixed: (1600, 900)
+            FixedRadioButtons:
+                selected: settings['show_center_message_choice']
+                active_pos_fixed: (400, 200)
+                size_fixed: (1400, 192*2)
+                selections: visual_settings['show_center_message_choice']
+                color: (0, 0, 0, 1)
+                background_selected: "assets/img/selected.png"
+                background_normal: "assets/img/not-selected.png"
+                on_selection:
+                    update_setting("show_center_message_choice", self.selected)
+                    root.ids.show_center_message_popup.active = False
 
 <SettingsSoundScreen>
     name: "settings_sound_screen"
@@ -475,12 +494,12 @@ AppScreenManager:
             color: (0, 0, 0, 1)
             FixedSimpleMenuItem:
                 name: "notification_volume"
-                heading: "Notification volume"
+                heading: _("Notification volume")
                 text: "Medium"
                 on_press: root.ids.notification_volume_popup.active = True
             FixedSimpleMenuItem:
                 name: "seed_volume"
-                heading: "Environmental sound volume (seed drop, etc)"
+                heading: _("Environmental sound volume (seed drop, etc)")
                 text: "Medium"
                 on_press: root.ids.seed_volume_popup.active = True
         FixedPopup:
@@ -541,13 +560,12 @@ AppScreenManager:
             source: 'assets/img/message-background.png'
             pos_fixed: (330, 540-80)
             size_fixed: (1260, 160)
-        Button:
+        Image:
             id: message_down_button
-            text: "V"
             font_size_fixed: 80
-            pos_fixed: (330, 540-80)
+            source: 'assets/img/arrow-not.png'
+            pos_fixed: (0, 0)
             size_fixed: (160, 160)
-            on_release: root.toggle_message_bar()
         FixedPopup:
             id: spinner_background
             active_pos_fixed: (1400-25, 490-25)
@@ -575,10 +593,8 @@ AppScreenManager:
             Button:
                 active_pos_fixed: (1200, 500)
                 size_fixed: (300, 100)
-                color: (101/255.0, 244/255.0, 66/255.0, 1)
-                background_normal: 'assets/img/blank-wood-button.png'
                 font_size_fixed: 64
-                text: "New Game"
+                text: _("New Game")
                 on_release: app.start_new_game()
         Button:
             opacity: 0
