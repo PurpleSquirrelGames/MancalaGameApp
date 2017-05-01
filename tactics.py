@@ -73,8 +73,10 @@ class Tactics(object):
         first_player = settings['first_player']
         seed_count = settings['seeds_per_house']
         turns_ahead = character['lookahead']
-        if turns_ahead > 4:
-            turns_ahead = 4
+        if turns_ahead > 1:
+            turns_ahead = 3
+        else:
+            turns_ahead = 0
         capture_rule = settings['capture_rule']
         eog_rule = settings['eog_rule']
         tup = (first_player, seed_count, turns_ahead, capture_rule, eog_rule)

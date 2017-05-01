@@ -137,6 +137,7 @@ class KalahAIPlayer(easyAI.AI_Player):
 class KalahGame(easyAI.TwoPlayersGame):
 
     def __init__(self, settings, testing=False, verbose=True):
+        self.trace = []
         self.testing = testing
         self.settings = settings
         self.verbose = verbose
@@ -425,11 +426,11 @@ class KalahGame(easyAI.TwoPlayersGame):
             exactly equal the disadvantage fo the other player.
         '''
         # leaving empty pits on own side
-        if True: self.trace = []
+        # if True: self.trace = []
         if self.character['tactics'] == "blind":
-            if True: self.trace.append("+0 BLIND TACTICS")
+            # if True: self.trace.append("+0 BLIND TACTICS")
             return 0
-        tactics = self.players[player - 1].get_tactics()
+        tactics = self.players[1].get_tactics()
         if not tactics:
             return 0
         score = 0
@@ -438,28 +439,28 @@ class KalahGame(easyAI.TwoPlayersGame):
                 opp_count = self.board[P[pit][OPP]]
                 if opp_count:
                     score += tactics.empty_pit_value[dist][FULL] * opp_count
-                    if True: self.trace.append("+{} OWN EMPTY/FULL PIT {} cnt={}".format(tactics.empty_pit_value[dist][FULL] * opp_count, pit, opp_count))
+                    # if True: self.trace.append("+{} OWN EMPTY/FULL PIT {} cnt={}".format(tactics.empty_pit_value[dist][FULL] * opp_count, pit, opp_count))
                 else:
                     score += tactics.empty_pit_value[dist][EMPTY]
-                    if True: self.trace.append("+{} OWN EMPTY/EMPTY PIT {}".format(tactics.empty_pit_value[dist][EMPTY], pit))
+                    # if True: self.trace.append("+{} OWN EMPTY/EMPTY PIT {}".format(tactics.empty_pit_value[dist][EMPTY], pit))
         for dist, pit in enumerate(OWN_PITS_FROM_STORE[opponent]):
             if self.board[pit]==0:
                 opp_count = self.board[P[pit][OPP]]
                 if opp_count:
                     score -= tactics.empty_pit_value[dist][FULL] * opp_count
-                    if True: self.trace.append("-{} OPP EMPTY/FULL PIT {} cnt={}".format(tactics.empty_pit_value[dist][FULL] * opp_count, pit, opp_count))
+                    # if True: self.trace.append("-{} OPP EMPTY/FULL PIT {} cnt={}".format(tactics.empty_pit_value[dist][FULL] * opp_count, pit, opp_count))
                 else:
                     score -= tactics.empty_pit_value[dist][EMPTY]
-                    if True: self.trace.append("-{} OPP EMPTY/EMPTY PIT {}".format(tactics.empty_pit_value[dist][EMPTY], pit))
+                    # if True: self.trace.append("-{} OPP EMPTY/EMPTY PIT {}".format(tactics.empty_pit_value[dist][EMPTY], pit))
         # easy repeat patterns seen
         for dist, pit in enumerate(OWN_PITS_FROM_STORE[player]):
             if self.board[pit] == (dist + 1):
                 score += tactics.easy_repeat_value[dist]
-                if True: self.trace.append("+{} OWN EASY REPEAT AT {}".format(tactics.easy_repeat_value[dist], pit))
+                # if True: self.trace.append("+{} OWN EASY REPEAT AT {}".format(tactics.easy_repeat_value[dist], pit))
         for dist, pit in enumerate(OWN_PITS_FROM_STORE[opponent]):
             if self.board[P[pit][OPP]] == (dist + 1):
                 score -= tactics.easy_repeat_value[dist]
-                if True: self.trace.append("-{} OPP EASY REPEAT AT {}".format(tactics.easy_repeat_value[dist], pit))
+                # if True: self.trace.append("-{} OPP EASY REPEAT AT {}".format(tactics.easy_repeat_value[dist], pit))
         return score
 
 #    def unmake_move(self, move):
@@ -497,6 +498,28 @@ class KalahGame(easyAI.TwoPlayersGame):
         self.board[HAND] = 0  # this is for error recovery. In theory, you
                               # should never needs this as the hand will be
                               # empty already.
+        #
+        # randomly move seeds if that is called for
+        #
+        if not restoration:
+            if self.settings['randomness_rule'] == 2:
+                from_pit = random.choice(HOUSE_LIST[AI])
+                to_pit = random.choice([h for h in HOUSE_LIST[AI] if h!=from_pit])
+                leave = self.board[from_pit] - 1
+                #
+                self.animate.append({ACTION: "random_seed", LOC: from_pit})
+                self._scoop(from_pit)
+                self._drop(from_pit, count=leave)
+                self._drop(to_pit)
+                #
+                from_pit = random.choice(HOUSE_LIST[USER])
+                to_pit = random.choice([h for h in HOUSE_LIST[USER] if h!=from_pit])
+                leave = self.board[from_pit] - 1
+                #
+                self.animate.append({ACTION: "random_seed", LOC: from_pit})
+                self._scoop(from_pit)
+                self._drop(from_pit, count=leave)
+                self._drop(to_pit)
         #
         # manipulate AI character
         #
@@ -563,6 +586,7 @@ if __name__=="__main__":
         "seeds_per_house": 4,
         "capture_rule": 0,
         "eog_rule": 0,
+        "randomness_rule": 0,
         "seed_drop_rate": 0.4,
     }
     character = AI_LIST[settings['ai_chosen']]

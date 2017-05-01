@@ -191,11 +191,6 @@ AppScreenManager:
             size_fixed: (1500, 192*5)
             color: (0, 0, 0, 1)
             FixedSimpleMenuItem:
-                name: "game_chosen"
-                heading: "Game chosen"
-                text: "Kalah"
-                on_press: root.ids.game_choice_popup.active = True
-            FixedSimpleMenuItem:
                 name: "who_plays_first"
                 heading: _("Who plays first")
                 text: visual_settings["who_plays_first"][settings["who_plays_first"]]
@@ -215,19 +210,25 @@ AppScreenManager:
                 heading: _("At end of game, how to handle remaining seeds")
                 text: "Move seeds to the store/Kalaha on that side"
                 on_press: root.ids.eog_rule_popup.active = True
+            FixedSimpleMenuItem:
+                name: "randomness_rule"
+                heading: _("Randomness")
+                text: "None"
+                on_press: root.ids.randomness_rule_popup.active = True
         FixedPopup:
-            id: game_choice_popup
+            id: randomness_rule_popup
             active_pos_fixed: (300, 100)
             size_fixed: (1600, 900)
             FixedRadioButtons:
                 active_pos_fixed: (400, 200)
-                size_fixed: (1400, 192*1)
-                selections: ["Kalah"]
+                size_fixed: (1400, 192*3)
+                selections: visual_settings["randomness_rule"]
                 color: (0, 0, 0, 1)
                 background_selected: "assets/img/selected.png"
                 background_normal: "assets/img/not-selected.png"
                 on_selection:
-                    root.ids.game_choice_popup.active = False
+                    update_setting("randomness_rule", self.selected)
+                    root.ids.randomness_rule_popup.active = False
         FixedPopup:
             id: who_first_popup
             active_pos_fixed: (300, 100)

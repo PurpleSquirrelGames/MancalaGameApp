@@ -10,7 +10,7 @@ AI_LIST = [
         "rank": "1",
         "strategy": "random",  # options: "random", "negamax"
         "tactics": "blind", # options: "blind", "standard"
-        "lookahead": 1,  # 1 to 6
+        "lookahead": 0,  # 1 to 6
         "error_rate": 1.00,  # 0.0 to 1.0; odds of making mistake
         "fitness": "greed", # options: greed, caution, balance
         "desc": _("This four-year-old likes to move seeds."),
@@ -22,7 +22,7 @@ AI_LIST = [
         "rank": "2",
         "strategy": "negamax",  # options: "random", "negamax"
         "tactics": "blind",
-        "lookahead": 1,  # 1 to 6
+        "lookahead": 0,  # 1 to 6
         "error_rate": 0.20,  # 0.0 to 1.0; odds of making mistake
         "fitness": "balance", # options: greed, caution, balance
         "desc": _("Billy just learned the rules of the game."),
@@ -34,7 +34,7 @@ AI_LIST = [
         "rank": "3",
         "strategy": "negamax",  # options: "random", "negamax"
         "tactics": "standard",
-        "lookahead": 1,  # 1 to 6
+        "lookahead": 0,  # 1 to 6
         "error_rate": 0.00,  # 0.0 to 1.0; odds of making mistake
         "fitness": "balance", # options: greed, caution, balance
         "desc": _("Emily is still a novice, but has played multiple times."),
@@ -46,7 +46,7 @@ AI_LIST = [
         "rank": "4",
         "strategy": "negamax",  # options: "random", "negamax"
         "tactics": "standard",
-        "lookahead": 2,  # 1 to 6
+        "lookahead": 1,  # 1 to 6
         "error_rate": 0.05,  # 0.0 to 1.0; odds of making mistake
         "fitness": "balance", # options: greed, caution, balance
         "desc": _("Jacob plays on occasion with friends."),
@@ -58,7 +58,7 @@ AI_LIST = [
         "rank": "5",
         "strategy": "negamax",  # options: "random", "negamax"
         "tactics": "standard",
-        "lookahead": 2,  # 1 to 6
+        "lookahead": 1,  # 1 to 6
         "error_rate": 0.00,  # 0.0 to 1.0; odds of making mistake
         "fitness": "greed", # options: greed, caution, balance
         "desc": _("Emma is determined to win, even if she does not play much."),
@@ -70,7 +70,7 @@ AI_LIST = [
         "rank": "6",
         "strategy": "negamax",  # options: "random", "negamax"
         "tactics": "standard",
-        "lookahead": 3,  # 1 to 6
+        "lookahead": 2,  # 1 to 6
         "error_rate": 0.00,  # 0.0 to 1.0; odds of making mistake
         "fitness": "caution", # options: greed, caution, balance
         "desc": _("Matthew plays with friends and family, but is embarrased if he loses by too much."),
@@ -82,7 +82,7 @@ AI_LIST = [
         "rank": "7",
         "strategy": "negamax",  # options: "random", "negamax"
         "tactics": "standard",
-        "lookahead": 3,  # 1 to 6
+        "lookahead": 2,  # 1 to 6
         "error_rate": 0.05,  # 0.0 to 1.0; odds of making mistake
         "fitness": "balance", # options: greed, caution, balance
         "desc": _("Olivia plays regularly but doesn't consider herself a gamer."),
@@ -94,7 +94,7 @@ AI_LIST = [
         "rank": "8",
         "strategy": "negamax",  # options: "random", "negamax"
         "tactics": "standard",
-        "lookahead": 4,  # 1 to 6
+        "lookahead": 2,  # 1 to 6
         "error_rate": 0.03,  # 0.0 to 1.0; odds of making mistake
         "fitness": "greed", # options: greed, caution, balance
         "desc": _("William loves to gamble and win big."),
@@ -106,7 +106,7 @@ AI_LIST = [
         "rank": "9",
         "strategy": "negamax",  # options: "random", "negamax"
         "tactics": "standard",
-        "lookahead": 4,  # 1 to 6
+        "lookahead": 3,  # 1 to 6
         "error_rate": 0.00,  # 0.0 to 1.0; odds of making mistake
         "fitness": "caution", # options: greed, caution, balance
         "desc": _("Sam plays a good game."),
@@ -118,7 +118,7 @@ AI_LIST = [
         "rank": "10",
         "strategy": "negamax",  # options: "random", "negamax"
         "tactics": "standard",
-        "lookahead": 5,  # 1 to 6
+        "lookahead": 3,  # 1 to 6
         "error_rate": 0.01,  # 0.0 to 1.0; odds of making mistake
         "fitness": "balance", # options: greed, caution, balance
         "desc": _("Sandra is very good. Plays regularly."),
@@ -130,7 +130,7 @@ AI_LIST = [
         "rank": "11",
         "strategy": "negamax",  # options: "random", "negamax"
         "tactics": "standard",
-        "lookahead": 6,  # 1 to 6
+        "lookahead": 4,  # 1 to 6
         "error_rate": 0.00,  # 0.0 to 1.0; odds of making mistake
         "fitness": "balance", # options: greed, caution, balance
         "desc": _("An arrogant artificial intelligence."),
@@ -142,7 +142,7 @@ AI_LIST = [
         "rank": "12",
         "strategy": "negamax",  # options: "random", "negamax"
         "tactics": "standard",
-        "lookahead": 6,  # 1 to 6
+        "lookahead": 5,  # 1 to 6
         "error_rate": 0.00,  # 0.0 to 1.0; odds of making mistake
         "fitness": "balance", # options: greed, caution, balance
         "desc": _("A deep artificial intelligence. ThoughtNet finds interacting with humans pleasing.\nNOTE: on some devices, ThoughtNet is very slow."),

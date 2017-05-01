@@ -62,6 +62,7 @@ current = {
     'first_time_flag': False,
     'allow_resume': False,
     'seed_sounds': {},
+    'turn': 0,
     'cheat': False
 }
 character = None
@@ -75,10 +76,15 @@ def load_global_settings(user_data_dir):
     global app
     global game
 
-    fn = join(user_data_dir, 'mancala.json') 
+    fn = join(user_data_dir, 'mancala.json')
     print "SETTINGS STORAGE FILE", fn 
     storage = JsonStore(fn)
 
+    stats = {
+        'games_played': 0,
+        'games_won': 0,
+        'games_tied': 0
+    }
     settings = {
         "settings_version": 3, # settings (below) have changed, then increment this
         "ai_chosen": 0,
@@ -88,6 +94,7 @@ def load_global_settings(user_data_dir):
         "seeds_per_house": 4,
         "capture_rule": 0,
         "eog_rule": 0,
+        "randomness_rule": 0,
         "animation_speed_choice": 1,
         "seed_drop_rate": 0.4,
         "board_choice": 0,
@@ -96,7 +103,8 @@ def load_global_settings(user_data_dir):
         "seed_choice": 0,
         "notification_volume": 2,
         "seed_volume": 2,
-        "best_level": -1
+        "best_level": -1,
+        'stats': [copy(stats) for i in range(12)],
     }
     settings_ref = settings["settings_version"]
 
@@ -139,6 +147,11 @@ visual_settings = {
         _("Move seeds to the player with empty houses"),
         _("Move seeds to the player that ended the game"),
         _("Leave the seeds in the houses")
+    ],
+    "randomness_rule": [
+        _("Nothing is random"),
+        _("Randomly choose first move for first player"),
+        _("Randomly move a seed on each side at start"),
     ],
     "board_choice": [
         _("Walnut"),
@@ -205,6 +218,11 @@ def update_setting(setting_name, value):
             settings["first_player"] = USER
         else:
             settings["first_player"] = AI
+        app.root.screens[SETTINGS_RULES_SCREEN].ids.rules_screen_menu.\
+            set_text(setting_name, visual_settings[setting_name][value])
+        if change_seen:
+            disable_resume_game()
+    if setting_name == "randomness_rule":
         app.root.screens[SETTINGS_RULES_SCREEN].ids.rules_screen_menu.\
             set_text(setting_name, visual_settings[setting_name][value])
         if change_seen:
@@ -618,11 +636,11 @@ class MancalaApp(App):
         generically_apply_settings()
         Window.bind(on_keyboard=self.on_key)
         self.MENU_POPUPS = [
-            self.root.screens[SETTINGS_RULES_SCREEN].ids.game_choice_popup,
             self.root.screens[SETTINGS_RULES_SCREEN].ids.who_first_popup,
             self.root.screens[SETTINGS_RULES_SCREEN].ids.seeds_per_house_selection_popup,
             self.root.screens[SETTINGS_RULES_SCREEN].ids.capture_rule_popup,
             self.root.screens[SETTINGS_RULES_SCREEN].ids.eog_rule_popup,
+            self.root.screens[SETTINGS_RULES_SCREEN].ids.randomness_rule_popup,
             self.root.screens[SETTINGS_SCREEN_SCREEN].ids.board_choice_popup,
             self.root.screens[SETTINGS_SCREEN_SCREEN].ids.background_popup,
             self.root.screens[SETTINGS_SCREEN_SCREEN].ids.seed_choice_popup,
@@ -854,7 +872,10 @@ class HandSeedAnimation(object):
 
     def __init__(self, player, board, display, restoration=False):
         self.restoration = restoration
-        self.nplayer = player
+        if (current["turn"] == 1) and (settings["randomness_rule"] == 1):
+            self.nplayer = settings['first_player']
+        else:
+            self.nplayer = player
         self.idx = 0
         self.board = copy(board)
         self.display = display
@@ -862,7 +883,7 @@ class HandSeedAnimation(object):
         self.animation_steps.append({"action": "home"})
         # print self.animation_steps
         self.last_step = {}
-        if player == USER:
+        if self.nplayer == USER:
             self.hand = seeds.user_hand
         else:
             self.hand = seeds.ai_hand
@@ -917,6 +938,8 @@ class HandSeedAnimation(object):
                 )
             elif step['action'] == "steal":
                 status_bar.say(_("Capture!"))
+            elif step['action'] == "random_seed":
+                status_bar.say(_("Randomly Moving Seed"))
             elif step['action'] == "game_over":
                 status_bar.say(_("Handling End of Game"))
             elif step['action'] == "setting_up":
@@ -925,7 +948,8 @@ class HandSeedAnimation(object):
                 else:
                     status_bar.say(_("Setting Up Board"))
             elif step['action'] == "normal_move":
-                status_bar.done()
+                if not ((current["turn"] == 1) and (settings["randomness_rule"] == 1)):
+                    status_bar.done()
                 hand_animation = Animation(
                     pos_fixed=GameScreen.PITS[pit]["out-pos"],
                     duration=settings['seed_drop_rate'],
@@ -976,6 +1000,7 @@ class InitGameState(State):
     def on_entry(self):
         global current
 
+        current["turn"] = 0
         self.ref['kivy'].wait_on_ai.stop_spinning()
         board_prior = copy(self.ref["game"].board)
         if current['first_time_flag']:
@@ -988,6 +1013,7 @@ class InitGameState(State):
                 self.animation = HandSeedAnimation(
                     AI, board_prior, self.ref['kivy'], restoration=True
                 )
+                current["turn"] = 100  # we really don't know the turn; but prevent randomness
             else:
                 self.ref["game"].reset_board()
                 self.animation = HandSeedAnimation(AI, board_prior, self.ref['kivy'])
@@ -1018,13 +1044,21 @@ def display_board(board, kivy_ids):
 class StartTurn(State):
 
     def on_entry(self):
+        current["turn"] += 1
         save_game()
         self.ref["choices_so_far"] = []
         self.ref["ai_choices"] = []
         if self.ref["game"].is_over():
             return self.change_state("eog")
+        if current["turn"] == 1:
+            if settings["randomness_rule"] == 1:
+                # randomly choose first move
+                status_bar.say(_("Playing Randomly Chosen First Move"))
+                move_list = self.ref["game"].possible_moves()
+                self.ref['ai_choices'] = random.choice(move_list)
+                return self.change_state("animate_ai")
         if self.ref["game"].nplayer == 1:
-            status_bar.say(_("Your turn."), wait_on_player=True)
+            status_bar.say(_("Your Turn"), wait_on_player=True)
             self.ref["game"].usermove_start_simulation()
             self.ref["possible_user_moves"] = self.ref["game"].possible_moves()
             return self.change_state("wait_for_pit")

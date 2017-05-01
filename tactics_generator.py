@@ -65,7 +65,7 @@ COMBOS.append([4, 3, 5, 6])  # doing 4 first to help with early analysis
 #
 #     (6) LOOKING 1, 2, 3, 4, 5, or 6 TURNS AHEAD
 # COMBOS.append([1, 2, 3, 4, 5, 6])
-COMBOS.append([3])
+COMBOS.append([0, 3])
 #
 #     (3) CAPTURE RULE VARIATIONS
 COMBOS.append([0, 1, 2])
@@ -83,19 +83,19 @@ SCENARIOS, FILENAMES = build_scenario_tuples(COMBOS)
 #
 #  DO 10 "islands" of independent evolution;
 #     then later run all of them together for 20 more generations
-ISLAND_QTY = 10  # 10
+ISLAND_QTY = 5  # 10
 #
 #  RUN 100 generations for each island
-GENERATION_QTY = 20  # 100
+GENERATION_QTY = 10  # 100
 #  HAVE 50 genomes start each generation
-POPULATION_SIZE = 10  # 50
+POPULATION_SIZE = 12  # 50
 #  EACH genome engages each of the other genomes in the "attacker" role
 #     EACH engagement is N plays, the final scores are tallied for fitness
-PLAYS_PER_ENGAGEMENT = 6
+PLAYS_PER_ENGAGEMENT = 1
 #     WHEN a genome is in the defender role; it COULD have a % chance of wrong move
 #        per round of play to mimic diversity, however it currently does not
 #  AFTER ALL engagements are finished, extinct the bottom 60%
-EXTINCTION_RATE = 0.5
+EXTINCTION_RATE = 0.45
 #  BREED replacements:
 #        1/3rd get a +1 or -1 change to a random gene
 #        1/3rd get a big change to a random gene
@@ -166,7 +166,7 @@ ALT_AI_LIST = [
         "rank": "1",
         "strategy": "negamax",  # options: "random", "negamax"
         "lookahead": 4,  # 1 to 6
-        "error_rate": 0.05,  # 0.0 to 1.0; odds of making mistake
+        "error_rate": 0.00,  # 0.0 to 1.0; odds of making mistake
         "fitness": "balance",  # options: greed, caution, balance
         "desc": "test genome",
         "tagline": "",
@@ -189,11 +189,22 @@ ALT_AI_LIST = [
 
 game = None
 
-def play_engagement():
+def play_engagement(genome):
     score = 0
     for round in range(PLAYS_PER_ENGAGEMENT):
         game.reset_board()
-        game.play(verbose=False)
+        # game.play(verbose=False)
+        while not game.is_over():
+            if game.nplayer==1:
+                # USER
+                apply_genome(game.players[0], PROTO_GENOME)
+                apply_genome(game.players[1], PROTO_GENOME)
+            else:
+                # AI
+                apply_genome(game.players[0], genome)
+                apply_genome(game.players[1], genome)
+            move = game.get_move()
+            game.play_move(move)
         result = game.strategic_scoring(2, 1) # we are scoring from AI perspective
         score += result
     final_score = score / PLAYS_PER_ENGAGEMENT
@@ -250,7 +261,7 @@ def do_trials(genome_list):
     # opp_qty = len(genome_list) - 1
     opp_qty = 4
     for me, genome in enumerate(genome_list):
-        apply_genome(game.players[1], genome) # always apply to AI 
+        # apply_genome(game.players[1], genome) # always apply to AI 
         print me, "GENOME", genome['id'], "ANCESTORS", genome["parent_qty"],
         print "LIFESPAN", genome['life_span'], "OLD_SCORE",
         if genome['score'] == -1000000:
@@ -258,7 +269,7 @@ def do_trials(genome_list):
         else:
             print genome['score']
         print "    CURRENT:", genome['genes']
-        genome['score'] = play_engagement()
+        genome['score'] = play_engagement(genome)
         print "    SCORE", genome['score']
     return
 
@@ -349,7 +360,7 @@ if __name__=="__main__":
         #---------------------
         print "CHAMPIONSHIP FOR WORLD"
         for gen in range(GENERATION_QTY):
-            print "CHAMPIONSHIP GEN", gen, "OF", GENERATION_QTY
+            print "CHAMPIONSHIP GEN", gen + 1, "OF", GENERATION_QTY
             do_trials(winner_list)          # for these rounds, START with trials
             winner_list = do_sort(winner_list)
             winner_list = do_extinction(winner_list)
