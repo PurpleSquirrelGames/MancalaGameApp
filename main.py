@@ -37,6 +37,7 @@ machine = StateMachine(debug=True)
 seeds = None
 status_bar = None
 
+TIE = 0
 USER = 1
 AI = 2
 
@@ -76,7 +77,14 @@ def load_global_settings(user_data_dir):
     global app
     global game
 
-    fn = join(user_data_dir, 'mancala.json')
+    if platform=="android":
+        from jnius import autoclass
+        Environment = autoclass('android.os.Environment')
+        sdpath = Environment.getExternalStorageDirectory().getAbsolutePath() 
+    else:
+        sdpath = user_data_dir
+
+    fn = join(sdpath, 'mancala.json')
     print "SETTINGS STORAGE FILE", fn 
     storage = JsonStore(fn)
 
@@ -353,6 +361,18 @@ def generically_apply_settings():
         disable_resume_game()
 
 
+def update_stats_at_eog():
+    global settings
+    global game
+    current_ai = settings["ai_chosen"]
+    winner = game.get_winner()
+    settings["stats"][current_ai]["games_played"] += 1
+    if winner == USER:
+        settings["stats"][current_ai]["games_won"] += 1
+    if winner == TIE:
+        settings["stats"][current_ai]["games_tied"] += 1
+    storage.put('settings', **settings)
+
 ##############################
 #
 #  KIVY SOUNDS & BACKGROUNDS
@@ -525,8 +545,7 @@ class SettingsOpponentScreen(Screen):
         self.ids.ai_rank.text = format("{} of 12").format(c['rank'])
         self.ids.ai_face_image.source = "assets/img/ai-pic-{:02d}.png".format(c['index'])
         if ai_chosen > (settings['best_level'] + 1):
-            self.ids.choose_ai.background_normal = 'assets/img/invisible.png'
-            self.ids.choose_ai.text = ""
+            self.ids.choose_ai.text = _("not\navailable")
             n = AI_LIST[settings['best_level'] + 1]
             msg = _("You must first defeat {name} ({level}).").format(
                 name=n['name'],
@@ -534,7 +553,7 @@ class SettingsOpponentScreen(Screen):
             )
             if ai_chosen > settings['best_level'] + 2:
                 m = AI_LIST[ai_chosen - 1]
-                msg = "You must first defeat {first_opponent_name} ({first_level}) to {second_opponent_name} ({second_level}).".format(
+                msg = _("You must first defeat {first_opponent_name} ({first_level}) to {second_opponent_name} ({second_level}).").format(
                     first_opponent_name=n['name'],
                     first_level=settings['best_level'] + 2,
                     second_opponent_name=m['name'],
@@ -544,13 +563,32 @@ class SettingsOpponentScreen(Screen):
             # msg += "to play {}.".format(c['name'])
             self.ids.choose_msg.text = msg
         elif ai_chosen == settings['ai_chosen']:
-            self.ids.choose_msg.text = "You are currently playing this opponent."
-            self.ids.choose_ai.background_normal = 'assets/img/blank-wood-button.png'
-            self.ids.choose_ai.text = "(current)"
+            self.ids.choose_msg.text = _("You are currently playing this opponent.")
+            self.ids.choose_ai.text = _("(current)")
         else:
             self.ids.choose_msg.text = ""
-            self.ids.choose_ai.background_normal = 'assets/img/blank-wood-button.png'
-            self.ids.choose_ai.text = "Choose"
+            self.ids.choose_ai.text = _("Choose")
+        #
+        # update the stats screen for the viewed AI
+        #
+        s = settings["stats"][ai_chosen]
+        msg = ""
+        msg += _("name: {player_name}").format(player_name=c['name']) + "\n\n"
+        msg += _("rank: {rank_number}").format(rank_number=c['rank'])
+        msg += _("{count} games played").format(count=s["games_played"]) + "\n"
+        msg += _("   {count} games won by you").format(count=s["games_won"]) + "\n"
+        msg += _("   {count} games tied").format(count=s["games_tied"]) + "\n"
+        lost = s["games_played"] - s["games_won"] - s["games_tied"]
+        msg += _("   {count} games won by {player_name}").format(
+            count=lost, player_name=c['name']
+        )
+        msg += "\n\n"
+        msg += _('tech details: algorithm {algorithm_name}\n  lookahead {number} with fitness "{desc}"').format(
+            algorithm_name = c['strategy'],
+            number = c['lookahead'],
+            desc = c['fitness']
+        )
+        self.ids.stats_text.text = msg
 
     def previous_ai(self):
         global cheat_spin
@@ -1180,14 +1218,16 @@ class EndOfGameDisplayState(State):
         global AI_LIST
 
         save_game()
+        current_ai = settings["ai_chosen"]
         winner = self.ref['game'].get_winner()
         msg = [_("Tie Game."), _("You won!"), _("{player_name} won.").format(player_name=character["name"])][winner]
         status_bar.say(msg, force_show=True)
         self.ref["kivy"].message_down_button.source = 'assets/img/arrow-not.png'
         self.ref["kivy"].eog_new_game_button.active = True
+        update_stats_at_eog()
         if (winner == USER) or current['cheat']:
-            if settings['ai_chosen'] > settings['best_level']:
-                best_level = settings['ai_chosen']
+            if current_ai > settings['best_level']:
+                best_level = current_ai
                 update_setting('best_level', best_level)
                 n = AI_LIST[best_level]
                 pmsg = _("Congratulations!") + "\n\n"

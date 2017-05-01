@@ -94,7 +94,7 @@ AI_LIST = [
         "rank": "8",
         "strategy": "negamax",  # options: "random", "negamax"
         "tactics": "standard",
-        "lookahead": 2,  # 1 to 6
+        "lookahead": 3,  # 1 to 6
         "error_rate": 0.03,  # 0.0 to 1.0; odds of making mistake
         "fitness": "greed", # options: greed, caution, balance
         "desc": _("William loves to gamble and win big."),
@@ -109,7 +109,7 @@ AI_LIST = [
         "lookahead": 3,  # 1 to 6
         "error_rate": 0.00,  # 0.0 to 1.0; odds of making mistake
         "fitness": "caution", # options: greed, caution, balance
-        "desc": _("Sam plays a good game."),
+        "desc": _("Sam plays a good game and has played all his life."),
         "tagline": _("Too cautious, but a solid player. High difficulty.")
     },
     {
@@ -118,7 +118,7 @@ AI_LIST = [
         "rank": "10",
         "strategy": "negamax",  # options: "random", "negamax"
         "tactics": "standard",
-        "lookahead": 3,  # 1 to 6
+        "lookahead": 4,  # 1 to 6
         "error_rate": 0.01,  # 0.0 to 1.0; odds of making mistake
         "fitness": "balance", # options: greed, caution, balance
         "desc": _("Sandra is very good. Plays regularly."),
@@ -130,11 +130,11 @@ AI_LIST = [
         "rank": "11",
         "strategy": "negamax",  # options: "random", "negamax"
         "tactics": "standard",
-        "lookahead": 4,  # 1 to 6
+        "lookahead": 5,  # 1 to 6
         "error_rate": 0.00,  # 0.0 to 1.0; odds of making mistake
         "fitness": "balance", # options: greed, caution, balance
         "desc": _("An arrogant artificial intelligence."),
-        "tagline": _("Looks ahead 6 moves, but basically good. High difficulty.")
+        "tagline": _("R3 UNIT looks ahead 6 moves. High difficulty.")
     },
     {
         "index": 12,
@@ -142,10 +142,10 @@ AI_LIST = [
         "rank": "12",
         "strategy": "negamax",  # options: "random", "negamax"
         "tactics": "standard",
-        "lookahead": 5,  # 1 to 6
+        "lookahead": 6,  # 1 to 6
         "error_rate": 0.00,  # 0.0 to 1.0; odds of making mistake
         "fitness": "balance", # options: greed, caution, balance
-        "desc": _("A deep artificial intelligence. ThoughtNet finds interacting with humans pleasing.\nNOTE: on some devices, ThoughtNet is very slow."),
-        "tagline": _("Very high difficulty. Still possible to win if you go first.")
+        "desc": _("A deep artificial intelligence. ThoughtNet finds interacting with humans pleasing.\n\nOn some devices, ThoughtNet runs very slow."),
+        "tagline": _("Very high difficulty. It is still possible to win if you go first.")
     },
 ]
