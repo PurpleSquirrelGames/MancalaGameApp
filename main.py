@@ -82,16 +82,18 @@ def load_global_settings(user_data_dir):
     global app
     global game
 
-    if platform=="android":
-        # from jnius import autoclass
-        # Environment = autoclass('android.os.Environment')
-        # sdpath = Environment.getExternalStorageDirectory().getAbsolutePath() 
-        #
-        app_folder = os.path.dirname(os.path.abspath(__file__))
-        jpath = app_folder
-        # print "JSON DIR =", jpath
-    else:
-        jpath = user_data_dir
+    # if platform=="android":
+    #     # from jnius import autoclass
+    #     # Environment = autoclass('android.os.Environment')
+    #     # sdpath = Environment.getExternalStorageDirectory().getAbsolutePath() 
+    #     #
+    #     app_folder = os.path.dirname(os.path.abspath(__file__))
+    #     jpath = app_folder
+    #     print "JSON DIR =", jpath
+    # else:
+    #     jpath = user_data_dir
+
+    jpath = user_data_dir
 
     fn = join(jpath, 'pskalah.json')
     storage = JsonStore(fn)
@@ -696,6 +698,49 @@ class PSKalahApp(App):
         load_global_settings(self.user_data_dir)
         presentation = Builder.load_file('mancala_app.kv')
         return presentation
+
+    # I am overriding this
+    @property
+    def user_data_dir(self):
+        '''
+        .. versionadded:: 1.7.0
+
+        Returns the path to the directory in the users file system which the
+        application can use to store additional data.
+
+        Different platforms have different conventions with regards to where
+        the user can store data such as preferences, saved games and settings.
+        This function implements these conventions. The <app_name> directory
+        is created when the property is called, unless it already exists.
+
+        On iOS, `~/Documents/<app_name>` is returned (which is inside the
+        app's sandbox).
+
+        On Android, `/sdcard/<app_name>` is returned.
+
+        On Windows, `%APPDATA%/<app_name>` is returned.
+
+        On OS X, `~/Library/Application Support/<app_name>` is returned.
+
+        On Linux, `$XDG_CONFIG_HOME/<app_name>` is returned.
+        '''
+        data_dir = ""
+        if platform == 'ios':
+            data_dir = join('~/Documents', self.name)
+        elif platform == 'android':
+            # data_dir = join('/sdcard', self.name)  # this is what I'm overriding
+            data_dir = os.path.dirname(os.path.abspath(__file__))
+        elif platform == 'win':
+            data_dir = os.path.join(os.environ['APPDATA'], self.name)
+        elif platform == 'macosx':
+            data_dir = '~/Library/Application Support/{}'.format(self.name)
+        else:  # _platform == 'linux' or anything else...:
+            data_dir = os.environ.get('XDG_CONFIG_HOME', '~/.config')
+            data_dir = join(data_dir, self.name)
+        data_dir = os.path.expanduser(data_dir)
+        if not os.path.exists(data_dir):
+            os.mkdir(data_dir)
+        return data_dir
 
     def on_start(self):
         global game
