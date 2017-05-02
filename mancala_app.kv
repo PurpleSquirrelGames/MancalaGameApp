@@ -46,6 +46,10 @@ AppScreenManager:
             text: "Resume"
             color: (101/255.0, 244/255.0, 66/255.0, 1)
             on_release: app.resume_game()
+        Image:
+            pos_fixed: (1580, -20)
+            size_fixed: (340, 340)
+            source: 'assets/img/start-button-bright.png'
         Button:
             id: start_game_wrapper
             pos_fixed: (1580, -20)
@@ -54,6 +58,7 @@ AppScreenManager:
             on_release: app.start_new_game()
             font_size_fixed: 56
             color: (0, 0, 0, 1)
+            background_color: [1, 1, 1, 1]
             background_normal: 'assets/img/start-button.png'
         Image:
             id: ai_face_image
@@ -209,6 +214,7 @@ AppScreenManager:
             pos_fixed: (400, 150)
             size_fixed: (1500, 192*5)
             color: (0, 0, 0, 1)
+            background_color: (1, 1, 153.0/255.0, 1)
             FixedSimpleMenuItem:
                 name: "who_plays_first"
                 heading: _("Who plays first")
@@ -236,12 +242,13 @@ AppScreenManager:
                 on_press: root.ids.randomness_rule_popup.active = True
         FixedPopup:
             id: randomness_rule_popup
-            active_pos_fixed: (300, 100)
-            size_fixed: (1600, 900)
+            active_pos_fixed: (350, 150)
+            size_fixed: (1500, 192*3 + 100)
             FixedRadioButtons:
                 selected: settings["randomness_rule"]
                 active_pos_fixed: (400, 200)
                 size_fixed: (1400, 192*3)
+                fixed_font_size: 64
                 selections: visual_settings["randomness_rule"]
                 color: (0, 0, 0, 1)
                 background_selected: "assets/img/selected.png"
@@ -249,10 +256,15 @@ AppScreenManager:
                 on_selection:
                     update_setting("randomness_rule", self.selected)
                     root.ids.randomness_rule_popup.active = False
+            Button:
+                active_pos_fixed: (400 + 1400 - 250 - 20, 200 + 20)
+                size_fixed: (250, 100)
+                text: _("Cancel")
+                on_release: root.ids.randomness_rule_popup.active = False
         FixedPopup:
             id: who_first_popup
-            active_pos_fixed: (300, 100)
-            size_fixed: (1600, 900)
+            active_pos_fixed: (350, 150)
+            size_fixed: (1500, 192*2 + 100)
             FixedRadioButtons:
                 selected: settings["who_plays_first"]
                 active_pos_fixed: (400, 200)
@@ -264,10 +276,15 @@ AppScreenManager:
                 on_selection:
                     update_setting("who_plays_first", self.selected)
                     root.ids.who_first_popup.active = False
+            Button:
+                active_pos_fixed: (400 + 1400 - 250 - 20, 200 + 20)
+                size_fixed: (250, 100)
+                text: _("Cancel")
+                on_release: root.ids.who_first_popup.active = False
         FixedPopup:
             id: seeds_per_house_selection_popup
-            active_pos_fixed: (300, 100)
-            size_fixed: (1600, 900)
+            active_pos_fixed: (350, 150)
+            size_fixed: (1500, 192*4 + 100)
             FixedRadioButtons:
                 selected: settings["seeds_per_house_selection"]
                 active_pos_fixed: (400, 200)
@@ -279,10 +296,15 @@ AppScreenManager:
                 on_selection:
                     update_setting("seeds_per_house_selection", self.selected)
                     root.ids.seeds_per_house_selection_popup.active = False
+            Button:
+                active_pos_fixed: (400 + 1400 - 250 - 20, 200 + 20)
+                size_fixed: (250, 100)
+                text: _("Cancel")
+                on_release: root.ids.seeds_per_house_selection_popup.active = False
         FixedPopup:
             id: capture_rule_popup
-            active_pos_fixed: (300, 100)
-            size_fixed: (1600, 900)
+            active_pos_fixed: (350, 150)
+            size_fixed: (1500, 192*3 + 100)
             FixedRadioButtons:
                 selected: settings["capture_rule"]
                 active_pos_fixed: (400, 200)
@@ -294,10 +316,15 @@ AppScreenManager:
                 on_selection:
                     update_setting("capture_rule", self.selected)
                     root.ids.capture_rule_popup.active = False
+            Button:
+                active_pos_fixed: (400 + 1400 - 250 - 20, 200 + 20)
+                size_fixed: (250, 100)
+                text: _("Cancel")
+                on_release: root.ids.capture_rule_popup.active = False
         FixedPopup:
             id: eog_rule_popup
-            active_pos_fixed: (300, 100)
-            size_fixed: (1600, 900)
+            active_pos_fixed: (350, 150)
+            size_fixed: (1500, 192*4 + 100)
             FixedRadioButtons:
                 selected: settings["eog_rule"]
                 active_pos_fixed: (400, 200)
@@ -309,6 +336,11 @@ AppScreenManager:
                 on_selection:
                     update_setting("eog_rule", self.selected)
                     root.ids.eog_rule_popup.active = False
+            Button:
+                active_pos_fixed: (400 + 1400 - 250 - 20, 200 + 20)
+                size_fixed: (250, 100)
+                text: _("Cancel")
+                on_release: root.ids.eog_rule_popup.active = False
 
 <SettingsScreenScreen>
     name: "settings_screen_screen"
@@ -355,6 +387,7 @@ AppScreenManager:
             pos_fixed: (400, 150)
             size_fixed: (1500, 192*5)
             color: (0, 0, 0, 1)
+            background_color: (1, 1, 153.0/255.0, 1)
             FixedSimpleMenuItem:
                 name: "board_choice"
                 heading: _("Board chosen")
@@ -382,8 +415,8 @@ AppScreenManager:
                 on_press: root.ids.show_center_message_popup.active = True
         FixedPopup:
             id: board_choice_popup
-            active_pos_fixed: (300, 100)
-            size_fixed: (1600, 900)
+            active_pos_fixed: (350, 150)
+            size_fixed: (1500, 192*2 + 100)
             FixedRadioButtons:
                 selected: settings['board_choice']
                 active_pos_fixed: (400, 200)
@@ -395,10 +428,15 @@ AppScreenManager:
                 on_selection:
                     update_setting("board_choice", self.selected)
                     root.ids.board_choice_popup.active = False
+            Button:
+                active_pos_fixed: (400 + 1400 - 250 - 20, 200 + 20)
+                size_fixed: (250, 100)
+                text: _("Cancel")
+                on_release: root.ids.board_choice_popup.active = False
         FixedPopup:
             id: background_popup
-            active_pos_fixed: (300, 100)
-            size_fixed: (1600, 900)
+            active_pos_fixed: (350, 150)
+            size_fixed: (1500, 192*2 + 100)
             FixedRadioButtons:
                 selected: settings['background']
                 active_pos_fixed: (400, 200)
@@ -410,10 +448,15 @@ AppScreenManager:
                 on_selection:
                     update_setting("background", self.selected)
                     root.ids.background_popup.active = False
+            Button:
+                active_pos_fixed: (400 + 1400 - 250 - 20, 200 + 20)
+                size_fixed: (250, 100)
+                text: _("Cancel")
+                on_release: root.ids.background_popup.active = False
         FixedPopup:
             id: seed_choice_popup
-            active_pos_fixed: (300, 100)
-            size_fixed: (1600, 900)
+            active_pos_fixed: (350, 150)
+            size_fixed: (1500, 192*3 + 100)
             FixedRadioButtons:
                 selected: settings['seed_choice']
                 active_pos_fixed: (400, 200)
@@ -425,10 +468,15 @@ AppScreenManager:
                 on_selection:
                     update_setting("seed_choice", self.selected)
                     root.ids.seed_choice_popup.active = False
+            Button:
+                active_pos_fixed: (400 + 1400 - 250 - 20, 200 + 20)
+                size_fixed: (250, 100)
+                text: _("Cancel")
+                on_release: root.ids.seed_choice_popup.active = False
         FixedPopup:
             id: animation_speed_popup
-            active_pos_fixed: (300, 100)
-            size_fixed: (1600, 900)
+            active_pos_fixed: (350, 150)
+            size_fixed: (1500, 192*3 + 100)
             FixedRadioButtons:
                 selected: settings['animation_speed_choice']
                 active_pos_fixed: (400, 200)
@@ -440,10 +488,15 @@ AppScreenManager:
                 on_selection:
                     update_setting("animation_speed_choice", self.selected)
                     root.ids.animation_speed_popup.active = False
+            Button:
+                active_pos_fixed: (400 + 1400 - 250 - 20, 200 + 20)
+                size_fixed: (250, 100)
+                text: _("Cancel")
+                on_release: root.ids.animation_speed_popup.active = False
         FixedPopup:
             id: show_center_message_popup
-            active_pos_fixed: (300, 100)
-            size_fixed: (1600, 900)
+            active_pos_fixed: (350, 150)
+            size_fixed: (1500, 192*2 + 100)
             FixedRadioButtons:
                 selected: settings['show_center_message_choice']
                 active_pos_fixed: (400, 200)
@@ -455,6 +508,11 @@ AppScreenManager:
                 on_selection:
                     update_setting("show_center_message_choice", self.selected)
                     root.ids.show_center_message_popup.active = False
+            Button:
+                active_pos_fixed: (400 + 1400 - 250 - 20, 200 + 20)
+                size_fixed: (250, 100)
+                text: _("Cancel")
+                on_release: root.ids.show_center_message_popup.active = False
 
 <SettingsSoundScreen>
     name: "settings_sound_screen"
@@ -532,6 +590,7 @@ AppScreenManager:
             pos_fixed: (400, 150)
             size_fixed: (1500, 192*2)
             color: (0, 0, 0, 1)
+            background_color: (1, 1, 153.0/255.0, 1)
             FixedSimpleMenuItem:
                 name: "notification_volume"
                 heading: _("Notification volume")
@@ -544,8 +603,8 @@ AppScreenManager:
                 on_press: root.ids.seed_volume_popup.active = True
         FixedPopup:
             id: notification_volume_popup
-            active_pos_fixed: (300, 100)
-            size_fixed: (1600, 900)
+            active_pos_fixed: (350, 150)
+            size_fixed: (1500, 192*4 + 100)
             FixedRadioButtons:
                 selected: settings['notification_volume']
                 active_pos_fixed: (400, 200)
@@ -557,10 +616,15 @@ AppScreenManager:
                 on_selection:
                     update_setting("notification_volume", self.selected)
                     root.ids.notification_volume_popup.active = False
+            Button:
+                active_pos_fixed: (400 + 1400 - 250 - 20, 200 + 20)
+                size_fixed: (250, 100)
+                text: _("Cancel")
+                on_release: root.ids.notification_volume_popup.active = False
         FixedPopup:
             id: seed_volume_popup
-            active_pos_fixed: (300, 100)
-            size_fixed: (1600, 900)
+            active_pos_fixed: (350, 150)
+            size_fixed: (1500, 192*4 + 100)
             FixedRadioButtons:
                 selected: settings['seed_volume']
                 active_pos_fixed: (400, 200)
@@ -572,6 +636,11 @@ AppScreenManager:
                 on_selection:
                     update_setting("seed_volume", self.selected)
                     root.ids.seed_volume_popup.active = False
+            Button:
+                active_pos_fixed: (400 + 1400 - 250 - 20, 200 + 20)
+                size_fixed: (250, 100)
+                text: _("Cancel")
+                on_release: root.ids.seed_volume_popup.active = False
 
 <GameScreen>
     name: "game_screen"

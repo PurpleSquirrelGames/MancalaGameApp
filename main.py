@@ -86,11 +86,14 @@ def load_global_settings(user_data_dir):
         # from jnius import autoclass
         # Environment = autoclass('android.os.Environment')
         # sdpath = Environment.getExternalStorageDirectory().getAbsolutePath() 
+        #
         app_folder = os.path.dirname(os.path.abspath(__file__))
+        jpath = app_folder
+        # print "JSON DIR =", jpath
     else:
-        sdpath = user_data_dir
+        jpath = user_data_dir
 
-    fn = join(sdpath, 'pskalah.json')
+    fn = join(jpath, 'pskalah.json')
     storage = JsonStore(fn)
 
     stats = {
@@ -702,6 +705,12 @@ class PSKalahApp(App):
         machine.bind_reference("kivy", self.root.screens[GAME_SCREEN].ids)
         if current['first_time_flag']:
             self.jump_to_screen(SETTINGS_OPPONENT_SCREEN)
+            x = Animation(background_color=[0.5, 0.5, 0.5, 1.0], duration=0.1)
+            for i in range(5):
+                x += Animation(background_color=[1.0, 1.0, 1.0, 0.0])  # bright
+                x += Animation(background_color=[0.5, 0.5, 0.5, 1.0])  # dark
+            x += Animation(background_color=[1.0, 1.0, 1.0, 1.0])  # full
+            x.start(self.root.screens[SETTINGS_OPPONENT_SCREEN].ids.start_game_wrapper)
         else:
             self.jump_to_screen(GAME_SCREEN)
         machine.change_state("init_game")
@@ -893,7 +902,7 @@ class Seeds(object):
         face = Image()
         face.id = "ai_picture"
         face.source = "assets/img/ai-pic-01.png"
-        face.pos_fixed = (0, 1080)
+        face.pos_fixed = (-1000, 2401)
         face.size_fixed = (300, 300)
         self.ai_face = face
         display.game_screen_root.add_widget(face)
@@ -960,7 +969,7 @@ class Seeds(object):
 
 def animate_ai_start(display):
     global seeds
-    a = Animation(pos_fixed=(230, 400)) + Animation(pos_fixed=(234, 400), duration=2.0)
+    a = Animation(pos_fixed=(0, 1080), duration=0.5) + Animation(pos_fixed=(230, 400)) + Animation(pos_fixed=(234, 400), duration=2.0)
     a.bind(on_complete=animate_ai_start_finished)
     a.start(seeds.ai_face)
 
@@ -970,7 +979,7 @@ def animate_ai_start_finished(*args, **kwargs):
 
 
 def animate_ai_end(display):
-    a = Animation(pos_fixed=(0, 1080))
+    a = Animation(pos_fixed=(0, 1080)) + Animation(pos_fixed=(-1000, 2401), duration=0.5)
     a.start(seeds.ai_face)
 
 

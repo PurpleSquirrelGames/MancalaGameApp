@@ -83,7 +83,7 @@ SCENARIOS, FILENAMES = build_scenario_tuples(COMBOS)
 #
 #  DO 10 "islands" of independent evolution;
 #     then later run all of them together for 20 more generations
-ISLAND_QTY = 5  # 10
+ISLAND_QTY = 4  # 10
 #
 #  RUN 100 generations for each island
 GENERATION_QTY = 10  # 100
@@ -95,7 +95,7 @@ PLAYS_PER_ENGAGEMENT = 1
 #     WHEN a genome is in the defender role; it COULD have a % chance of wrong move
 #        per round of play to mimic diversity, however it currently does not
 #  AFTER ALL engagements are finished, extinct the bottom 60%
-EXTINCTION_RATE = 0.45
+EXTINCTION_RATE = 0.60
 #  BREED replacements:
 #        1/3rd get a +1 or -1 change to a random gene
 #        1/3rd get a big change to a random gene
@@ -156,6 +156,7 @@ settings = {
     "capture_rule": 0,
     "eog_rule": 0,
     "seed_drop_rate": 0.4,
+    "randomness_rule": 0
 }
 
 
@@ -189,7 +190,11 @@ ALT_AI_LIST = [
 
 game = None
 
+INF = 1000000
+
 def play_engagement(genome):
+    if (genome["score"] > -INF) and (PLAYS_PER_ENGAGEMENT==1):
+        return genome["score"]
     score = 0
     for round in range(PLAYS_PER_ENGAGEMENT):
         game.reset_board()
@@ -253,7 +258,7 @@ def do_reproduction(genome_list):
         new_genome['parent_qty'] += 1
         new_genome['id'] = ID_CTR
         ID_CTR += 1
-        new_genome['score'] = -1000000
+        new_genome['score'] = -INF
         genome_list.append(new_genome)            
     return
 
@@ -264,7 +269,7 @@ def do_trials(genome_list):
         # apply_genome(game.players[1], genome) # always apply to AI 
         print me, "GENOME", genome['id'], "ANCESTORS", genome["parent_qty"],
         print "LIFESPAN", genome['life_span'], "OLD_SCORE",
-        if genome['score'] == -1000000:
+        if genome['score'] == -INF:
             print "None"
         else:
             print genome['score']
