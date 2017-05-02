@@ -336,15 +336,16 @@ class KalahGame(easyAI.TwoPlayersGame):
                     if self.board[HAND]:
                         self._drop_all(STORE_IDX[self.nplayer])
             elif self.settings['eog_rule'] == 3:
+                pass
                 # leave seeds alone
-                # just place in hand for proper scoring; don't animate this ever
-                temp = self.want_animation
-                self.want_animation = False
-                for player in PLAYER_LIST:
-                    for house in HOUSE_LIST[player]:
-                        if self.board[house]:
-                            self._scoop(house)
-                self.want_animation = temp  # restore
+                # # just place in hand for proper scoring; don't animate this ever
+                # temp = self.want_animation
+                # self.want_animation = False
+                # for player in PLAYER_LIST:
+                #     for house in HOUSE_LIST[player]:
+                #         if self.board[house]:
+                #             self._scoop(house)
+                # self.want_animation = temp  # restore
 
     # def is_over(self):
     #     for player in PLAYER_LIST:

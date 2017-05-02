@@ -26,17 +26,17 @@ AppScreenManager:
             background_normal: 'assets/img/not-rules.png'
             pos_fixed: (-190, 478)
             size_fixed: (498, 218)
-            on_release: app.root.current = "settings_rules_screen"
+            on_release: app.jump_to_screen("settings_rules_screen")
         Button:
             background_normal: 'assets/img/not-screen.png'
             pos_fixed: (-190, 275)
             size_fixed: (498, 205)
-            on_release: app.root.current = "settings_screen_screen"
+            on_release: app.jump_to_screen("settings_screen_screen")
         Button:
             background_normal: 'assets/img/not-sound.png'
             pos_fixed: (-191, -14)
             size_fixed: (499, 289)
-            on_release: app.root.current = "settings_sound_screen"
+            on_release: app.jump_to_screen("settings_sound_screen")
         Button:
             id: resume_game
             pos_fixed: (1300, 0)
@@ -178,17 +178,17 @@ AppScreenManager:
             background_normal: 'assets/img/not-opponent.png'
             pos_fixed: (-184, 698)
             size_fixed: (498, 226)
-            on_release: app.root.current = "settings_opponent_screen"
+            on_release: app.jump_to_screen("settings_opponent_screen")
         Button:
             background_normal: 'assets/img/not-screen.png'
             pos_fixed: (-190, 275)
             size_fixed: (498, 205)
-            on_release: app.root.current = "settings_screen_screen"
+            on_release: app.jump_to_screen("settings_screen_screen")
         Button:
             background_normal: 'assets/img/not-sound.png'
             pos_fixed: (-191, -14)
             size_fixed: (499, 289)
-            on_release: app.root.current = "settings_sound_screen"
+            on_release: app.jump_to_screen("settings_sound_screen")
         Button:
             id: resume_game
             pos_fixed: (1300, 0)
@@ -322,17 +322,17 @@ AppScreenManager:
             background_normal: 'assets/img/not-opponent.png'
             pos_fixed: (-184, 698)
             size_fixed: (498, 226)
-            on_release: app.root.current = "settings_opponent_screen"
+            on_release: app.jump_to_screen("settings_opponent_screen")
         Button:
             background_normal: 'assets/img/not-rules.png'
             pos_fixed: (-190, 478)
             size_fixed: (498, 218)
-            on_release: app.root.current = "settings_rules_screen"
+            on_release: app.jump_to_screen("settings_rules_screen")
         Button:
             background_normal: 'assets/img/not-sound.png'
             pos_fixed: (-191, -14)
             size_fixed: (499, 289)
-            on_release: app.root.current = "settings_sound_screen"
+            on_release: app.jump_to_screen("settings_sound_screen")
         Button:
             id: resume_game
             pos_fixed: (1300, 0)
@@ -350,18 +350,6 @@ AppScreenManager:
             font_size_fixed: 64
             background_normal: 'assets/img/blank-wood-button.png'
             color: (101/255.0, 244/255.0, 66/255.0, 1)
-        Image:
-            pos_fixed: (400, 780)
-            size_fixed: (1400, 300)
-            source: 'assets/img/link-background.png'
-        Label:
-            pos_fixed: (400, 780+50)
-            size_fixed: (1400, 250)
-            font_size_fixed: 64
-            text: "Like the look of the Mancala board?\nThe author of this game also makes physical boards:\n\n         [b][ref=url]Amazon Store Reference[/ref][/b]"
-            markup: True
-            color: (0, 0, 0, 1)
-            on_ref_press: root.launch_url(args[1])
         FixedSimpleMenu:
             id: screen_screen_menu
             pos_fixed: (400, 150)
@@ -480,17 +468,17 @@ AppScreenManager:
             background_normal: 'assets/img/not-opponent.png'
             pos_fixed: (-184, 698)
             size_fixed: (498, 226)
-            on_release: app.root.current = "settings_opponent_screen"
+            on_release: app.jump_to_screen("settings_opponent_screen")
         Button:
             background_normal: 'assets/img/not-rules.png'
             pos_fixed: (-190, 478)
             size_fixed: (498, 218)
-            on_release: app.root.current = "settings_rules_screen"
+            on_release: app.jump_to_screen("settings_rules_screen")
         Button:
             background_normal: 'assets/img/not-screen.png'
             pos_fixed: (-190, 275)
             size_fixed: (498, 205)
-            on_release: app.root.current = "settings_screen_screen"
+            on_release: app.jump_to_screen("settings_screen_screen")
         Button:
             id: resume_game
             pos_fixed: (1300, 0)
@@ -508,6 +496,37 @@ AppScreenManager:
             on_release: app.start_new_game()
             font_size_fixed: 64
             color: (101/255.0, 244/255.0, 66/255.0, 1)
+        #Image:
+        #    pos_fixed: (400, 1080-500)
+        #    size_fixed: (1400, 500)
+        #    source: 'assets/img/link-background.png'
+        Label:
+            pos_fixed: (400, 1080-125)
+            size_fixed: (1400, 125)
+            font_size_fixed: 96
+            text: "Credits"
+            markup: True
+            color: (0, 0, 0, 1)
+            on_ref_press: root.launch_url(args[1])
+        Label:
+            pos_fixed: (480, 1080-125-300-50)
+            size_fixed: (200, 300)
+            font_size_fixed: 56
+            halign: "right"
+            # These are titles for people on the Credits screen.
+            text: _("Programming:\n\nArt:\n\nPhotography:\n\nWoodworking:")
+            markup: True
+            color: (0, 0, 0, 1)
+            on_ref_press: root.launch_url(args[1])
+        Label:
+            pos_fixed: (600, 1080-125-300-50)
+            size_fixed: (1200, 300)
+            font_size_fixed: 56
+            # This is a list of people being given credit. Characters in square brackets are for URL references.
+            text: _("John Dupuy of [b][ref=ps]Purple Squirrel Games[/ref][/b]\n\nDaniel, cartoonist of [b][ref=art]JODDAS VAPD[/ref][/b]\n\nDrew Piester of [b][ref=photo]Drew Piester Photography LLC[/ref][/b]\n\nJohn Dupuy (board available at [b][ref=url]Amazon[/ref][/b])")
+            markup: True
+            color: (0, 0, 0, 1)
+            on_ref_press: root.launch_url(args[1])
         FixedSimpleMenu:
             id: sound_screen_menu
             pos_fixed: (400, 150)
@@ -575,7 +594,7 @@ AppScreenManager:
             background_normal: 'assets/img/gear.png'
             pos_fixed: (1720, 880)
             size_fixed: (200, 200)
-            on_release: app.root.current = "settings_opponent_screen"
+            on_release: app.jump_to_screen("settings_opponent_screen")
         Image:
             id: message_background
             source: 'assets/img/message-background.png'
@@ -772,10 +791,11 @@ AppScreenManager:
             size_fixed: (300, 100)
             Button:
                 id: next_opponent_button
-                active_pos_fixed: (1200, 400 + 40 - 100 - 50)
-                size_fixed: (300, 100)
-                color: (101/255.0, 244/255.0, 66/255.0, 1)
-                background_normal: 'assets/img/blank-wood-button.png'
+                active_pos_fixed: (1200-100, 400 + 40 - 100 - 50)
+                size_fixed: (400, 100)
+                color: (0, 0, 0, 1)
+                background_normal: 'assets/img/youtube-url.png'
                 font_size_fixed: 56
                 text: "Play ?"
                 on_release: app.upgrade_opponent()
+

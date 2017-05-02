@@ -4,6 +4,7 @@ import webbrowser
 import gettext
 from copy import copy
 from os.path import join 
+import os
 from kivy.app import App
 from kivy.animation import Animation
 from kivy.core.audio import SoundLoader
@@ -12,6 +13,7 @@ from kivy.garden.progressspinner import ProgressSpinner
 from kivy.lang import Builder
 from kivy.storage.jsonstore import JsonStore
 from kivy.uix.image import Image
+from kivy.uix.button import Button
 from kivy.uix.screenmanager import ScreenManager, Screen, NoTransition
 from kivy.uix.floatlayout import FloatLayout
 from kivy.utils import platform
@@ -31,8 +33,11 @@ __version__ = u"0.0.18"
 
 t = gettext.translation('pskalah', 'locale', fallback=True)
 _ = t.ugettext
+ngettext = gettext.ngettext
 
 machine = StateMachine(debug=True)
+
+back_screen_list = []
 
 seeds = None
 status_bar = None
@@ -78,14 +83,14 @@ def load_global_settings(user_data_dir):
     global game
 
     if platform=="android":
-        from jnius import autoclass
-        Environment = autoclass('android.os.Environment')
-        sdpath = Environment.getExternalStorageDirectory().getAbsolutePath() 
+        # from jnius import autoclass
+        # Environment = autoclass('android.os.Environment')
+        # sdpath = Environment.getExternalStorageDirectory().getAbsolutePath() 
+        app_folder = os.path.dirname(os.path.abspath(__file__))
     else:
         sdpath = user_data_dir
 
-    fn = join(sdpath, 'mancala.json')
-    print "SETTINGS STORAGE FILE", fn 
+    fn = join(sdpath, 'pskalah.json')
     storage = JsonStore(fn)
 
     stats = {
@@ -573,20 +578,40 @@ class SettingsOpponentScreen(Screen):
         #
         s = settings["stats"][ai_chosen]
         msg = ""
-        msg += _("name: {player_name}").format(player_name=c['name']) + "\n\n"
-        msg += _("rank: {rank_number}").format(rank_number=c['rank'])
-        msg += _("{count} games played").format(count=s["games_played"]) + "\n"
-        msg += _("   {count} games won by you").format(count=s["games_won"]) + "\n"
-        msg += _("   {count} games tied").format(count=s["games_tied"]) + "\n"
-        lost = s["games_played"] - s["games_won"] - s["games_tied"]
-        msg += _("   {count} games won by {player_name}").format(
-            count=lost, player_name=c['name']
+        msg += _("{player_name}, rank {rank_number}").format(
+            player_name=c['name'],
+            rank_number=c['rank']
         )
         msg += "\n\n"
-        msg += _('tech details: algorithm {algorithm_name}\n  lookahead {number} with fitness "{desc}"').format(
+        msg += ngettext(
+            "{count} game played",
+            "{count} games played",
+            s["games_played"]
+        ).format(count=s["games_played"])
+        msg += "\n"
+        msg += ngettext(
+            "   {count} game won by you",
+            "   {count} games won by you",
+            s["games_won"]
+        ).format(count=s["games_won"])
+        msg += "\n"
+        msg += ngettext(
+            "   {count} game tied",
+            "   {count} games tied",
+            s["games_tied"]
+        ).format(count=s["games_tied"])
+        msg += "\n"
+        lost = s["games_played"] - s["games_won"] - s["games_tied"]
+        msg += ngettext(
+            "   {count} game won by {player_name}",
+            "   {count} games won by {player_name}",
+            lost
+        ).format(count=lost, player_name=c['name'])
+        msg += "\n\n"
+        msg += _('tech details: algorithm {algorithm_name}\n  look-ahead {number} with fitness of "{desc}"').format(
             algorithm_name = c['strategy'],
             number = c['lookahead'],
-            desc = c['fitness']
+            desc = c['fitness_desc']
         )
         self.ids.stats_text.text = msg
 
@@ -625,36 +650,42 @@ class SettingsRulesScreen(Screen):
 
 
 class SettingsScreenScreen(Screen):
-
-    global settings
-
-    def launch_url(self, value):
-        # TODO: look at settings and send the right lookup
-        if settings["board_choice"] == 0:       # walnut
-            if settings["seed_choice"] == 0:    # w teal
-                webbrowser.open('https://www.amazon.com/dp/B01CKHM4WC')
-            elif settings["seed_choice"] == 1:  # w tumbled pebbles
-                webbrowser.open('https://www.amazon.com/dp/B01CKI1DLY')
-            else:                               # w river stones
-                webbrowser.open('https://www.amazon.com/dp/B01CKHQ4GO')
-        else:                                   # birch
-            if settings["seed_choice"] == 0:    #  w teal
-                webbrowser.open('https://www.amazon.com/dp/B01IRS81CU')
-            elif settings["seed_choice"] == 1:  #  w tumbled pebbles
-                webbrowser.open('https://www.amazon.com/dp/B01IRSJGVA')
-            else:                               #  w river stones
-                webbrowser.open('https://www.amazon.com/dp/B01IRPHFJI')
+    pass
 
 
 class SettingsSoundScreen(Screen):
-    pass
+
+    def launch_url(self, value):
+        global settings
+
+        if value=="photo":
+            webbrowser.open('http://www.drewpiester.com/')
+        elif value=="ps":
+            webbrowser.open('http://www.purplesquirrel.design/')
+        elif value=="art":
+            webbrowser.open('https://tapas.io/series/JODDAS-VAPD')
+        else:
+            if settings["board_choice"] == 0:       # walnut
+                if settings["seed_choice"] == 0:    # w teal
+                    webbrowser.open('https://www.amazon.com/dp/B01CKHM4WC')
+                elif settings["seed_choice"] == 1:  # w tumbled pebbles
+                    webbrowser.open('https://www.amazon.com/dp/B01CKI1DLY')
+                else:                               # w river stones
+                    webbrowser.open('https://www.amazon.com/dp/B01CKHQ4GO')
+            else:                                   # birch
+                if settings["seed_choice"] == 0:    #  w teal
+                    webbrowser.open('https://www.amazon.com/dp/B01IRS81CU')
+                elif settings["seed_choice"] == 1:  #  w tumbled pebbles
+                    webbrowser.open('https://www.amazon.com/dp/B01IRSJGVA')
+                else:                               #  w river stones
+                    webbrowser.open('https://www.amazon.com/dp/B01IRPHFJI')
 
 
 class AppScreenManager(ScreenManager):
     pass
 
 
-class MancalaApp(App):
+class PSKalahApp(App):
 
     global current
 
@@ -665,11 +696,14 @@ class MancalaApp(App):
 
     def on_start(self):
         global game
+        global back_screen_list
         set_current_sound_combo()
         machine.bind_reference("game", game)
         machine.bind_reference("kivy", self.root.screens[GAME_SCREEN].ids)
         if current['first_time_flag']:
-            self.root.current = "settings_opponent_screen"
+            self.jump_to_screen(SETTINGS_OPPONENT_SCREEN)
+        else:
+            self.jump_to_screen(GAME_SCREEN)
         machine.change_state("init_game")
         generically_apply_settings()
         Window.bind(on_keyboard=self.on_key)
@@ -704,34 +738,71 @@ class MancalaApp(App):
         return open_popup_found
 
     def on_key(self, window, key, *args):
+        global back_screen_list
         if key == 27:  # Esc on PC, Back on Android
             if self.need_to_escape_menu():
                 return True
-            if current['allow_resume']:
-                self.resume_game()
-            else:
-                self.start_new_game()
-            return True
+            if back_screen_list:
+                next_screen = back_screen_list.pop()
+                if next_screen == GAME_SCREEN:
+                    if current['allow_resume']:
+                        self.resume_game(from_esc=True)
+                    else:
+                        self.start_new_game(from_esc=True)
+                    return True
+                self.jump_to_screen(next_screen, from_esc=True)
+                return True
+            return True  # return true or it will exit app
         return False
 
-    def resume_game(self):
+    def resume_game(self, from_esc=False):
         if not current['allow_resume']:
             return
-        self.root.current = "game_screen"
+        self.jump_to_screen(GAME_SCREEN, from_esc=from_esc)
 
-    def start_new_game(self):
-        self.root.current = "game_screen"
+    def start_new_game(self, from_esc=False):
+        self.jump_to_screen(GAME_SCREEN, from_esc=from_esc)
         self.root.screens[GAME_SCREEN].ids.eog_new_game_button.active = False
         save_game(force_new_game=True)
         current['first_time_flag'] = False
         enable_resume_game()
         machine.input("request_new_game")
 
+    # this routine is called at the end-of-game that allows for upgrade to new opponent.
     def upgrade_opponent(self):
         global settings
         update_setting("ai_chosen", settings['best_level'] + 1)
+        current['ai_viewed'] = settings["ai_chosen"]
+        self.root.screens[SETTINGS_OPPONENT_SCREEN]._update_details(settings["ai_chosen"])
         self.start_new_game()
 
+    def jump_to_screen(self, next_screen, from_esc=False):
+        global back_screen_list
+        if isinstance(next_screen, basestring):
+            if next_screen == "settings_opponent_screen":
+                next_screen = SETTINGS_OPPONENT_SCREEN
+            elif next_screen == "settings_rules_screen":
+                next_screen = SETTINGS_RULES_SCREEN
+            elif next_screen == "settings_screen_screen":
+                next_screen = SETTINGS_SCREEN_SCREEN
+            elif next_screen == "settings_sound_screen":
+                next_screen = SETTINGS_SOUND_SCREEN
+            elif next_screen == "game_screen":
+                next_screen = GAME_SCREEN
+        if next_screen == GAME_SCREEN:
+            self.root.current = "game_screen"
+        elif next_screen == SETTINGS_OPPONENT_SCREEN:
+            self.root.current = "settings_opponent_screen"
+        elif next_screen == SETTINGS_RULES_SCREEN:
+            self.root.current = "settings_rules_screen"
+        elif next_screen == SETTINGS_SCREEN_SCREEN:
+            self.root.current = "settings_screen_screen"
+        elif next_screen == SETTINGS_SOUND_SCREEN:
+            self.root.current = "settings_sound_screen"
+        else:
+            return # error
+        if not from_esc:
+            back_screen_list.append(next_screen)
 
 ##############################
 #
@@ -1090,7 +1161,6 @@ class StartTurn(State):
             return self.change_state("eog")
         if current["turn"] == 1:
             if settings["randomness_rule"] == 1:
-                # randomly choose first move
                 status_bar.say(_("Playing Randomly Chosen First Move"))
                 move_list = self.ref["game"].possible_moves()
                 self.ref['ai_choices'] = random.choice(move_list)
@@ -1256,7 +1326,7 @@ class EndOfGameDisplayState(State):
 
 
 if __name__ == '__main__':
-    app = MancalaApp()
+    app = PSKalahApp()
     # machine.bind_reference("game", game)
     machine.bind_reference("settings", settings)
     machine.register_state(StartTurn("start_turn"))
