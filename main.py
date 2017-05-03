@@ -29,7 +29,7 @@ from coordinates import PIT_ARRANGEMENT, SEED_DICT, HAND_FOCUS
 if platform=="android":
     import runnable
 
-__version__ = u"0.0.18"
+__version__ = u"0.0.19"
 
 t = gettext.translation('pskalah', 'locale', fallback=True)
 _ = t.ugettext
@@ -669,6 +669,8 @@ class SettingsSoundScreen(Screen):
             webbrowser.open('http://www.purplesquirrel.design/')
         elif value=="art":
             webbrowser.open('https://tapas.io/series/JODDAS-VAPD')
+        elif value=="qa":
+            webbrowser.open('http://www.aviparshan.com/')
         else:
             if settings["board_choice"] == 0:       # walnut
                 if settings["seed_choice"] == 0:    # w teal
@@ -780,7 +782,8 @@ class PSKalahApp(App):
         return True
 
     def on_resume(self):
-        pass
+        if platform=="android":
+            runnable.set_fullscreen()
 
     def need_to_escape_menu(self):
         ''' if any menu screen is open; then close it. '''

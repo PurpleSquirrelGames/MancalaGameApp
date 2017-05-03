@@ -571,17 +571,19 @@ AppScreenManager:
             size_fixed: (200, 300)
             font_size_fixed: 56
             halign: "right"
+            line_height: 1.5
             # These are titles for people on the Credits screen.
-            text: _("Programming:\n\nArt:\n\nPhotography:\n\nWoodworking:")
+            text: _("Programming:\nArt:\nPhotography:\nQA/Testing:\nWoodworking:")
             markup: True
             color: (0, 0, 0, 1)
             on_ref_press: root.launch_url(args[1])
         Label:
             pos_fixed: (600, 1080-125-300-50)
             size_fixed: (1200, 300)
+            line_height: 1.5
             font_size_fixed: 56
             # This is a list of people being given credit. Characters in square brackets are for URL references.
-            text: _("John Dupuy of [b][ref=ps]Purple Squirrel Games[/ref][/b]\n\nDaniel, cartoonist of [b][ref=art]JODDAS VAPD[/ref][/b]\n\nDrew Piester of [b][ref=photo]Drew Piester Photography LLC[/ref][/b]\n\nJohn Dupuy (board available at [b][ref=url]Amazon[/ref][/b])")
+            text: _("John Dupuy of [b][ref=ps]Purple Squirrel Games[/ref][/b]\nDaniel Anthony, cartoonist of [b][ref=art]JODDAS VAPD[/ref][/b]\nDrew Piester of [b][ref=photo]Drew Piester Photography LLC[/ref][/b]\nAvi Parshan of [ref=qa]Avi Parshan Productions[/ref]\nJohn Dupuy (board available at [b][ref=url]Amazon[/ref][/b])")
             markup: True
             color: (0, 0, 0, 1)
             on_ref_press: root.launch_url(args[1])
