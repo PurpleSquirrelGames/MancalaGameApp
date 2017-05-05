@@ -141,11 +141,11 @@ AI_LIST = [
         "strategy": "negamax",  # options: "random", "negamax"
         "tactics": "standard",
         "lookahead": 5,  # 1 to 6
-        "error_rate": 0.00,  # 0.0 to 1.0; odds of making mistake
+        "error_rate": 0.03,  # 0.0 to 1.0; odds of making mistake
         "fitness": "balance",
         "fitness_desc": _("balance"),
-        "desc": _("An arrogant artificial intelligence."),
-        "tagline": _("R3 UNIT looks ahead 6 moves. High difficulty.")
+        "desc": _("An arrogant artificial intelligence.\n\n[b]On some devices, R3 UNIT runs very slow.[/b]"),
+        "tagline": _("R3 UNIT looks ahead 5 moves. High difficulty.")
     },
     {
         "index": 12,
@@ -153,11 +153,11 @@ AI_LIST = [
         "rank": "12",
         "strategy": "negamax",  # options: "random", "negamax"
         "tactics": "standard",
-        "lookahead": 6,  # 1 to 6
+        "lookahead": 5,  # 1 to 6
         "error_rate": 0.00,  # 0.0 to 1.0; odds of making mistake
         "fitness": "balance",
         "fitness_desc": _("balance"),
-        "desc": _("A deep artificial intelligence. ThoughtNet finds interacting with humans pleasing.\n\nOn some devices, ThoughtNet runs very slow."),
+        "desc": _("A deep artificial intelligence. ThoughtNet finds interacting with humans pleasing.\n\n[b]On some devices, ThoughtNet runs very slow.[/b]"),
         "tagline": _("Very high difficulty. It is still possible to win if you go first.")
     },
 ]

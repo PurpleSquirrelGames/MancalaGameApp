@@ -29,7 +29,7 @@ from coordinates import PIT_ARRANGEMENT, SEED_DICT, HAND_FOCUS
 if platform=="android":
     import runnable
 
-__version__ = u"0.0.19"
+__version__ = u"0.0.20"
 
 t = gettext.translation('pskalah', 'locale', fallback=True)
 _ = t.ugettext
@@ -280,7 +280,7 @@ def update_setting(setting_name, value):
         app.root.screens[GAME_SCREEN].ids.game_background.source = filename
         set_current_sound_combo()
     if setting_name == "animation_speed_choice":
-        settings["seed_drop_rate"] = 0.1 + value * 0.3
+        settings["seed_drop_rate"] = [0.15, 0.35, 0.6][value]
         app.root.screens[SETTINGS_SCREEN_SCREEN].ids.screen_screen_menu.\
             set_text(setting_name, visual_settings[setting_name][value])
     if setting_name == "show_center_message_choice":
@@ -1017,7 +1017,9 @@ class Seeds(object):
 
 def animate_ai_start(display):
     global seeds
-    a = Animation(pos_fixed=(0, 1080), duration=0.5) + Animation(pos_fixed=(230, 400)) + Animation(pos_fixed=(234, 400), duration=2.0)
+    a = Animation(pos_fixed=(0, 1080), duration=0.2) 
+    a += Animation(pos_fixed=(230, 400), duration=settings['seed_drop_rate']) 
+    a += Animation(pos_fixed=(234, 400), duration=settings['seed_drop_rate'] * 2.0)
     a.bind(on_complete=animate_ai_start_finished)
     a.start(seeds.ai_face)
 
@@ -1027,7 +1029,8 @@ def animate_ai_start_finished(*args, **kwargs):
 
 
 def animate_ai_end(display):
-    a = Animation(pos_fixed=(0, 1080)) + Animation(pos_fixed=(-1000, 2401), duration=0.5)
+    a = Animation(pos_fixed=(0, 1080), duration=settings['seed_drop_rate'])
+    a += Animation(pos_fixed=(-1000, 2401), duration=0.2)
     a.start(seeds.ai_face)
 
 
@@ -1053,6 +1056,7 @@ class HandSeedAnimation(object):
             self.hand = seeds.user_hand
         else:
             self.hand = seeds.ai_hand
+        self.speed = settings["seed_drop_rate"]
         self.play_one_step(None, None)
 
     def play_one_step(self, sequence, widget):
@@ -1087,19 +1091,19 @@ class HandSeedAnimation(object):
             if step['action'] == "scoop":
                 hand_animation = Animation(
                     pos_fixed=GameScreen.PITS[pit]["pos"],
-                    duration=settings['seed_drop_rate'],
+                    duration=self.speed,
                     t='in_out_sine'
                 )
             elif step['action'] == "drop":
                 hand_animation = Animation(
                     pos_fixed=GameScreen.PITS[pit]["pos"],
-                    duration=settings['seed_drop_rate'],
+                    duration=self.speed,
                     t='in_out_sine'
                 )
             elif step['action'] == "drop_all":
                 hand_animation = Animation(
                     pos_fixed=GameScreen.PITS[pit]["pos"],
-                    duration=settings['seed_drop_rate'],
+                    duration=self.speed,
                     t='in_out_sine'
                 )
             elif step['action'] == "steal":
@@ -1109,6 +1113,7 @@ class HandSeedAnimation(object):
             elif step['action'] == "game_over":
                 status_bar.say(_("Handling End of Game"))
             elif step['action'] == "setting_up":
+                self.speed = 0.15  # override speed if setting up
                 if self.restoration:
                     status_bar.say(_("Restoring Last Game"))
                 else:
@@ -1118,14 +1123,14 @@ class HandSeedAnimation(object):
                     status_bar.done()
                 hand_animation = Animation(
                     pos_fixed=GameScreen.PITS[pit]["out-pos"],
-                    duration=settings['seed_drop_rate'],
+                    duration=self.speed,
                     t='in_out_sine'
                 )
             elif step['action'] == "home":
                 status_bar.done()
                 hand_animation = Animation(
                     pos_fixed=GameScreen.HANDS[self.nplayer]['pos'],
-                    duration=settings['seed_drop_rate'],
+                    duration=self.speed,
                     t='in_out_sine'
                 )
             # update_numbers
@@ -1274,7 +1279,7 @@ class AnitmateUserChoiceState(State):
                 self.ref["game"].usermove_finish_simulation()
                 self.ref["game"].animated_play_move(self.ref['choices_so_far'])
                 return self.change_state("start_turn")
-            status_bar.say(_("Landed in store. Play again."), wait_on_player=True)
+            status_bar.say(_("Landed in store. Continue turn."), wait_on_player=True)
             return self.change_state("wait_for_pit")
         if input_name == "request_new_game":
             self.change_state("init_game")
