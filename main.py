@@ -26,12 +26,12 @@ from gameengine import KalahGame
 from characters import AI_LIST
 from coordinates import PIT_ARRANGEMENT, SEED_DICT, HAND_FOCUS
 
-from params import target_platform, target_language, img_dir
+from params import target_platform, img_dir
 
 if platform=="android":
     import runnable
 
-__version__ = u"0.0.20"
+__version__ = u"0.0.21"
 
 t = gettext.translation('pskalah', 'locale', fallback=True)
 _ = t.ugettext
