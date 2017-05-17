@@ -5,6 +5,7 @@
 #:import update_setting __main__.update_setting
 #:import visual_settings __main__.visual_settings
 #:import _ __main__._
+#:import img_dir __main__.img_dir
 
 AppScreenManager:
     transition: NoTransition()
@@ -18,22 +19,22 @@ AppScreenManager:
     name: "settings_opponent_screen"
     FixedLayout:
         Image:
-            source: 'assets/img/settings-background.png'
+            source: img_dir + '/settings-background.png'
             pos_fixed: (0, 0)
             spot_fixed: ((2400 - 1920)/2, (2400 - 1080)/2)
             size_fixed: (2400, 2400)
         Button:
-            background_normal: 'assets/img/not-rules.png'
+            background_normal: img_dir + '/not-rules.png'
             pos_fixed: (-190, 478)
             size_fixed: (498, 218)
             on_release: app.jump_to_screen("settings_rules_screen")
         Button:
-            background_normal: 'assets/img/not-screen.png'
+            background_normal: img_dir + '/not-screen.png'
             pos_fixed: (-190, 275)
             size_fixed: (498, 205)
             on_release: app.jump_to_screen("settings_screen_screen")
         Button:
-            background_normal: 'assets/img/not-sound.png'
+            background_normal: img_dir + '/not-sound.png'
             pos_fixed: (-191, -14)
             size_fixed: (499, 289)
             on_release: app.jump_to_screen("settings_sound_screen")
@@ -41,7 +42,7 @@ AppScreenManager:
             id: resume_game
             pos_fixed: (1300, 0)
             size_fixed: (250, 100)
-            background_normal: 'assets/img/blank-wood-button.png'
+            background_normal: img_dir + '/blank-wood-button.png'
             font_size_fixed: 64
             text: "Resume"
             color: (101/255.0, 244/255.0, 66/255.0, 1)
@@ -49,7 +50,7 @@ AppScreenManager:
         Image:
             pos_fixed: (1580, -20)
             size_fixed: (340, 340)
-            source: 'assets/img/start-button-bright.png'
+            source: img_dir + '/start-button-bright.png'
         Button:
             id: start_game_wrapper
             pos_fixed: (1580, -20)
@@ -59,22 +60,22 @@ AppScreenManager:
             font_size_fixed: 56
             color: (0, 0, 0, 1)
             background_color: [1, 1, 1, 1]
-            background_normal: 'assets/img/start-button.png'
+            background_normal: img_dir + '/start-button.png'
         Image:
             id: ai_face_image
             pos_fixed: (1920-410+55, 1080-417+58)
             size_fixed: (300, 300)
-            source: 'assets/img/blue3.png'
+            source: img_dir + '/blue3.png'
         Image:
             pos_fixed: (1920-410, 1080-417)
             size_fixed: (410, 417)
-            source: 'assets/img/picture-frame.png'
+            source: img_dir + '/picture-frame.png'
         Button:
             text: _("Learn How to Play\n(YouTube video)")
             pos_fixed: (1920 - 410, 1080 - 417 - 300)
             size_fixed: (410, 150)
             color: (0, 0, 0, 1)
-            background_normal: 'assets/img/youtube-url.png'
+            background_normal: img_dir + '/youtube-url.png'
             font_size_fixed: 56
             on_release: root.launch_url()
         Button:
@@ -82,7 +83,7 @@ AppScreenManager:
             pos_fixed: (1920 - 410, 1080 - 417 - 125)
             size_fixed: (200, 100)
             color: (0, 0, 0, 1)
-            background_normal: 'assets/img/youtube-url.png'
+            background_normal: img_dir + '/youtube-url.png'
             font_size_fixed: 56
             on_release: root.ids.stats_popup.active = True
         Label:
@@ -127,7 +128,7 @@ AppScreenManager:
             id: prev_ai
             pos_fixed: (400, 0)
             size_fixed: (200, 200)
-            background_normal: 'assets/img/prev-button.png'
+            background_normal: img_dir + '/prev-button.png'
             on_release: root.previous_ai()
         Label:
             id: choose_msg
@@ -142,7 +143,7 @@ AppScreenManager:
             id: choose_ai
             pos_fixed: (700, 0)
             size_fixed: (250, 250)
-            background_normal: 'assets/img/ai-select-button.png'
+            background_normal: img_dir + '/ai-select-button.png'
             font_size_fixed: 56
             text: ""
             color: (101/255.0, 244/255.0, 66/255.0, 1)
@@ -151,7 +152,7 @@ AppScreenManager:
             id: next_ai
             pos_fixed: (1050, 0)
             size_fixed: (200, 200)
-            background_normal: 'assets/img/next-button.png'
+            background_normal: img_dir + '/next-button.png'
             on_release: root.next_ai()
         FixedPopup:
             id: stats_popup
@@ -175,22 +176,22 @@ AppScreenManager:
     name: "settings_rules_screen"
     FixedLayout:
         Image:
-            source: 'assets/img/settings-background.png'
+            source: img_dir + '/settings-background.png'
             pos_fixed: (0, 0)
             spot_fixed: ((2400 - 1920)/2, (2400 - 1080)/2)
             size_fixed: (2400, 2400)
         Button:
-            background_normal: 'assets/img/not-opponent.png'
+            background_normal: img_dir + '/not-opponent.png'
             pos_fixed: (-184, 698)
             size_fixed: (498, 226)
             on_release: app.jump_to_screen("settings_opponent_screen")
         Button:
-            background_normal: 'assets/img/not-screen.png'
+            background_normal: img_dir + '/not-screen.png'
             pos_fixed: (-190, 275)
             size_fixed: (498, 205)
             on_release: app.jump_to_screen("settings_screen_screen")
         Button:
-            background_normal: 'assets/img/not-sound.png'
+            background_normal: img_dir + '/not-sound.png'
             pos_fixed: (-191, -14)
             size_fixed: (499, 289)
             on_release: app.jump_to_screen("settings_sound_screen")
@@ -198,7 +199,7 @@ AppScreenManager:
             id: resume_game
             pos_fixed: (1300, 0)
             size_fixed: (250, 100)
-            background_normal: 'assets/img/blank-wood-button.png'
+            background_normal: img_dir + '/blank-wood-button.png'
             font_size_fixed: 64
             text: _("Resume")
             color: (101/255.0, 244/255.0, 66/255.0, 1)
@@ -251,8 +252,8 @@ AppScreenManager:
                 fixed_font_size: 64
                 selections: visual_settings["randomness_rule"]
                 color: (0, 0, 0, 1)
-                background_selected: "assets/img/selected.png"
-                background_normal: "assets/img/not-selected.png"
+                background_selected: img_dir + "/selected.png"
+                background_normal: img_dir + "/not-selected.png"
                 on_selection:
                     update_setting("randomness_rule", self.selected)
                     root.ids.randomness_rule_popup.active = False
@@ -271,8 +272,8 @@ AppScreenManager:
                 size_fixed: (1400, 192*2)
                 selections: visual_settings["who_plays_first"]
                 color: (0, 0, 0, 1)
-                background_selected: "assets/img/selected.png"
-                background_normal: "assets/img/not-selected.png"
+                background_selected: img_dir + "/selected.png"
+                background_normal: img_dir + "/not-selected.png"
                 on_selection:
                     update_setting("who_plays_first", self.selected)
                     root.ids.who_first_popup.active = False
@@ -291,8 +292,8 @@ AppScreenManager:
                 size_fixed: (1400, 192*4)
                 selections: visual_settings["seeds_per_house_selection"]
                 color: (0, 0, 0, 1)
-                background_selected: "assets/img/selected.png"
-                background_normal: "assets/img/not-selected.png"
+                background_selected: img_dir + "/selected.png"
+                background_normal: img_dir + "/not-selected.png"
                 on_selection:
                     update_setting("seeds_per_house_selection", self.selected)
                     root.ids.seeds_per_house_selection_popup.active = False
@@ -311,8 +312,8 @@ AppScreenManager:
                 size_fixed: (1400, 192*3)
                 selections: visual_settings["capture_rule"]
                 color: (0, 0, 0, 1)
-                background_selected: "assets/img/selected.png"
-                background_normal: "assets/img/not-selected.png"
+                background_selected: img_dir + "/selected.png"
+                background_normal: img_dir + "/not-selected.png"
                 on_selection:
                     update_setting("capture_rule", self.selected)
                     root.ids.capture_rule_popup.active = False
@@ -331,8 +332,8 @@ AppScreenManager:
                 size_fixed: (1400, 192*4)
                 selections: visual_settings["eog_rule"]
                 color: (0, 0, 0, 1)
-                background_selected: "assets/img/selected.png"
-                background_normal: "assets/img/not-selected.png"
+                background_selected: img_dir + "/selected.png"
+                background_normal: img_dir + "/not-selected.png"
                 on_selection:
                     update_setting("eog_rule", self.selected)
                     root.ids.eog_rule_popup.active = False
@@ -346,22 +347,22 @@ AppScreenManager:
     name: "settings_screen_screen"
     FixedLayout:
         Image:
-            source: 'assets/img/settings-background.png'
+            source: img_dir + '/settings-background.png'
             pos_fixed: (0, 0)
             spot_fixed: ((2400 - 1920)/2, (2400 - 1080)/2)
             size_fixed: (2400, 2400)
         Button:
-            background_normal: 'assets/img/not-opponent.png'
+            background_normal: img_dir + '/not-opponent.png'
             pos_fixed: (-184, 698)
             size_fixed: (498, 226)
             on_release: app.jump_to_screen("settings_opponent_screen")
         Button:
-            background_normal: 'assets/img/not-rules.png'
+            background_normal: img_dir + '/not-rules.png'
             pos_fixed: (-190, 478)
             size_fixed: (498, 218)
             on_release: app.jump_to_screen("settings_rules_screen")
         Button:
-            background_normal: 'assets/img/not-sound.png'
+            background_normal: img_dir + '/not-sound.png'
             pos_fixed: (-191, -14)
             size_fixed: (499, 289)
             on_release: app.jump_to_screen("settings_sound_screen")
@@ -369,7 +370,7 @@ AppScreenManager:
             id: resume_game
             pos_fixed: (1300, 0)
             size_fixed: (250, 100)
-            background_normal: 'assets/img/blank-wood-button.png'
+            background_normal: img_dir + '/blank-wood-button.png'
             font_size_fixed: 64
             text: "Resume"
             color: (101/255.0, 244/255.0, 66/255.0, 1)
@@ -380,7 +381,7 @@ AppScreenManager:
             text: "New Game"
             on_release: app.start_new_game()
             font_size_fixed: 64
-            background_normal: 'assets/img/blank-wood-button.png'
+            background_normal: img_dir + '/blank-wood-button.png'
             color: (101/255.0, 244/255.0, 66/255.0, 1)
         FixedSimpleMenu:
             id: screen_screen_menu
@@ -423,8 +424,8 @@ AppScreenManager:
                 size_fixed: (1400, 192*2)
                 selections: visual_settings['board_choice']
                 color: (0, 0, 0, 1)
-                background_selected: "assets/img/selected.png"
-                background_normal: "assets/img/not-selected.png"
+                background_selected: img_dir + "/selected.png"
+                background_normal: img_dir + "/not-selected.png"
                 on_selection:
                     update_setting("board_choice", self.selected)
                     root.ids.board_choice_popup.active = False
@@ -443,8 +444,8 @@ AppScreenManager:
                 size_fixed: (1400, 192*2)
                 selections: visual_settings['background']
                 color: (0, 0, 0, 1)
-                background_selected: "assets/img/selected.png"
-                background_normal: "assets/img/not-selected.png"
+                background_selected: img_dir + "/selected.png"
+                background_normal: img_dir + "/not-selected.png"
                 on_selection:
                     update_setting("background", self.selected)
                     root.ids.background_popup.active = False
@@ -463,8 +464,8 @@ AppScreenManager:
                 size_fixed: (1400, 192*3)
                 selections: visual_settings['seed_choice']
                 color: (0, 0, 0, 1)
-                background_selected: "assets/img/selected.png"
-                background_normal: "assets/img/not-selected.png"
+                background_selected: img_dir + "/selected.png"
+                background_normal: img_dir + "/not-selected.png"
                 on_selection:
                     update_setting("seed_choice", self.selected)
                     root.ids.seed_choice_popup.active = False
@@ -483,8 +484,8 @@ AppScreenManager:
                 size_fixed: (1400, 192*3)
                 selections: visual_settings['animation_speed_choice']
                 color: (0, 0, 0, 1)
-                background_selected: "assets/img/selected.png"
-                background_normal: "assets/img/not-selected.png"
+                background_selected: img_dir + "/selected.png"
+                background_normal: img_dir + "/not-selected.png"
                 on_selection:
                     update_setting("animation_speed_choice", self.selected)
                     root.ids.animation_speed_popup.active = False
@@ -503,8 +504,8 @@ AppScreenManager:
                 size_fixed: (1400, 192*2)
                 selections: visual_settings['show_center_message_choice']
                 color: (0, 0, 0, 1)
-                background_selected: "assets/img/selected.png"
-                background_normal: "assets/img/not-selected.png"
+                background_selected: img_dir + "/selected.png"
+                background_normal: img_dir + "/not-selected.png"
                 on_selection:
                     update_setting("show_center_message_choice", self.selected)
                     root.ids.show_center_message_popup.active = False
@@ -518,22 +519,22 @@ AppScreenManager:
     name: "settings_sound_screen"
     FixedLayout:
         Image:
-            source: 'assets/img/settings-background.png'
+            source: img_dir + '/settings-background.png'
             pos_fixed: (0, 0)
             spot_fixed: ((2400 - 1920)/2, (2400 - 1080)/2)
             size_fixed: (2400, 2400)
         Button:
-            background_normal: 'assets/img/not-opponent.png'
+            background_normal: img_dir + '/not-opponent.png'
             pos_fixed: (-184, 698)
             size_fixed: (498, 226)
             on_release: app.jump_to_screen("settings_opponent_screen")
         Button:
-            background_normal: 'assets/img/not-rules.png'
+            background_normal: img_dir + '/not-rules.png'
             pos_fixed: (-190, 478)
             size_fixed: (498, 218)
             on_release: app.jump_to_screen("settings_rules_screen")
         Button:
-            background_normal: 'assets/img/not-screen.png'
+            background_normal: img_dir + '/not-screen.png'
             pos_fixed: (-190, 275)
             size_fixed: (498, 205)
             on_release: app.jump_to_screen("settings_screen_screen")
@@ -541,7 +542,7 @@ AppScreenManager:
             id: resume_game
             pos_fixed: (1300, 0)
             size_fixed: (250, 100)
-            background_normal: 'assets/img/blank-wood-button.png'
+            background_normal: img_dir + '/blank-wood-button.png'
             font_size_fixed: 64
             text: "Resume"
             color: (101/255.0, 244/255.0, 66/255.0, 1)
@@ -549,15 +550,11 @@ AppScreenManager:
         Button:
             pos_fixed: (1600, 0)
             size_fixed: (300, 100)
-            background_normal: 'assets/img/blank-wood-button.png'
+            background_normal: img_dir + '/blank-wood-button.png'
             text: "New Game"
             on_release: app.start_new_game()
             font_size_fixed: 64
             color: (101/255.0, 244/255.0, 66/255.0, 1)
-        #Image:
-        #    pos_fixed: (400, 1080-500)
-        #    size_fixed: (1400, 500)
-        #    source: 'assets/img/link-background.png'
         Label:
             pos_fixed: (400, 1080-125)
             size_fixed: (1400, 125)
@@ -613,8 +610,8 @@ AppScreenManager:
                 size_fixed: (1400, 192*4)
                 selections: visual_settings['notification_volume']
                 color: (0, 0, 0, 1)
-                background_selected: "assets/img/selected.png"
-                background_normal: "assets/img/not-selected.png"
+                background_selected: img_dir + "/selected.png"
+                background_normal: img_dir + "/not-selected.png"
                 on_selection:
                     update_setting("notification_volume", self.selected)
                     root.ids.notification_volume_popup.active = False
@@ -633,8 +630,8 @@ AppScreenManager:
                 size_fixed: (1400, 192*4)
                 selections: visual_settings['seed_volume']
                 color: (0, 0, 0, 1)
-                background_selected: "assets/img/selected.png"
-                background_normal: "assets/img/not-selected.png"
+                background_selected: img_dir + "/selected.png"
+                background_normal: img_dir + "/not-selected.png"
                 on_selection:
                     update_setting("seed_volume", self.selected)
                     root.ids.seed_volume_popup.active = False
@@ -650,31 +647,31 @@ AppScreenManager:
         id: game_screen_root
         Image:
             id: game_background
-            source: 'assets/img/green-background.png'
+            source: img_dir + '/green-background.png'
             pos_fixed: (0, 0)
             spot_fixed: ((2400 - 1920)/2, (2400 - 1080)/2)
             size_fixed: (2400, 2400)
         Image:
             id: board_image
-            source: 'assets/img/walnut-board.png'
+            source: img_dir + '/walnut-board.png'
             pos_fixed: (0, 0)
             pos_fixed: (0, 1080 - 800 - 160)
             size_fixed: (1920, 800)
         Button:
             id: settings_button
-            background_normal: 'assets/img/gear.png'
+            background_normal: img_dir + '/gear.png'
             pos_fixed: (1720, 880)
             size_fixed: (200, 200)
             on_release: app.jump_to_screen("settings_opponent_screen")
         Image:
             id: message_background
-            source: 'assets/img/message-background.png'
+            source: img_dir + '/message-background.png'
             pos_fixed: (330, 540-80)
             size_fixed: (1260, 160)
         Image:
             id: message_down_button
             font_size_fixed: 80
-            source: 'assets/img/arrow-not.png'
+            source: img_dir + '/arrow-not.png'
             pos_fixed: (0, 0)
             size_fixed: (160, 160)
         FixedPopup:
@@ -682,7 +679,7 @@ AppScreenManager:
             active_pos_fixed: (1400-25, 490-25)
             size_fixed: (150, 150)
             Image:
-                source: 'assets/img/spinner-background.png'
+                source: img_dir + '/spinner-background.png'
                 active_pos_fixed: (1400-25, 490-25)
                 size_fixed: (150, 150)
         ProgressSpinner:
@@ -865,7 +862,7 @@ AppScreenManager:
                 active_pos_fixed: (1200-100, 400 + 40 - 100 - 50)
                 size_fixed: (400, 100)
                 color: (0, 0, 0, 1)
-                background_normal: 'assets/img/youtube-url.png'
+                background_normal: img_dir + '/youtube-url.png'
                 font_size_fixed: 56
                 text: "Play ?"
                 on_release: app.upgrade_opponent()

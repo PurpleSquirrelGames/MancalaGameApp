@@ -26,6 +26,8 @@ from gameengine import KalahGame
 from characters import AI_LIST
 from coordinates import PIT_ARRANGEMENT, SEED_DICT, HAND_FOCUS
 
+from params import target_platform, target_language, img_dir
+
 if platform=="android":
     import runnable
 
@@ -273,10 +275,10 @@ def update_setting(setting_name, value):
             set_text(setting_name, visual_settings[setting_name][value])
     if setting_name in ["board_choice", "background"]:
         wood = ["walnut", "birch"][settings["board_choice"]]
-        filename = 'assets/img/{}-board.png'.format(wood)
+        filename = img_dir + '/{}-board.png'.format(wood)
         app.root.screens[GAME_SCREEN].ids.board_image.source = filename
         color = ["green", "white"][settings["background"]]
-        filename = 'assets/img/{}-background.png'.format(color)
+        filename = img_dir + '/{}-background.png'.format(color)
         app.root.screens[GAME_SCREEN].ids.game_background.source = filename
         set_current_sound_combo()
     if setting_name == "animation_speed_choice":
@@ -333,7 +335,7 @@ def restore_game():
 
 def enable_resume_game():
     global current
-    p = "assets/img/blank-wood-button.png"
+    p = img_dir + "/blank-wood-button.png"
     t = _("Resume")
     app.root.screens[SETTINGS_OPPONENT_SCREEN].ids.resume_game.background_normal = p
     app.root.screens[SETTINGS_RULES_SCREEN].ids.resume_game.background_normal = p
@@ -348,7 +350,7 @@ def enable_resume_game():
 
 def disable_resume_game():
     global current
-    p = "assets/img/invisible.png"
+    p = img_dir + "/invisible.png"
     app.root.screens[SETTINGS_OPPONENT_SCREEN].ids.resume_game.background_normal = p
     app.root.screens[SETTINGS_RULES_SCREEN].ids.resume_game.background_normal = p
     app.root.screens[SETTINGS_SCREEN_SCREEN].ids.resume_game.background_normal = p
@@ -553,7 +555,7 @@ class SettingsOpponentScreen(Screen):
         self.ids.ai_play_style.text = "[i]" + c['tagline'] + "[/i]"
         self.ids.ai_name.text = c['name']
         self.ids.ai_rank.text = format("{} of 12").format(c['rank'])
-        self.ids.ai_face_image.source = "assets/img/ai-pic-{:02d}.png".format(c['index'])
+        self.ids.ai_face_image.source = img_dir + "/ai-pic-{:02d}.png".format(c['index'])
         if ai_chosen > (settings['best_level'] + 1):
             self.ids.choose_ai.text = _("not\navailable")
             n = AI_LIST[settings['best_level'] + 1]
@@ -933,7 +935,7 @@ class Seeds(object):
             self.seed_ref.append(seed)
         hand = Image()
         hand.id = "user_hand"
-        hand.source = "assets/img/user-hand-01.png"
+        hand.source = img_dir + "/user-hand-01.png"
         hand.pos_fixed = GameScreen.HANDS[USER]['pos']
         hand.spot_fixed = (300, 1500 - 128)
         hand.size_fixed = (600, 1500)
@@ -941,7 +943,7 @@ class Seeds(object):
         self.user_hand = hand
         hand = Image()
         hand.id = "ai_hand"
-        hand.source = "assets/img/ai-hand-01.png"
+        hand.source = img_dir + "/ai-hand-01.png"
         hand.pos_fixed = GameScreen.HANDS[AI]['pos']
         hand.spot_fixed = (340, 128)
         hand.size_fixed = (600, 1500)
@@ -949,7 +951,7 @@ class Seeds(object):
         self.ai_hand = hand
         face = Image()
         face.id = "ai_picture"
-        face.source = "assets/img/ai-pic-01.png"
+        face.source = img_dir + "/ai-pic-01.png"
         face.pos_fixed = (-1000, 2401)
         face.size_fixed = (300, 300)
         self.ai_face = face
@@ -958,8 +960,8 @@ class Seeds(object):
 
     def change_ai_pictures(self, rank):
         global HAND_FOCUS
-        self.ai_hand.source = "assets/img/ai-hand-{}.png".format(rank)
-        self.ai_face.source = "assets/img/ai-pic-{}.png".format(rank)
+        self.ai_hand.source = img_dir + "/ai-hand-{}.png".format(rank)
+        self.ai_face.source = img_dir + "/ai-pic-{}.png".format(rank)
         i = int(rank) - 1
         self.ai_hand.spot_fixed = HAND_FOCUS[i]
         # self.ai_hand.size_fixed = (100, 100)  # toggle to force recalc
@@ -1242,7 +1244,7 @@ class StartTurn(State):
 class WaitForPitButtons(State):
 
     def on_entry(self):
-        self.ref["kivy"].message_down_button.source = 'assets/img/arrow-down.png'
+        self.ref["kivy"].message_down_button.source = img_dir + '/arrow-down.png'
         play_waiting_for_player()
         display_board(self.ref['game'].board, self.ref['kivy'])
 
@@ -1269,7 +1271,7 @@ class AnitmateUserChoiceState(State):
         board_prior = copy(self.ref["game"].board)
         self.ref["game"].usermove_simulate_choice(self.ref['choices_so_far'])
         self.animation = HandSeedAnimation(USER, board_prior, self.ref['kivy'])
-        self.ref["kivy"].message_down_button.source = 'assets/img/arrow-not.png'
+        self.ref["kivy"].message_down_button.source = img_dir + '/arrow-not.png'
 
     def input(self, input_name, *args, **kwargs):
         if input_name == "animation_done":
@@ -1300,7 +1302,7 @@ class AIThinkingState(State):
     def on_entry(self):
         global character
         status_bar.say(_("{player_name} is thinking.").format(player_name=character["name"]))
-        self.ref["kivy"].message_down_button.source = 'assets/img/arrow-up.png'
+        self.ref["kivy"].message_down_button.source = img_dir + '/arrow-up.png'
         self.ref['kivy'].wait_on_ai.start_spinning()
         self.ref['kivy'].spinner_background.active = True
         self.animation_finished = False
@@ -1354,7 +1356,7 @@ class EndOfGameDisplayState(State):
         winner = self.ref['game'].get_winner()
         msg = [_("Tie Game."), _("You won!"), _("{player_name} won.").format(player_name=character["name"])][winner]
         status_bar.say(msg, force_show=True)
-        self.ref["kivy"].message_down_button.source = 'assets/img/arrow-not.png'
+        self.ref["kivy"].message_down_button.source = img_dir + '/arrow-not.png'
         self.ref["kivy"].eog_new_game_button.active = True
         update_stats_at_eog()
         if (winner == USER) or current['cheat']:
