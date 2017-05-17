@@ -97,6 +97,9 @@ bin/
 _source_work/marketing
 assets/img/icon.png
 assets/img/pre-splash.png
+assets/img_large/icon.png
+assets/img_large/pre-splash.png
 
 # temp library changes
+libs/garden/
 easyAI/
