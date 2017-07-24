@@ -1,0 +1,598 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: \n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2017-07-23 17:12-0500\n"
+"PO-Revision-Date: 2017-07-23 20:18-0500\n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"X-Generator: Poedit 2.0.2\n"
+"Last-Translator: \n"
+"Language: es_MX\n"
+
+#: main.py:151
+msgid "You play first"
+msgstr "Juegas Primero"
+
+#: main.py:152
+msgid "Opponent (AI) plays first"
+msgstr "El Oponente (AI) juega primero"
+
+#: main.py:161
+msgid "Capture if opposite house has seeds"
+msgstr "Captura si la casa opuesta tiene semillas"
+
+#: main.py:162
+msgid "Always capture (even if opposite empty)"
+msgstr "Siempre captura (aun si el opuesto está vacío)"
+
+#: main.py:163
+msgid "Never allow capture"
+msgstr "Nunca permitir Captura"
+
+#: main.py:166
+msgid "Move seeds to the store/Kalaha on that side"
+msgstr "Mueve las semillas a la tienda/Kalaha en ese lado"
+
+#: main.py:167
+msgid "Move seeds to the player with empty houses"
+msgstr "Mueve las semillas al jugador con casas vacias"
+
+#: main.py:168
+msgid "Move seeds to the player that ended the game"
+msgstr "Mueve las semillas al jugador que haya terminado el juego"
+
+#: main.py:169
+msgid "Leave the seeds in the houses"
+msgstr "Deja las semillas en las casas"
+
+#: main.py:172
+msgid "Nothing is random"
+msgstr "Nada el al azar"
+
+#: main.py:173
+msgid "Randomly choose first move for first player"
+msgstr "Aleatoriamente escoge el primer movimiento para el primer jugador"
+
+#: main.py:174
+msgid "Randomly move a seed on each side at start"
+msgstr "Aleatoriamente mueve una semilla a cada lado al inicio"
+
+#: main.py:177
+msgid "Walnut"
+msgstr "Nuez"
+
+#: main.py:178
+msgid "Birch"
+msgstr "Abedul"
+
+#: main.py:181
+msgid "Green Linen"
+msgstr "Lino Verde"
+
+#: main.py:182
+msgid "White Table"
+msgstr "Mesa Blanca"
+
+#: main.py:185
+msgid "Teal Green Glass Gems"
+msgstr "Gemas de Cristal Verde Trullo"
+
+#: main.py:186
+msgid "Tumbled Pebbles"
+msgstr "Piedras Caídas"
+
+#: main.py:187
+msgid "Black River Rock"
+msgstr "Piedra de Rio Negra"
+
+#: main.py:190
+msgid "Fast"
+msgstr "Rapido"
+
+#: main.py:191 main.py:201 main.py:207
+msgid "Medium"
+msgstr "Medio"
+
+#: main.py:192
+msgid "Slow"
+msgstr "Lento"
+
+#: main.py:195
+msgid "No"
+msgstr "No"
+
+#: main.py:196
+msgid "Yes"
+msgstr "Si"
+
+#: main.py:199 main.py:205
+msgid "Mute"
+msgstr "Silenciar"
+
+#: main.py:200 main.py:206
+msgid "Soft"
+msgstr "Suave"
+
+#: main.py:202 main.py:208
+msgid "Loud"
+msgstr "Fuerte"
+
+#: main.py:233
+#, python-brace-format
+msgid ""
+"play\n"
+"{name}"
+msgstr ""
+"jugar\n"
+"{name}"
+
+#: main.py:339 mancala_app.kv:204
+msgid "Resume"
+msgstr "Resumir"
+
+#: main.py:560
+msgid ""
+"not\n"
+"available"
+msgstr ""
+"no\n"
+"disponible"
+
+#: main.py:562
+#, python-brace-format
+msgid "You must first defeat {name} ({level})."
+msgstr "Debes derrotar primero {name} ({level})."
+
+#: main.py:568
+#, python-brace-format
+msgid ""
+"You must first defeat {first_opponent_name} ({first_level}) to "
+"{second_opponent_name} ({second_level})."
+msgstr ""
+"Debes derrotar primero a {first_opponent_name} ({first_level}) para "
+"{second_opponent_name} ({second_level})."
+
+#: main.py:578
+msgid "You are currently playing this opponent."
+msgstr "Estas jugando actualmente con este oponente."
+
+#: main.py:579
+msgid "(current)"
+msgstr "(Actual)"
+
+#: main.py:582
+msgid "Choose"
+msgstr "Escoger"
+
+#: main.py:588
+#, python-brace-format
+msgid "{player_name}, rank {rank_number}"
+msgstr "{player_name}, rango {rank_number}"
+
+#: main.py:594
+#, python-brace-format
+msgid "{count} game played"
+msgid_plural "{count} games played"
+msgstr[0] "{count} juego jugado"
+msgstr[1] "{count} juegos jugados"
+
+#: main.py:600
+#, python-brace-format
+msgid "   {count} game won by you"
+msgid_plural "   {count} games won by you"
+msgstr[0] "   {count} juego ganado por ti"
+msgstr[1] "   {count} juegos ganados por ti"
+
+#: main.py:606
+#, python-brace-format
+msgid "   {count} game tied"
+msgid_plural "   {count} games tied"
+msgstr[0] "   {count} juego empatado"
+msgstr[1] "   {count} juegos empatados"
+
+#: main.py:613
+#, python-brace-format
+msgid "   {count} game won by {player_name}"
+msgid_plural "   {count} games won by {player_name}"
+msgstr[0] "   {count} juego ganado por {player_name}"
+msgstr[1] "   {count} juegos ganados por {player_name}"
+
+#: main.py:618
+#, python-brace-format
+msgid ""
+"tech details: algorithm {algorithm_name}\n"
+"  look-ahead {number} with fitness of \"{desc}\""
+msgstr ""
+"detalles técnicos: algoritmo {algorithm_name}\n"
+" mira adelante {number} con aptitud de \"{desc}\""
+
+#: main.py:1112
+msgid "Capture!"
+msgstr "¡Captura!"
+
+#: main.py:1114
+msgid "Randomly Moving Seed"
+msgstr "Semilla Moviéndose Aleatoriamente"
+
+#: main.py:1116
+msgid "Handling End of Game"
+msgstr "Manejando el Fin del Juego"
+
+#: main.py:1120
+msgid "Restoring Last Game"
+msgstr "Restaurar el Ultimo Juego"
+
+#: main.py:1122
+msgid "Setting Up Board"
+msgstr "Configurando Tablero"
+
+#: main.py:1228
+msgid "Playing Randomly Chosen First Move"
+msgstr "Jugando el Primer Nombre Elegido al Azar"
+
+#: main.py:1233
+msgid "Your Turn"
+msgstr "Tu Turno"
+
+#: main.py:1259
+#, python-brace-format
+msgid "Playing house {house_number}"
+msgstr "Casa Jugando {house_number}"
+
+#: main.py:1263
+msgid "Cannot play empty house. Try again."
+msgstr "No se puede jugar en una casa vacía. Intenta de nuevo."
+
+#: main.py:1284
+msgid "Landed in store. Continue turn."
+msgstr "Caiste en una tienda. Continuar turno."
+
+#: main.py:1304
+#, python-brace-format
+msgid "{player_name} is thinking."
+msgstr "{player_name} esta pensando."
+
+#: main.py:1357
+msgid "Tie Game."
+msgstr "Juego Empatado."
+
+#: main.py:1357
+msgid "You won!"
+msgstr "¡Ganaste!"
+
+#: main.py:1357
+#, python-brace-format
+msgid "{player_name} won."
+msgstr "{player_name} ganó."
+
+#: main.py:1367
+msgid "Congratulations!"
+msgstr "¡Felicidades!"
+
+#: main.py:1370
+#, python-brace-format
+msgid "You have successfully defeated {player_name}."
+msgstr "Has derrotado exitosamente a {player_name}."
+
+#: main.py:1373
+#, python-brace-format
+msgid "You can now play {player_name}, a smarter opponent."
+msgstr "Ahora puedes jugar {player_name}, un oponente mas inteligente."
+
+#: main.py:1375
+#, python-brace-format
+msgid "Play {player_name}"
+msgstr "Jugar {player_name}"
+
+#: main.py:1377
+msgid "You have won the game!"
+msgstr "¡Has ganado el juego!"
+
+#: main.py:1378
+msgid "For more challenge, let the opponent go first."
+msgstr "Para un mayor desafío, permite a los oponentes ir primero."
+
+#: characters.py:16
+msgid "simple"
+msgstr "simple"
+
+#: characters.py:17
+msgid "This four-year-old likes to move seeds."
+msgstr "A este niño de cuatro años le gusta mover las semillas."
+
+#: characters.py:18
+msgid "Play is largely random. Very easy to win."
+msgstr "El juego es mayormente al azar. Muy fácil de ganar."
+
+#: characters.py:29 characters.py:42 characters.py:55 characters.py:94
+#: characters.py:133 characters.py:146 characters.py:159
+msgid "balance"
+msgstr "balance"
+
+#: characters.py:30
+msgid "Billy just learned the rules of the game."
+msgstr "Billy acaba de aprender las reglas del juego."
+
+#: characters.py:31
+msgid "Sometimes makes obviously bad moves. Still easy to win against."
+msgstr ""
+"Algunas veces hace movimientos obviamente malos. Aun es fácil de ganar en "
+"contra."
+
+#: characters.py:43
+msgid "Emily is still a novice, but has played multiple times."
+msgstr "Emily aun es una novata, pero ha jugado múltiples veces."
+
+#: characters.py:44
+msgid "Blunt errors are rare, but still easy to win against."
+msgstr "Los errores contundentes son raros, pero aun es fácil ganar en contra."
+
+#: characters.py:56
+msgid "Jacob plays on occasion with friends."
+msgstr "Jacob juega en ocasiones con amigos."
+
+#: characters.py:57
+msgid "Jacob plays okay. Moderate difficulty."
+msgstr "Jacob juega bien. Dificultad Moderada."
+
+#. 1 to 6
+#. 0.0 to 1.0; odds of making mistake
+#: characters.py:67 characters.py:107
+msgid "greed"
+msgstr "avaricia"
+
+#: characters.py:69
+msgid "Emma is determined to win, even if she does not play much."
+msgstr "Emma esta determinada a ganar, aun si ella no juega mucho."
+
+#: characters.py:70
+msgid "Emma is a gambler trying to win big. Moderate difficulty."
+msgstr ""
+"Emma es una apostadora tratando de ganar en grande. Dificultad Moderada."
+
+#: characters.py:81 characters.py:120
+msgid "caution"
+msgstr "precaución"
+
+#: characters.py:82
+msgid ""
+"Matthew plays with friends and family, but is embarrased if he loses by too "
+"much."
+msgstr ""
+"Matthew juega con amigos y familia, pero se avergüenza si pierde demasiado."
+
+#: characters.py:83
+msgid ""
+"Matthew is obsessed with keeping you from getting seeds, even if that makes "
+"the game long. Moderate difficulty."
+msgstr ""
+"Matthew esta obsesionado con evitar que consigas semillas, aun si eso hace "
+"el juego mas largo. Dificultad moderada."
+
+#: characters.py:95
+msgid "Olivia plays regularly but doesn't consider herself a gamer."
+msgstr ""
+"Olivia juega regularmente pero no se considera a ella misma una jugadora."
+
+#: characters.py:96
+msgid "A well-rounded player. Moderate difficulty."
+msgstr "Una jugadora bien balanceada. Dificultad Moderada."
+
+#: characters.py:108
+msgid "William loves to gamble and win big."
+msgstr "William ama apostar y ganar en grande."
+
+#: characters.py:109
+msgid "Smart but concentrates on his own store too much. Moderate difficulty."
+msgstr ""
+"Inteligente pero se concentra en su propia tienda demasiado. Dificultad "
+"moderada."
+
+#: characters.py:121
+msgid "Sam plays a good game and has played all his life."
+msgstr "Sam juega un buen juego y ha jugado toda su vida."
+
+#: characters.py:122
+msgid "Too cautious, but a solid player. High difficulty."
+msgstr "Muy precavido, pero un solido jugado. Alta dificultad."
+
+#: characters.py:134
+msgid "Sandra is very good. Plays regularly."
+msgstr "Sandra es muy buena. Juega regularmente."
+
+#: characters.py:135
+msgid "High difficulty. Errors are very rare."
+msgstr "Alta dificultad. Los errores son muy raros."
+
+#: characters.py:147
+msgid ""
+"An arrogant artificial intelligence.\n"
+"\n"
+"[b]On some devices, R3 UNIT runs very slow.[/b]"
+msgstr ""
+"Una inteligencia artificial arrogante.\n"
+"\n"
+"[b]En algunos dispositivos, la UNIDAD R3 corre muy lento.[/b]"
+
+#: characters.py:148
+msgid "R3 UNIT looks ahead 5 moves. High difficulty."
+msgstr "La UNIDAD R3 ve 5 movimientos adelante. Alta dificultad."
+
+#: characters.py:160
+msgid ""
+"A deep artificial intelligence. ThoughtNet finds interacting with humans "
+"pleasing.\n"
+"\n"
+"[b]On some devices, ThoughtNet runs very slow.[/b]"
+msgstr ""
+"Una profunda inteligencia artificial. ThoughtNet encuentra interactuar con "
+"humanos agradable.\n"
+"\n"
+"[b]En algunos dispositivos, ThoughtNet corre muy lento[/b]"
+
+#: characters.py:161
+msgid "Very high difficulty. It is still possible to win if you go first."
+msgstr "Muy alta dificultad. Aun es posible ganar si vas primero."
+
+#: mancala_app.kv:74
+msgid ""
+"Learn How to Play\n"
+"(YouTube video)"
+msgstr ""
+"Aprende Como Jugar\n"
+"(Video de YouTube)"
+
+#: mancala_app.kv:82
+msgid "Stats"
+msgstr "Estadisticas"
+
+#: mancala_app.kv:172
+msgid "Close"
+msgstr "Cerrar"
+
+#: mancala_app.kv:210 mancala_app.kv:705
+msgid "New Game"
+msgstr "Juego Nuevo"
+
+#: mancala_app.kv:221
+msgid "Who plays first"
+msgstr "Quien juega primero"
+
+#: mancala_app.kv:226
+msgid "Seeds per house"
+msgstr "Semillas por casa"
+
+#: mancala_app.kv:231
+msgid "Capturing if last seed drops into own empty house"
+msgstr "Capturar si la ultima semilla cae en tu propia casa vacía"
+
+#: mancala_app.kv:236
+msgid "At end of game, how to handle remaining seeds"
+msgstr "Al final del juego, como manejar las semillas sobrantes"
+
+#: mancala_app.kv:241
+msgid "Randomness"
+msgstr "Aleatoriedad"
+
+#: mancala_app.kv:263 mancala_app.kv:283 mancala_app.kv:303 mancala_app.kv:323
+#: mancala_app.kv:343 mancala_app.kv:435 mancala_app.kv:455 mancala_app.kv:475
+#: mancala_app.kv:495 mancala_app.kv:515 mancala_app.kv:621 mancala_app.kv:641
+msgid "Cancel"
+msgstr "Cancelar"
+
+#: mancala_app.kv:394
+msgid "Board chosen"
+msgstr "Tablero Elegido"
+
+#: mancala_app.kv:399
+msgid "Background chosen"
+msgstr "Fondo Elegido"
+
+#: mancala_app.kv:404
+msgid "Seed chosen"
+msgstr "Semilla Elegida"
+
+#: mancala_app.kv:409
+msgid "Animated hand speed"
+msgstr "Velocidad de la Mano Animada"
+
+#: mancala_app.kv:414
+msgid "Display of center message on the board"
+msgstr "Pantalla del mensaje central en el tablero"
+
+#. These are titles for people on the Credits screen.
+#: mancala_app.kv:573
+msgid ""
+"Programming:\n"
+"Art:\n"
+"Photography:\n"
+"QA/Testing:\n"
+"Woodworking:"
+msgstr ""
+"Programación:\n"
+"Arte:\n"
+"Fotografía:\n"
+"QA/Pruebas:\n"
+"Trabajo de Madera:"
+
+#. This is a list of people being given credit. Characters in square brackets are for URL references.
+#: mancala_app.kv:583
+msgid ""
+"John Dupuy of [b][ref=ps]Purple Squirrel Games[/ref][/b]\n"
+"Daniel Anthony, cartoonist of [b][ref=art]JODDAS VAPD[/ref][/b]\n"
+"Drew Piester of [b][ref=photo]Drew Piester Photography LLC[/ref][/b]\n"
+"Avi Parshan of [b][ref=qa]Avi Parshan Productions[/ref][/b]\n"
+"John Dupuy (game board available at [b][ref=url]Amazon[/ref][/b])"
+msgstr ""
+"John Dupuy de [b][ref=ps]Purple Squirrel Games[/ref][/b]\n"
+"Daniel Anthony, caricaturista de [b][ref=art]JODDAS VAPD[/ref][/b]\n"
+"Drew Piester de [b][ref=photo]Fotografía Drew Piester LLC[/ref][/b]\n"
+"Avi Parshan de [b][ref=qa]Producciones Avi Parshan[/ref][/b]\n"
+"John Dupuy (tablero de juego disponible en [b][ref=url]Amazon[/ref][/b])"
+
+#: mancala_app.kv:595
+msgid "Notification volume"
+msgstr "Volumen de notificación"
+
+#: mancala_app.kv:600
+msgid "Environmental sound volume (seed drop, etc)"
+msgstr "Volumen de Sonidos Ambientales (caída de semillas, etc.)"
+
+#: googleplaystore:1
+msgid "Kalah Mancala"
+msgstr "Kalah Mancala"
+
+#: googleplaystore:2
+msgid "Play a game of Mancala (Kalah version) with 12 unique opponents."
+msgstr "Jugar un juego de Mancala (versión Kalah) con 12 oponentes únicos."
+
+#: googleplaystore:3
+msgid ""
+"Play 12 unique characters.You will start playing Mancala with Maisy, who "
+"just learned the game, and work your way up to ThoughtNet, an advanced AI "
+"that finds playing mere humans...amusing. Each of the twelve characters have "
+"their own style of play, cautious to greedy, exacting to experimental, ... "
+"each with a mix strategy and tactics. Each time you win against a character, "
+"you can play the next one.Play the way YOU learned to play.There are over "
+"200 different games playable with a Mancala board. This app plays the "
+"version most common in Western Europe and North America: Kalah. But even "
+"with Kalah, many folks learn different house rules. Check out the Rules tab "
+"of the settings screen. You can adjust the Mancala rules to match up with "
+"the way you expect the game to be played.Beautiful play environment.While "
+"the character images are definitely drawings, the rest is based on a real "
+"world Mancala board and \"seeds\" (stones). Choose between two types of wood "
+"and three unique stones. Even the sounds are from real-world recordings of "
+"the wood/stone combinations.No harassing adverts, in-app purchases, or "
+"special permissions.Everything is fully featured as soon as you get the app. "
+"No hidden gotchas anywhere. It is simply a game of Mancala with twelve "
+"unique characters."
+msgstr ""
+"Juega contra 12 personajes únicos. Empezarás jugando Mancala con Maisy, que "
+"acaba de aprender el juego, y trabaja tu camino hasta a ThoughtNet, una IA "
+"avanzada que encuentra jugar contra simples humanos... entretenido. Cada uno "
+"de los doce personajes tienen su propio estilo de juego, de precavidos a "
+"avariciosos, exactos a experimentales, ... cada uno con una mezcla de "
+"estrategia y tácticas. Cada vez que ganes contra un personaje. Podrás jugar "
+"contra el siguiente. Juega del modo que hayas aprendido a jugar. Hay mas de "
+"200 juegos diferentes jugables con un tablero de Mancala. Esta app juega la "
+"versión mas común en Europa del Oeste y Norte América: Kalah. Pero aun con "
+"el Kalah, muchas personas aprenden diferentes reglas de la casa. Revisa la "
+"pestaña de Reglas en la pantalla de opciones. Puedes ajustar las reglas de "
+"Mancala para coincidir con el modo que esperas que se juegue el juego. "
+"Hermoso ambiente de juego. Mientras las imágenes de los personajes "
+"definitivamente son dibujos, el resto esta basado en un tablero Mancala del "
+"mundo real y \"semillas\" (piedras). Elige entre dos tipos de madera y tres "
+"piedras únicas. Hasta los sonidos son de grabaciones del mundo real de "
+"combinaciones madera/piedra. No anuncios acosadores, compras dentro de la "
+"app, o permisos especiales. Todo está totalmente destacado tan pronto como "
+"obtengas la app. Ninguna cosa oculta en ningún lugar. Es simplemente un "
+"juego de Mancala con doce jugadores únicos."
